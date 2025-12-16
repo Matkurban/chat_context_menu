@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('ChatContextMenuWrapper builds and shows menu', (WidgetTester tester) async {
+  testWidgets('ChatContextMenuWrapper builds and shows menu', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -16,12 +18,18 @@ void main() {
                     const Text('Delete'),
                     const Icon(Icons.copy),
                     const Icon(Icons.delete),
-                    ElevatedButton(onPressed: hideMenu, child: const Text('Close')),
+                    ElevatedButton(
+                      onPressed: hideMenu,
+                      child: const Text('Close'),
+                    ),
                   ],
                 );
               },
               widgetBuilder: (context, showMenu) {
-                return GestureDetector(onLongPress: showMenu, child: const Text('Long press me'));
+                return GestureDetector(
+                  onLongPress: showMenu,
+                  child: const Text('Long press me'),
+                );
               },
             ),
           ),

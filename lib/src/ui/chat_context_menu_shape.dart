@@ -16,8 +16,10 @@ class ChatContextMenuShape extends ShapeBorder {
   });
 
   @override
-  EdgeInsetsGeometry get dimensions =>
-      EdgeInsets.only(top: isArrowUp ? arrowHeight : 0, bottom: isArrowUp ? 0 : arrowHeight);
+  EdgeInsetsGeometry get dimensions => EdgeInsets.only(
+    top: isArrowUp ? arrowHeight : 0,
+    bottom: isArrowUp ? 0 : arrowHeight,
+  );
 
   @override
   Path getInnerPath(Rect rect, {TextDirection? textDirection}) {

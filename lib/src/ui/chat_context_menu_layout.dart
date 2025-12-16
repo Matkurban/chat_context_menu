@@ -2,9 +2,18 @@ import 'package:flutter/material.dart';
 
 class ChatContextMenuLayout extends StatefulWidget {
   final Rect widgetRect;
-  final Widget Function(BuildContext context, double? arrowOffset, bool isArrowUp) childBuilder;
+  final Widget Function(
+    BuildContext context,
+    double? arrowOffset,
+    bool isArrowUp,
+  )
+  childBuilder;
 
-  const ChatContextMenuLayout({super.key, required this.widgetRect, required this.childBuilder});
+  const ChatContextMenuLayout({
+    super.key,
+    required this.widgetRect,
+    required this.childBuilder,
+  });
 
   @override
   State<ChatContextMenuLayout> createState() => _ChatContextMenuLayoutState();
@@ -24,7 +33,8 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
   }
 
   void _calculatePosition() {
-    final RenderBox? renderBox = _childKey.currentContext?.findRenderObject() as RenderBox?;
+    final RenderBox? renderBox =
+        _childKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox == null) return;
 
     final Size childSize = renderBox.size;
@@ -36,7 +46,8 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
     final double bottomSpace = screenSize.height - widgetRect.bottom;
     final double topSpace = widgetRect.top;
 
-    final double totalHeight = childSize.height + arrowHeight + 10; // 10 padding
+    final double totalHeight =
+        childSize.height + arrowHeight + 10; // 10 padding
 
     bool isArrowUp = true;
     double y = widgetRect.bottom + 10;
@@ -70,7 +81,8 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
     // We assume border radius is around 12.0, so keep arrow away from corners
     final double safeMargin = 12.0 + 6.0; // Radius + half arrow width
     if (arrowOffset < safeMargin) arrowOffset = safeMargin;
-    if (arrowOffset > childSize.width - safeMargin) arrowOffset = childSize.width - safeMargin;
+    if (arrowOffset > childSize.width - safeMargin)
+      arrowOffset = childSize.width - safeMargin;
 
     if (mounted) {
       setState(() {
@@ -90,7 +102,10 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
           Positioned(
             top: 0,
             left: 0,
-            child: Container(key: _childKey, child: widget.childBuilder(context, null, false)),
+            child: Container(
+              key: _childKey,
+              child: widget.childBuilder(context, null, false),
+            ),
           ),
         ],
       );

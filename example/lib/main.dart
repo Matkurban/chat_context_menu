@@ -75,7 +75,10 @@ class _ChatScreenState extends State<ChatScreen> {
                     height: 200,
                     color: Colors.green,
                     child: Center(
-                      child: ElevatedButton(onPressed: hideMenu, child: const Text('Close')),
+                      child: ElevatedButton(
+                        onPressed: hideMenu,
+                        child: const Text('Close'),
+                      ),
                     ),
                   );
                 },
@@ -83,12 +86,20 @@ class _ChatScreenState extends State<ChatScreen> {
                   return GestureDetector(
                     onLongPress: showMenu,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
                       decoration: BoxDecoration(
-                        color: isMe ? Colors.blue.shade100 : Colors.grey.shade200,
+                        color: isMe
+                            ? Colors.blue.shade100
+                            : Colors.grey.shade200,
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: Text(_messages[index], style: const TextStyle(fontSize: 16)),
+                      child: Text(
+                        _messages[index],
+                        style: const TextStyle(fontSize: 16),
+                      ),
                     ),
                   );
                 },
