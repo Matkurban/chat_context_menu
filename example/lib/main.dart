@@ -69,7 +69,16 @@ class _ChatScreenState extends State<ChatScreen> {
                 barrierColor: Colors.transparent,
                 backgroundColor: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                menuItems: Container(width: 300, height: 200, color: Colors.green),
+                menuBuilder: (context, hideMenu) {
+                  return Container(
+                    width: 300,
+                    height: 200,
+                    color: Colors.green,
+                    child: Center(
+                      child: ElevatedButton(onPressed: hideMenu, child: const Text('Close')),
+                    ),
+                  );
+                },
                 widgetBuilder: (context, showMenu) {
                   return GestureDetector(
                     onLongPress: showMenu,

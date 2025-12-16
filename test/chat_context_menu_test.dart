@@ -9,7 +9,17 @@ void main() {
         home: Scaffold(
           body: Center(
             child: ChatContextMenuWrapper(
-              menuItems: SizedBox(),
+              menuBuilder: (context, hideMenu) {
+                return Column(
+                  children: [
+                    const Text('Copy'),
+                    const Text('Delete'),
+                    const Icon(Icons.copy),
+                    const Icon(Icons.delete),
+                    ElevatedButton(onPressed: hideMenu, child: const Text('Close')),
+                  ],
+                );
+              },
               widgetBuilder: (context, showMenu) {
                 return GestureDetector(onLongPress: showMenu, child: const Text('Long press me'));
               },

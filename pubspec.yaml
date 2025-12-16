@@ -5,6 +5,12 @@ homepage: https://github.com/Matkurban/chat_context_menu.git
 repository: https://github.com/Matkurban/chat_context_menu.git
 topics: [ widget,chat,context_menu,chat_context_menu ]
 
+screenshots:
+  - description: 'show'
+    path: doc/screenshot/img.png
+  - description: 'show'
+    path: doc/screenshot/img_1.png
+
 environment:
   sdk: ^3.10.0
   flutter: ">=3.38.1"

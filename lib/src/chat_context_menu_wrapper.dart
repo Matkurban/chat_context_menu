@@ -6,14 +6,14 @@ class ChatContextMenuWrapper extends StatefulWidget {
   const ChatContextMenuWrapper({
     super.key,
     required this.widgetBuilder,
-    required this.menuItems,
+    required this.menuBuilder,
     this.barrierColor = Colors.transparent,
     this.backgroundColor = Colors.white,
     this.borderRadius = const BorderRadius.all(Radius.circular(10)),
   });
 
   final ContextMenuWidgetBuilder widgetBuilder;
-  final Widget menuItems;
+  final ContextMenuContentBuilder menuBuilder;
   final Color barrierColor;
   final Color backgroundColor;
   final BorderRadius borderRadius;
@@ -23,6 +23,8 @@ class ChatContextMenuWrapper extends StatefulWidget {
 }
 
 class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
+  ChatContextRoute? _route;
+
   void _showMenu() {
     final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
     if (renderBox == null) return;
@@ -30,15 +32,27 @@ class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
     final Offset offset = renderBox.localToGlobal(Offset.zero);
     final Rect widgetRect = offset & renderBox.size;
 
-    Navigator.of(context).push(
-      ChatContextRoute(
-        widgetRect: widgetRect,
-        menuItems: widget.menuItems,
-        barrierColor: widget.barrierColor,
-        backgroundColor: widget.backgroundColor,
-        borderRadius: widget.borderRadius,
-      ),
+    _route = ChatContextRoute(
+      widgetRect: widgetRect,
+      menuItems: widget.menuBuilder(context, _hideMenu),
+      barrierColor: widget.barrierColor,
+      backgroundColor: widget.backgroundColor,
+      borderRadius: widget.borderRadius,
     );
+
+    Navigator.of(context).push(_route!).then((_) {
+      _route = null;
+    });
+  }
+
+  void _hideMenu() {
+    if (_route != null) {
+      if (_route!.isCurrent) {
+        Navigator.of(context).pop();
+      } else {
+        Navigator.of(context).removeRoute(_route!);
+      }
+    }
   }
 
   @override
