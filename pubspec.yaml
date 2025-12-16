@@ -3,7 +3,7 @@ description: "A Flutter package that provides chat context menu with customizabl
 version: 1.0.0
 homepage: https://github.com/Matkurban/chat_context_menu.git
 repository: https://github.com/Matkurban/chat_context_menu.git
-topics: [ widget,chat,context_menu,chat_context_menu ]
+topics: [ widget,chat,contextMenu,chatContextMenu ]
 
 screenshots:
   - description: 'show context menu'
