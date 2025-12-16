@@ -6,9 +6,9 @@ repository: https://github.com/Matkurban/chat_context_menu.git
 topics: [ widget,chat,context_menu,chat_context_menu ]
 
 screenshots:
-  - description: 'show'
+  - description: 'show context menu'
     path: doc/screenshot/img.png
-  - description: 'show'
+  - description: 'show context menu'
     path: doc/screenshot/img_1.png
 
 environment:
