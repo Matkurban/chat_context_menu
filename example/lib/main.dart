@@ -51,13 +51,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final double topPadding =
-        MediaQuery.of(context).padding.top + kToolbarHeight;
-    final double bottomPadding =
-        MediaQuery.of(context).padding.bottom +
-        kBottomNavigationBarHeight +
-        MediaQuery.of(context).viewInsets.bottom;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chat Context Menu'),
@@ -84,14 +77,10 @@ class _ChatScreenState extends State<ChatScreen> {
                       // Fix 1: Prevent focus loss
                       requestFocus: false,
                       // Fix 2: Avoid overlapping AppBar and BottomNavigationBar
-                      safeAreaPadding: EdgeInsets.only(
-                        top: topPadding,
-                        bottom: bottomPadding,
-                      ),
                       menuBuilder: (context, hideMenu) {
                         return Container(
                           width: 300,
-                          height: 200,
+                          height: 56,
                           color: Colors.green,
                           child: Center(
                             child: ElevatedButton(

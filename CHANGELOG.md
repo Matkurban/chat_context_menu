@@ -1,7 +1,10 @@
+## 1.2.0
+
+* update `requestFocus` parameter default `false`
+
 ## 1.1.0
 
 * Added `requestFocus` parameter to `ChatContextMenuWrapper` to control focus behavior. Set it to `false` to prevent the menu from stealing focus from input fields.
-* Added `safeAreaPadding` parameter to `ChatContextMenuWrapper` to control the display area of the menu, preventing it from overlapping with AppBar, BottomNavigationBar, or other UI elements.
 
 ## 1.0.0
 

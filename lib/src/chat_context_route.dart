@@ -9,7 +9,6 @@ class ChatContextRoute extends PageRoute {
   final Color? backgroundColor;
   final BorderRadius? borderRadius;
   final EdgeInsetsGeometry? padding;
-  final EdgeInsets? safeAreaPadding;
 
   ChatContextRoute({
     super.settings,
@@ -25,7 +24,6 @@ class ChatContextRoute extends PageRoute {
     this.backgroundColor,
     this.borderRadius,
     this.padding,
-    this.safeAreaPadding,
   }) : _barrierColor = barrierColor;
 
   @override
@@ -48,7 +46,6 @@ class ChatContextRoute extends PageRoute {
   ) {
     return ChatContextMenuLayout(
       widgetRect: widgetRect,
-      safeAreaPadding: safeAreaPadding,
       childBuilder: (context, arrowOffset, isArrowUp) {
         return ChatContextMenuWidget(
           items: menuItems,

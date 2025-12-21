@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 class ChatContextMenuLayout extends StatefulWidget {
   final Rect widgetRect;
-  final EdgeInsets? safeAreaPadding;
   final Widget Function(
     BuildContext context,
     double? arrowOffset,
@@ -13,7 +12,6 @@ class ChatContextMenuLayout extends StatefulWidget {
   const ChatContextMenuLayout({
     super.key,
     required this.widgetRect,
-    this.safeAreaPadding,
     required this.childBuilder,
   });
 
@@ -40,13 +38,17 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
     if (renderBox == null) return;
 
     final Size childSize = renderBox.size;
-    final Size screenSize = MediaQuery.of(context).size;
+    final MediaQueryData media = MediaQuery.of(context);
+    final Size screenSize = media.size;
     final Rect widgetRect = widget.widgetRect;
     final double arrowHeight = 8.0; // Matches ChatContextMenuShape default
 
-    final double topLimit = widget.safeAreaPadding?.top ?? 0;
+    final double topLimit = media.padding.top + kToolbarHeight;
     final double bottomLimit =
-        screenSize.height - (widget.safeAreaPadding?.bottom ?? 0);
+        screenSize.height -
+        (media.padding.bottom +
+            kBottomNavigationBarHeight +
+            media.viewInsets.bottom);
 
     // Calculate available space
     final double bottomSpace = bottomLimit - widgetRect.bottom;
@@ -95,8 +97,9 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
     // We assume border radius is around 12.0, so keep arrow away from corners
     final double safeMargin = 12.0 + 6.0; // Radius + half arrow width
     if (arrowOffset < safeMargin) arrowOffset = safeMargin;
-    if (arrowOffset > childSize.width - safeMargin)
+    if (arrowOffset > childSize.width - safeMargin) {
       arrowOffset = childSize.width - safeMargin;
+    }
 
     if (mounted) {
       setState(() {
