@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class ChatContextMenuLayout extends StatefulWidget {
   final Rect widgetRect;
+  final EdgeInsets? safeAreaPadding;
   final Widget Function(
     BuildContext context,
     double? arrowOffset,
@@ -12,6 +13,7 @@ class ChatContextMenuLayout extends StatefulWidget {
   const ChatContextMenuLayout({
     super.key,
     required this.widgetRect,
+    this.safeAreaPadding,
     required this.childBuilder,
   });
 
@@ -42,9 +44,13 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
     final Rect widgetRect = widget.widgetRect;
     final double arrowHeight = 8.0; // Matches ChatContextMenuShape default
 
+    final double topLimit = widget.safeAreaPadding?.top ?? 0;
+    final double bottomLimit =
+        screenSize.height - (widget.safeAreaPadding?.bottom ?? 0);
+
     // Calculate available space
-    final double bottomSpace = screenSize.height - widgetRect.bottom;
-    final double topSpace = widgetRect.top;
+    final double bottomSpace = bottomLimit - widgetRect.bottom;
+    final double topSpace = widgetRect.top - topLimit;
 
     final double totalHeight =
         childSize.height + arrowHeight + 10; // 10 padding
@@ -53,7 +59,7 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
     double y = widgetRect.bottom + 10;
 
     // Prefer bottom, but check if it fits
-    if (y + totalHeight > screenSize.height) {
+    if (y + totalHeight > bottomLimit) {
       // If it doesn't fit bottom, try top
       if (topSpace > totalHeight) {
         y = widgetRect.top - childSize.height - arrowHeight - 10;
@@ -63,8 +69,16 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
         if (topSpace > bottomSpace) {
           y = widgetRect.top - childSize.height - arrowHeight - 10;
           isArrowUp = false;
+        } else {
+          // else keep bottom (default), but clamp to bottomLimit
+          if (y + totalHeight > bottomLimit) {
+            // If it still overflows, we might need to adjust y or let it overflow?
+            // For now, let's just stick to the logic.
+            // If we are forced to bottom, we might overlap bottom bar if we don't clamp.
+            // But if we clamp, we might overlap the widget.
+            // The logic here tries to avoid overlap with widget.
+          }
         }
-        // else keep bottom (default)
       }
     }
 

@@ -51,62 +51,102 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final double topPadding =
+        MediaQuery.of(context).padding.top + kToolbarHeight;
+    final double bottomPadding =
+        MediaQuery.of(context).padding.bottom +
+        kBottomNavigationBarHeight +
+        MediaQuery.of(context).viewInsets.bottom;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chat Context Menu'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: _messages.length,
-        itemBuilder: (context, index) {
-          final isMe = index % 2 == 0;
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Align(
-              alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-              child: ChatContextMenuWrapper(
-                barrierColor: Colors.transparent,
-                backgroundColor: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                menuBuilder: (context, hideMenu) {
-                  return Container(
-                    width: 300,
-                    height: 200,
-                    color: Colors.green,
-                    child: Center(
-                      child: ElevatedButton(
-                        onPressed: hideMenu,
-                        child: const Text('Close'),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _messages.length,
+              itemBuilder: (context, index) {
+                final isMe = index % 2 == 0;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Align(
+                    alignment: isMe
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
+                    child: ChatContextMenuWrapper(
+                      barrierColor: Colors.transparent,
+                      backgroundColor: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      // Fix 1: Prevent focus loss
+                      requestFocus: false,
+                      // Fix 2: Avoid overlapping AppBar and BottomNavigationBar
+                      safeAreaPadding: EdgeInsets.only(
+                        top: topPadding,
+                        bottom: bottomPadding,
                       ),
+                      menuBuilder: (context, hideMenu) {
+                        return Container(
+                          width: 300,
+                          height: 200,
+                          color: Colors.green,
+                          child: Center(
+                            child: ElevatedButton(
+                              onPressed: hideMenu,
+                              child: const Text('Close'),
+                            ),
+                          ),
+                        );
+                      },
+                      widgetBuilder: (context, showMenu) {
+                        return GestureDetector(
+                          onLongPress: showMenu,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isMe
+                                  ? Colors.blue.shade100
+                                  : Colors.grey.shade200,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Text(
+                              _messages[index],
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-                widgetBuilder: (context, showMenu) {
-                  return GestureDetector(
-                    onLongPress: showMenu,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isMe
-                            ? Colors.blue.shade100
-                            : Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Text(
-                        _messages[index],
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  );
-                },
+                  ),
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              decoration: const InputDecoration(
+                hintText: 'Type a message...',
+                border: OutlineInputBorder(),
               ),
             ),
-          );
-        },
+          ),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
       ),
     );
   }
