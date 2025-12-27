@@ -1,3 +1,10 @@
+## 1.3.0
+
+* Add custom shadows attribute
+* Add custom corner mark width and height
+* Add properties for custom display spacing
+* Add custom animation properties
+
 ## 1.2.0
 
 * update `requestFocus` parameter default `false`

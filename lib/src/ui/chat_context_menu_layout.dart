@@ -6,6 +6,8 @@ class ChatContextMenuLayout extends StatefulWidget {
     required this.widgetRect,
     required this.childBuilder,
     required this.padding,
+    this.arrowHeight = 8.0,
+    this.spacing = 10.0,
   });
 
   final Rect widgetRect;
@@ -17,6 +19,8 @@ class ChatContextMenuLayout extends StatefulWidget {
   childBuilder;
 
   final EdgeInsets padding;
+  final double arrowHeight;
+  final double spacing;
 
   @override
   State<ChatContextMenuLayout> createState() => _ChatContextMenuLayoutState();
@@ -30,6 +34,8 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
   bool _isArrowUp = false;
 
   EdgeInsets get padding => widget.padding;
+  double get arrowHeight => widget.arrowHeight;
+  double get spacing => widget.spacing;
 
   @override
   void initState() {
@@ -46,7 +52,6 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
     final MediaQueryData media = MediaQuery.of(context);
     final Size screenSize = media.size;
     final Rect widgetRect = widget.widgetRect;
-    final double arrowHeight = 8.0; // Matches ChatContextMenuShape default
 
     final double topLimit = media.padding.top + kToolbarHeight;
     final double bottomLimit =
@@ -60,21 +65,21 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
     final double topSpace = widgetRect.top - topLimit;
 
     final double totalHeight =
-        childSize.height + arrowHeight + 10; // 10 padding
+        childSize.height + arrowHeight + spacing; // spacing padding
 
     bool isArrowUp = true;
-    double y = widgetRect.bottom + 10;
+    double y = widgetRect.bottom + spacing;
 
     // Prefer bottom, but check if it fits
     if (y + totalHeight > bottomLimit) {
       // If it doesn't fit bottom, try top
       if (topSpace > totalHeight) {
-        y = widgetRect.top - childSize.height - arrowHeight - 10;
+        y = widgetRect.top - childSize.height - arrowHeight - spacing;
         isArrowUp = false;
       } else {
         // If it fits neither, pick the one with more space
         if (topSpace > bottomSpace) {
-          y = widgetRect.top - childSize.height - arrowHeight - 10;
+          y = widgetRect.top - childSize.height - arrowHeight - spacing;
           isArrowUp = false;
         } else {
           // else keep bottom (default), but clamp to bottomLimit

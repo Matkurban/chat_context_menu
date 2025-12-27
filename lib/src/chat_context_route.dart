@@ -10,6 +10,9 @@ class ChatContextRoute extends PageRoute {
   final BorderRadius? borderRadius;
   final EdgeInsets padding;
   final List<BoxShadow>? shadows;
+  final double arrowHeight;
+  final double arrowWidth;
+  final double spacing;
   final Widget? Function(
     BuildContext context,
     Animation<double> animation,
@@ -33,6 +36,9 @@ class ChatContextRoute extends PageRoute {
     this.borderRadius,
     required this.padding,
     this.shadows,
+    this.arrowHeight = 8.0,
+    this.arrowWidth = 12.0,
+    this.spacing = 10.0,
     this.transitionsBuilder,
   }) : _barrierColor = barrierColor;
 
@@ -57,6 +63,8 @@ class ChatContextRoute extends PageRoute {
     return ChatContextMenuLayout(
       widgetRect: widgetRect,
       padding: padding,
+      arrowHeight: arrowHeight,
+      spacing: spacing,
       childBuilder: (context, arrowOffset, isArrowUp) {
         return ChatContextMenuWidget(
           items: menuItems,
@@ -66,6 +74,8 @@ class ChatContextRoute extends PageRoute {
           arrowOffset: arrowOffset,
           isArrowUp: isArrowUp,
           shadows: shadows,
+          arrowHeight: arrowHeight,
+          arrowWidth: arrowWidth,
         );
       },
     );

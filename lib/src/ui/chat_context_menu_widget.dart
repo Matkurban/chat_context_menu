@@ -9,6 +9,8 @@ class ChatContextMenuWidget extends StatelessWidget {
   final double? arrowOffset;
   final bool isArrowUp;
   final List<BoxShadow>? shadows;
+  final double arrowHeight;
+  final double arrowWidth;
 
   const ChatContextMenuWidget({
     super.key,
@@ -19,6 +21,8 @@ class ChatContextMenuWidget extends StatelessWidget {
     this.arrowOffset,
     this.isArrowUp = false,
     this.shadows,
+    this.arrowHeight = 8.0,
+    this.arrowWidth = 12.0,
   });
 
   @override
@@ -34,6 +38,8 @@ class ChatContextMenuWidget extends StatelessWidget {
                   arrowOffset: arrowOffset!,
                   isArrowUp: isArrowUp,
                   borderRadius: borderRadius ?? BorderRadius.circular(10),
+                  arrowHeight: arrowHeight,
+                  arrowWidth: arrowWidth,
                 )
               : RoundedRectangleBorder(
                   borderRadius: borderRadius ?? BorderRadius.circular(10),
