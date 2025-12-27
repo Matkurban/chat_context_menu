@@ -8,17 +8,29 @@ class ChatContextMenuWrapper extends StatefulWidget {
     required this.widgetBuilder,
     required this.menuBuilder,
     this.barrierColor = Colors.transparent,
-    this.backgroundColor = Colors.white,
+    this.backgroundColor,
     this.borderRadius = const BorderRadius.all(Radius.circular(10)),
+    this.padding = const EdgeInsets.all(8),
     this.requestFocus = false,
+    this.shadows,
+    this.transitionsBuilder,
   });
 
   final ContextMenuWidgetBuilder widgetBuilder;
   final ContextMenuContentBuilder menuBuilder;
   final Color barrierColor;
-  final Color backgroundColor;
+  final Color? backgroundColor;
   final BorderRadius borderRadius;
+  final EdgeInsets padding;
   final bool requestFocus;
+  final List<BoxShadow>? shadows;
+  final Widget? Function(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  )?
+  transitionsBuilder;
 
   @override
   State<ChatContextMenuWrapper> createState() => _ChatContextMenuWrapperState();
@@ -41,6 +53,9 @@ class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
       backgroundColor: widget.backgroundColor,
       borderRadius: widget.borderRadius,
       requestFocus: widget.requestFocus,
+      padding: widget.padding,
+      shadows: widget.shadows,
+      transitionsBuilder: widget.transitionsBuilder,
     );
 
     Navigator.of(context).push(_route!).then((_) {

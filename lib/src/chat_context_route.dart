@@ -8,7 +8,15 @@ class ChatContextRoute extends PageRoute {
   final Color? _barrierColor;
   final Color? backgroundColor;
   final BorderRadius? borderRadius;
-  final EdgeInsetsGeometry? padding;
+  final EdgeInsets padding;
+  final List<BoxShadow>? shadows;
+  final Widget? Function(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  )?
+  transitionsBuilder;
 
   ChatContextRoute({
     super.settings,
@@ -23,14 +31,16 @@ class ChatContextRoute extends PageRoute {
     Color? barrierColor,
     this.backgroundColor,
     this.borderRadius,
-    this.padding,
+    required this.padding,
+    this.shadows,
+    this.transitionsBuilder,
   }) : _barrierColor = barrierColor;
 
   @override
   bool get barrierDismissible => true;
 
   @override
-  Color? get barrierColor => _barrierColor ?? Colors.black26;
+  Color? get barrierColor => _barrierColor;
 
   @override
   String? get barrierLabel => 'chat_context_menu';
@@ -46,14 +56,16 @@ class ChatContextRoute extends PageRoute {
   ) {
     return ChatContextMenuLayout(
       widgetRect: widgetRect,
+      padding: padding,
       childBuilder: (context, arrowOffset, isArrowUp) {
         return ChatContextMenuWidget(
           items: menuItems,
-          backgroundColor: backgroundColor ?? const Color(0xCCF9F9F9),
-          borderRadius: borderRadius ?? BorderRadius.circular(12),
-          padding: padding ?? EdgeInsets.all(8),
+          backgroundColor: backgroundColor,
+          borderRadius: borderRadius,
+          padding: padding,
           arrowOffset: arrowOffset,
           isArrowUp: isArrowUp,
+          shadows: shadows,
         );
       },
     );
@@ -66,7 +78,37 @@ class ChatContextRoute extends PageRoute {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    return FadeTransition(opacity: animation, child: child);
+    final Size screenSize = MediaQuery.of(context).size;
+    final Offset center = widgetRect.center;
+    // Calculate alignment (-1.0 to 1.0)
+    final double alignX = (center.dx / screenSize.width) * 2 - 1;
+    final double alignY = (center.dy / screenSize.height) * 2 - 1;
+    final Alignment alignment = Alignment(alignX, alignY);
+    final curve = CurvedAnimation(
+      parent: animation,
+      curve: Curves.fastOutSlowIn,
+    );
+    return transitionsBuilder?.call(
+          context,
+          animation,
+          secondaryAnimation,
+          child,
+        ) ??
+        FadeTransition(
+          opacity: curve,
+          child: ScaleTransition(
+            scale: curve,
+            alignment: alignment,
+            child: MediaQuery.removePadding(
+              context: context,
+              removeTop: true,
+              removeBottom: true,
+              removeLeft: true,
+              removeRight: true,
+              child: child,
+            ),
+          ),
+        );
   }
 
   @override

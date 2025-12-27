@@ -56,6 +56,7 @@ class _ChatScreenState extends State<ChatScreen> {
         title: const Text('Chat Context Menu'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
+      backgroundColor: Colors.white,
       body: Column(
         children: [
           Expanded(
@@ -73,7 +74,13 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: ChatContextMenuWrapper(
                       barrierColor: Colors.transparent,
                       backgroundColor: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(10),
+                      shadows: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 32,
+                        ),
+                      ],
                       // Fix 1: Prevent focus loss
                       requestFocus: false,
                       // Fix 2: Avoid overlapping AppBar and BottomNavigationBar
@@ -81,12 +88,10 @@ class _ChatScreenState extends State<ChatScreen> {
                         return Container(
                           width: 300,
                           height: 56,
-                          color: Colors.green,
-                          child: Center(
-                            child: ElevatedButton(
-                              onPressed: hideMenu,
-                              child: const Text('Close'),
-                            ),
+                          alignment: .center,
+                          child: ElevatedButton(
+                            onPressed: hideMenu,
+                            child: const Text('Close'),
                           ),
                         );
                       },

@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 
 class ChatContextMenuLayout extends StatefulWidget {
+  const ChatContextMenuLayout({
+    super.key,
+    required this.widgetRect,
+    required this.childBuilder,
+    required this.padding,
+  });
+
   final Rect widgetRect;
   final Widget Function(
     BuildContext context,
@@ -9,11 +16,7 @@ class ChatContextMenuLayout extends StatefulWidget {
   )
   childBuilder;
 
-  const ChatContextMenuLayout({
-    super.key,
-    required this.widgetRect,
-    required this.childBuilder,
-  });
+  final EdgeInsets padding;
 
   @override
   State<ChatContextMenuLayout> createState() => _ChatContextMenuLayoutState();
@@ -25,6 +28,8 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
   Offset? _childPosition;
   double? _arrowOffset;
   bool _isArrowUp = false;
+
+  EdgeInsets get padding => widget.padding;
 
   @override
   void initState() {

@@ -3,36 +3,41 @@ import 'package:flutter/material.dart';
 
 class ChatContextMenuWidget extends StatelessWidget {
   final Widget items;
-  final Color backgroundColor;
-  final BorderRadius borderRadius;
-  final EdgeInsetsGeometry? padding;
+  final Color? backgroundColor;
+  final BorderRadius? borderRadius;
+  final EdgeInsets padding;
   final double? arrowOffset;
   final bool isArrowUp;
+  final List<BoxShadow>? shadows;
 
   const ChatContextMenuWidget({
     super.key,
     required this.items,
-    required this.backgroundColor,
-    required this.borderRadius,
-    this.padding,
+    this.backgroundColor,
+    this.borderRadius,
+    required this.padding,
     this.arrowOffset,
     this.isArrowUp = false,
+    this.shadows,
   });
 
   @override
   Widget build(BuildContext context) {
     return IntrinsicWidth(
       child: Container(
-        padding: padding ?? const EdgeInsets.all(12.0),
+        padding: padding,
         decoration: ShapeDecoration(
           color: backgroundColor,
+          shadows: shadows,
           shape: arrowOffset != null
               ? ChatContextMenuShape(
                   arrowOffset: arrowOffset!,
                   isArrowUp: isArrowUp,
-                  borderRadius: borderRadius,
+                  borderRadius: borderRadius ?? BorderRadius.circular(10),
                 )
-              : RoundedRectangleBorder(borderRadius: borderRadius),
+              : RoundedRectangleBorder(
+                  borderRadius: borderRadius ?? BorderRadius.circular(10),
+                ),
         ),
         child: items,
       ),
