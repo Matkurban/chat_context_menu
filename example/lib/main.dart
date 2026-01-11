@@ -1,4 +1,6 @@
 import 'package:chat_context_menu/chat_context_menu.dart';
+import 'package:example/app_theme.dart';
+import 'package:example/context_menu_pane.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -11,11 +13,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Chat Context Menu Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
+      title: 'Chat Context Menu',
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: .system,
+      debugShowCheckedModeBanner: false,
       home: const ChatScreen(),
     );
   }
@@ -32,10 +34,10 @@ class _ChatScreenState extends State<ChatScreen> {
   final List<String> _messages = [
     "Hello!",
     "Hello!",
-    "Hello!",
     "How are you?",
-    "How are you?",
-    "How are you?",
+    "Im Fine",
+    "and you?",
+    "Im good too, thanks for asking.",
     "This is a long press context menu demo.",
     "Try long pressing on any message.",
     "Try long pressing on any message.",
@@ -51,12 +53,12 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final TextTheme textTheme = theme.textTheme;
+    final ColorScheme colorScheme = theme.colorScheme;
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Chat Context Menu'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
-      backgroundColor: Colors.white,
+      appBar: AppBar(title: const Text('Chat Context Menu')),
       body: Column(
         children: [
           Expanded(
@@ -73,26 +75,25 @@ class _ChatScreenState extends State<ChatScreen> {
                         : Alignment.centerLeft,
                     child: ChatContextMenuWrapper(
                       barrierColor: Colors.transparent,
-                      backgroundColor: Colors.white,
+                      backgroundColor: colorScheme.surface,
                       borderRadius: BorderRadius.circular(10),
                       shadows: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
+                          color: colorScheme.onSurface.withValues(alpha: 0.15),
                           blurRadius: 32,
                         ),
                       ],
-                      // Fix 1: Prevent focus loss
-                      requestFocus: false,
-                      // Fix 2: Avoid overlapping AppBar and BottomNavigationBar
                       menuBuilder: (context, hideMenu) {
-                        return Container(
-                          width: 300,
-                          height: 56,
-                          alignment: .center,
-                          child: ElevatedButton(
-                            onPressed: hideMenu,
-                            child: const Text('Close'),
-                          ),
+                        return ContextMenuPane(
+                          textTheme: textTheme,
+                          colorScheme: colorScheme,
+                          onReplayTap: hideMenu,
+                          onForwardTap: hideMenu,
+                          onCopyTap: hideMenu,
+                          onDeleteTap: hideMenu,
+                          onMoreTap: hideMenu,
+                          onQuoteTap: hideMenu,
+                          onSelectTap: hideMenu,
                         );
                       },
                       widgetBuilder: (context, showMenu) {
@@ -100,18 +101,22 @@ class _ChatScreenState extends State<ChatScreen> {
                           onLongPress: showMenu,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
+                              horizontal: 12,
+                              vertical: 8,
                             ),
+                            margin: .symmetric(vertical: 4),
                             decoration: BoxDecoration(
                               color: isMe
-                                  ? Colors.blue.shade100
-                                  : Colors.grey.shade200,
-                              borderRadius: BorderRadius.circular(16),
+                                  ? colorScheme.primary
+                                  : colorScheme.surfaceContainerHighest,
+                              borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               _messages[index],
-                              style: const TextStyle(fontSize: 16),
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: isMe ? colorScheme.onPrimary : null,
+                              ),
                             ),
                           ),
                         );

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class ChatContextMenuLayout extends StatefulWidget {
@@ -8,6 +10,9 @@ class ChatContextMenuLayout extends StatefulWidget {
     required this.padding,
     this.arrowHeight = 8.0,
     this.spacing = 10.0,
+    this.arrowWidth = 12.0,
+    this.borderRadius,
+    this.horizontalMargin = 10.0,
   });
 
   final Rect widgetRect;
@@ -21,6 +26,9 @@ class ChatContextMenuLayout extends StatefulWidget {
   final EdgeInsets padding;
   final double arrowHeight;
   final double spacing;
+  final double arrowWidth;
+  final BorderRadius? borderRadius;
+  final double horizontalMargin;
 
   @override
   State<ChatContextMenuLayout> createState() => _ChatContextMenuLayoutState();
@@ -36,6 +44,10 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
   EdgeInsets get padding => widget.padding;
   double get arrowHeight => widget.arrowHeight;
   double get spacing => widget.spacing;
+  double get arrowWidth => widget.arrowWidth;
+  BorderRadius get borderRadius =>
+      widget.borderRadius ?? BorderRadius.circular(8.0);
+  double get horizontalMargin => widget.horizontalMargin;
 
   @override
   void initState() {
@@ -64,8 +76,7 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
     final double bottomSpace = bottomLimit - widgetRect.bottom;
     final double topSpace = widgetRect.top - topLimit;
 
-    final double totalHeight =
-        childSize.height + arrowHeight + spacing; // spacing padding
+    final double totalHeight = childSize.height + arrowHeight + spacing;
 
     bool isArrowUp = true;
     double y = widgetRect.bottom + spacing;
@@ -84,28 +95,33 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
         } else {
           // else keep bottom (default), but clamp to bottomLimit
           if (y + totalHeight > bottomLimit) {
-            // If it still overflows, we might need to adjust y or let it overflow?
-            // For now, let's just stick to the logic.
-            // If we are forced to bottom, we might overlap bottom bar if we don't clamp.
-            // But if we clamp, we might overlap the widget.
-            // The logic here tries to avoid overlap with widget.
+            final double maxY = bottomLimit - childSize.height - arrowHeight;
+            if (maxY <= widgetRect.bottom) {
+              // Not enough room below without covering the anchor; flip to top.
+              y = widgetRect.top - childSize.height - arrowHeight - spacing;
+              isArrowUp = false;
+            } else {
+              // Clamp within bottom limit while keeping spacing from the anchor.
+              y = max(maxY, widgetRect.bottom + spacing);
+            }
           }
         }
       }
     }
 
     double x = widgetRect.center.dx - childSize.width / 2;
-    if (x < 10) x = 10;
-    if (x + childSize.width > screenSize.width - 10) {
-      x = screenSize.width - childSize.width - 10;
+    if (x < horizontalMargin) x = horizontalMargin;
+    if (x + childSize.width > screenSize.width - horizontalMargin) {
+      x = screenSize.width - childSize.width - horizontalMargin;
     }
 
     // Calculate arrow offset relative to the child's left edge
     double arrowOffset = widgetRect.center.dx - x;
 
-    // Clamp arrow offset to be within the child
-    // We assume border radius is around 12.0, so keep arrow away from corners
-    final double safeMargin = 12.0 + 6.0; // Radius + half arrow width
+    // Clamp arrow offset to be within the child using provided radius and width
+    // to keep the arrow away from rounded corners.
+    final double safeMargin =
+        _maxRadius(borderRadius) + arrowWidth / 2; // Radius + half arrow width
     if (arrowOffset < safeMargin) arrowOffset = safeMargin;
     if (arrowOffset > childSize.width - safeMargin) {
       arrowOffset = childSize.width - safeMargin;
@@ -119,6 +135,19 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
         _isArrowUp = isArrowUp;
       });
     }
+  }
+
+  double _maxRadius(BorderRadius radius) {
+    return <double>[
+      radius.topLeft.x,
+      radius.topLeft.y,
+      radius.topRight.x,
+      radius.topRight.y,
+      radius.bottomLeft.x,
+      radius.bottomLeft.y,
+      radius.bottomRight.x,
+      radius.bottomRight.y,
+    ].reduce(max);
   }
 
   @override

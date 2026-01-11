@@ -9,14 +9,16 @@ class ChatContextMenuWrapper extends StatefulWidget {
     required this.menuBuilder,
     this.barrierColor = Colors.transparent,
     this.backgroundColor,
-    this.borderRadius = const BorderRadius.all(Radius.circular(10)),
+    this.borderRadius = const BorderRadius.all(Radius.circular(8)),
     this.padding = const EdgeInsets.all(8),
     this.requestFocus = false,
     this.shadows,
     this.arrowHeight = 8.0,
     this.arrowWidth = 12.0,
-    this.spacing = 10.0,
+    this.spacing = 6.0,
     this.transitionsBuilder,
+    this.onClose,
+    this.horizontalMargin = 10.0,
   });
 
   ///在页面中显示的组件
@@ -77,6 +79,14 @@ class ChatContextMenuWrapper extends StatefulWidget {
   )?
   transitionsBuilder;
 
+  ///关闭时触发的回调
+  ///Callback triggered when closed
+  final void Function(dynamic result)? onClose;
+
+  ///距屏幕左右的最小留白
+  ///Minimum horizontal margin from screen edges
+  final double horizontalMargin;
+
   @override
   State<ChatContextMenuWrapper> createState() => _ChatContextMenuWrapperState();
 }
@@ -104,10 +114,12 @@ class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
       arrowWidth: widget.arrowWidth,
       spacing: widget.spacing,
       transitionsBuilder: widget.transitionsBuilder,
+      horizontalMargin: widget.horizontalMargin,
     );
 
-    Navigator.of(context).push(_route!).then((_) {
+    Navigator.of(context).push(_route!).then((result) {
       _route = null;
+      widget.onClose?.call(result);
     });
   }
 

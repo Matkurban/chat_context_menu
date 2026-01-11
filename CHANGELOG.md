@@ -1,3 +1,8 @@
+## 1.4.0
+
+* add `onClose` callback , triggered when the context menu is closed
+* add `horizontalMargin` properties , Minimum horizontal margin from screen edges
+
 ## 1.3.0
 
 * Add custom shadows attribute

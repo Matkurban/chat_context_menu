@@ -37,12 +37,12 @@ class ChatContextMenuWidget extends StatelessWidget {
               ? ChatContextMenuShape(
                   arrowOffset: arrowOffset!,
                   isArrowUp: isArrowUp,
-                  borderRadius: borderRadius ?? BorderRadius.circular(10),
+                  borderRadius: borderRadius ?? BorderRadius.circular(8),
                   arrowHeight: arrowHeight,
                   arrowWidth: arrowWidth,
                 )
               : RoundedRectangleBorder(
-                  borderRadius: borderRadius ?? BorderRadius.circular(10),
+                  borderRadius: borderRadius ?? BorderRadius.circular(8),
                 ),
         ),
         child: items,

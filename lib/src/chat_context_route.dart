@@ -13,6 +13,7 @@ class ChatContextRoute extends PageRoute {
   final double arrowHeight;
   final double arrowWidth;
   final double spacing;
+  final double horizontalMargin;
   final Widget? Function(
     BuildContext context,
     Animation<double> animation,
@@ -39,6 +40,7 @@ class ChatContextRoute extends PageRoute {
     this.arrowHeight = 8.0,
     this.arrowWidth = 12.0,
     this.spacing = 10.0,
+    this.horizontalMargin = 10.0,
     this.transitionsBuilder,
   }) : _barrierColor = barrierColor;
 
@@ -65,6 +67,9 @@ class ChatContextRoute extends PageRoute {
       padding: padding,
       arrowHeight: arrowHeight,
       spacing: spacing,
+      arrowWidth: arrowWidth,
+      borderRadius: borderRadius,
+      horizontalMargin: horizontalMargin,
       childBuilder: (context, arrowOffset, isArrowUp) {
         return ChatContextMenuWidget(
           items: menuItems,

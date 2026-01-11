@@ -13,9 +13,9 @@ A Flutter package that provides an iOS-style chat context menu with customizable
 
 ## Screenshots
 
-|               Light Mode                |                 Dark Mode                 |
-|:---------------------------------------:|:-----------------------------------------:|
-| ![Screenshot 1](doc/screenshot/img.png) | ![Screenshot 2](doc/screenshot/img_1.png) |
+|                    ScreenShot                    |                    ScreenShot                    |
+|:------------------------------------------------:|:------------------------------------------------:|
+| ![Screenshot 1](doc/screenshot/screenshot_1.jpg) | ![Screenshot 2](doc/screenshot/screenshot_2.jpg) |
 
 ## Getting started
 
@@ -23,7 +23,7 @@ Add `chat_context_menu` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  chat_context_menu: ^1.0.0
+  chat_context_menu: ^last_version
 ```
 
 ## Usage
@@ -32,75 +32,159 @@ Wrap the widget you want to trigger the menu (usually a chat bubble) with `ChatC
 
 ```dart
 import 'package:chat_context_menu/chat_context_menu.dart';
+import 'package:example/app_theme.dart';
+import 'package:example/context_menu_pane.dart';
 import 'package:flutter/material.dart';
 
-class ChatMessage extends StatelessWidget {
-  final String message;
-  final bool isMe;
+void main() {
+  runApp(const MyApp());
+}
 
-  const ChatMessage({super.key, required this.message, required this.isMe});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ChatContextMenuWrapper(
-      // Customize the menu appearance
-      backgroundColor: Colors.white,
-      barrierColor: Colors.black.withOpacity(0.4),
-      borderRadius: BorderRadius.circular(16),
-      
-      // Build the menu content
-      menuBuilder: (context, hideMenu) {
-        return Container(
-          width: 200,
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.reply),
-                title: const Text('Reply'),
-                onTap: () {
-                  hideMenu();
-                  print('Reply tapped');
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.copy),
-                title: const Text('Copy'),
-                onTap: () {
-                  hideMenu();
-                  print('Copy tapped');
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.delete, color: Colors.red),
-                title: const Text('Delete', style: TextStyle(color: Colors.red)),
-                onTap: () {
-                  hideMenu();
-                  print('Delete tapped');
-                },
-              ),
-            ],
-          ),
-        );
-      },
-      // Build the child widget and provide the showMenu callback
-      widgetBuilder: (context, showMenu) {
-        return GestureDetector(
-          onLongPress: showMenu,
-          child: Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: isMe ? Colors.blue : Colors.grey[300],
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(message),
-          ),
-        );
-      },
+    return MaterialApp(
+      title: 'Chat Context Menu',
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: .system,
+      debugShowCheckedModeBanner: false,
+      home: const ChatScreen(),
     );
   }
 }
+
+class ChatScreen extends StatefulWidget {
+  const ChatScreen({super.key});
+
+  @override
+  State<ChatScreen> createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  final List<String> _messages = [
+    "Hello!",
+    "Hello!",
+    "How are you?",
+    "Im Fine",
+    "and you?",
+    "Im good too, thanks for asking.",
+    "This is a long press context menu demo.",
+    "Try long pressing on any message.",
+    "Try long pressing on any message.",
+    "You can see different options.",
+    "You can see different options.",
+    "Like Reply, Copy, Forward, Delete.",
+    "It mimics the iOS style context menu.",
+    "Hope",
+    "It mimics the iOS style context menu.",
+    "Hope",
+    "Like Reply, Copy, Forward, Delete.",
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final TextTheme textTheme = theme.textTheme;
+    final ColorScheme colorScheme = theme.colorScheme;
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Chat Context Menu')),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _messages.length,
+              itemBuilder: (context, index) {
+                final isMe = index % 2 == 0;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Align(
+                    alignment: isMe
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
+                    child: ChatContextMenuWrapper(
+                      barrierColor: Colors.transparent,
+                      backgroundColor: colorScheme.surface,
+                      borderRadius: BorderRadius.circular(10),
+                      shadows: [
+                        BoxShadow(
+                          color: colorScheme.onSurface.withValues(alpha: 0.15),
+                          blurRadius: 32,
+                        ),
+                      ],
+                      menuBuilder: (context, hideMenu) {
+                        return ContextMenuPane(
+                          textTheme: textTheme,
+                          colorScheme: colorScheme,
+                          onReplayTap: hideMenu,
+                          onForwardTap: hideMenu,
+                          onCopyTap: hideMenu,
+                          onDeleteTap: hideMenu,
+                          onMoreTap: hideMenu,
+                          onQuoteTap: hideMenu,
+                          onSelectTap: hideMenu,
+                        );
+                      },
+                      widgetBuilder: (context, showMenu) {
+                        return GestureDetector(
+                          onLongPress: showMenu,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            margin: .symmetric(vertical: 4),
+                            decoration: BoxDecoration(
+                              color: isMe
+                                  ? colorScheme.primary
+                                  : colorScheme.surfaceContainerHighest,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              _messages[index],
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: isMe ? colorScheme.onPrimary : null,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              decoration: const InputDecoration(
+                hintText: 'Type a message...',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
 ```
 
 ## Customization
