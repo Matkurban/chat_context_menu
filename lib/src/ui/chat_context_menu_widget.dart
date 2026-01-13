@@ -11,6 +11,7 @@ class ChatContextMenuWidget extends StatelessWidget {
   final List<BoxShadow>? shadows;
   final double arrowHeight;
   final double arrowWidth;
+  final BoxConstraints? constraints;
 
   const ChatContextMenuWidget({
     super.key,
@@ -23,6 +24,7 @@ class ChatContextMenuWidget extends StatelessWidget {
     this.shadows,
     required this.arrowHeight,
     required this.arrowWidth,
+    this.constraints,
   });
 
   @override
@@ -30,6 +32,7 @@ class ChatContextMenuWidget extends StatelessWidget {
     return IntrinsicWidth(
       child: Container(
         padding: padding,
+        constraints: constraints,
         decoration: ShapeDecoration(
           color: backgroundColor,
           shadows: shadows,

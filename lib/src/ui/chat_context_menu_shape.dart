@@ -17,7 +17,10 @@ class ChatContextMenuShape extends ShapeBorder {
 
   @override
   EdgeInsetsGeometry get dimensions {
-    return EdgeInsets.only(top: isArrowUp ? arrowHeight : 0, bottom: isArrowUp ? 0 : arrowHeight);
+    return EdgeInsets.only(
+      top: isArrowUp ? arrowHeight : 0,
+      bottom: isArrowUp ? 0 : arrowHeight,
+    );
   }
 
   @override

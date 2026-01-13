@@ -22,6 +22,8 @@ class ChatContextRoute extends PageRoute {
   )?
   transitionsBuilder;
 
+  final BoxConstraints? constraints;
+
   ChatContextRoute({
     super.settings,
     super.requestFocus,
@@ -42,6 +44,7 @@ class ChatContextRoute extends PageRoute {
     required this.spacing,
     required this.horizontalMargin,
     this.transitionsBuilder,
+    this.constraints,
   }) : _barrierColor = barrierColor;
 
   @override
@@ -81,6 +84,7 @@ class ChatContextRoute extends PageRoute {
           shadows: shadows,
           arrowHeight: arrowHeight,
           arrowWidth: arrowWidth,
+          constraints: constraints,
         );
       },
     );
@@ -99,8 +103,16 @@ class ChatContextRoute extends PageRoute {
     final double alignX = (center.dx / screenSize.width) * 2 - 1;
     final double alignY = (center.dy / screenSize.height) * 2 - 1;
     final Alignment alignment = Alignment(alignX, alignY);
-    final curve = CurvedAnimation(parent: animation, curve: Curves.fastOutSlowIn);
-    return transitionsBuilder?.call(context, animation, secondaryAnimation, child) ??
+    final curve = CurvedAnimation(
+      parent: animation,
+      curve: Curves.fastOutSlowIn,
+    );
+    return transitionsBuilder?.call(
+          context,
+          animation,
+          secondaryAnimation,
+          child,
+        ) ??
         FadeTransition(
           opacity: curve,
           child: ScaleTransition(

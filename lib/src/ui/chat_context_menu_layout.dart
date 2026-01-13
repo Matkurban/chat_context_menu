@@ -16,7 +16,12 @@ class ChatContextMenuLayout extends StatefulWidget {
   });
 
   final Rect widgetRect;
-  final Widget Function(BuildContext context, double? arrowOffset, bool isArrowUp) childBuilder;
+  final Widget Function(
+    BuildContext context,
+    double? arrowOffset,
+    bool isArrowUp,
+  )
+  childBuilder;
 
   final EdgeInsets padding;
   final double arrowHeight;
@@ -50,7 +55,8 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
   }
 
   void _calculatePosition() {
-    final RenderBox? renderBox = _childKey.currentContext?.findRenderObject() as RenderBox?;
+    final RenderBox? renderBox =
+        _childKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox == null) return;
 
     final Size childSize = renderBox.size;
@@ -61,7 +67,9 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
     final double topLimit = media.padding.top + kToolbarHeight;
     final double bottomLimit =
         screenSize.height -
-        (media.padding.bottom + kBottomNavigationBarHeight + media.viewInsets.bottom);
+        (media.padding.bottom +
+            kBottomNavigationBarHeight +
+            media.viewInsets.bottom);
 
     // Calculate available space
     final double bottomSpace = bottomLimit - widgetRect.bottom;
@@ -149,7 +157,10 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
           Positioned(
             top: 0,
             left: 0,
-            child: Container(key: _childKey, child: widget.childBuilder(context, null, false)),
+            child: Container(
+              key: _childKey,
+              child: widget.childBuilder(context, null, false),
+            ),
           ),
         ],
       );

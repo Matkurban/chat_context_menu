@@ -19,6 +19,7 @@ class ChatContextMenuWrapper extends StatefulWidget {
     this.transitionsBuilder,
     this.onClose,
     this.horizontalMargin = 10.0,
+    this.constraints,
   });
 
   ///在页面中显示的组件
@@ -87,6 +88,10 @@ class ChatContextMenuWrapper extends StatefulWidget {
   ///Minimum horizontal margin from screen edges
   final double horizontalMargin;
 
+  ///context menu容器的约束
+  ///Constraints of context menu container
+  final BoxConstraints? constraints;
+
   @override
   State<ChatContextMenuWrapper> createState() => _ChatContextMenuWrapperState();
 }
@@ -116,6 +121,7 @@ class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
       spacing: widget.spacing,
       transitionsBuilder: widget.transitionsBuilder,
       horizontalMargin: widget.horizontalMargin,
+      constraints: widget.constraints,
     );
 
     Navigator.of(context).push(_route!).then((result) {
