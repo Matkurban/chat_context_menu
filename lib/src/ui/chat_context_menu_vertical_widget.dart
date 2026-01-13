@@ -1,20 +1,20 @@
-import 'package:chat_context_menu/src/model/arrow_direction.dart';
+import 'package:chat_context_menu/src/model/arrow_vertical_direction.dart';
 import 'package:chat_context_menu/src/shape/chat_context_menu_vertical_shape.dart';
 import 'package:flutter/material.dart';
 
-class ChatContextMenuWidget extends StatelessWidget {
+class ChatContextMenuVerticalWidget extends StatelessWidget {
   final Widget items;
   final Color? backgroundColor;
   final BorderRadius borderRadius;
   final EdgeInsets padding;
   final double? arrowOffset;
-  final ArrowDirection isArrowUp;
+  final ArrowVerticalDirection isArrowUp;
   final List<BoxShadow>? shadows;
   final double arrowHeight;
   final double arrowWidth;
   final BoxConstraints? constraints;
 
-  const ChatContextMenuWidget({
+  const ChatContextMenuVerticalWidget({
     super.key,
     required this.items,
     this.backgroundColor,

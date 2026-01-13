@@ -1,3 +1,8 @@
+## 1.5.0
+
+** Add `constraints` properties , to set maximum width and height for the context menu
+** Add `axis` properties , to set the direction of the context menu (vertical or horizontal)
+
 ## 1.4.0
 
 * add `onClose` callback , triggered when the context menu is closed

@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:chat_context_menu/src/model/arrow_direction.dart';
+import 'package:chat_context_menu/src/model/arrow_vertical_direction.dart';
 import 'package:flutter/material.dart';
 
 class ChatContextMenuVerticalLayout extends StatefulWidget {
@@ -20,7 +20,7 @@ class ChatContextMenuVerticalLayout extends StatefulWidget {
   final Widget Function(
     BuildContext context,
     double? arrowOffset,
-    ArrowDirection isArrowUp,
+    ArrowVerticalDirection isArrowUp,
   )
   childBuilder;
 
@@ -42,7 +42,7 @@ class _ChatContextMenuVerticalLayoutState
   Size? _childSize;
   Offset? _childPosition;
   double? _arrowOffset;
-  ArrowDirection _isArrowUp = .down;
+  ArrowVerticalDirection _isArrowUp = .down;
 
   EdgeInsets get padding => widget.padding;
   double get arrowHeight => widget.arrowHeight;
@@ -68,24 +68,19 @@ class _ChatContextMenuVerticalLayoutState
     final Rect widgetRect = widget.widgetRect;
 
     final double topLimit = media.padding.top + kToolbarHeight;
-    debugPrint('Top limit: $topLimit');
     final double bottomLimit =
         screenSize.height -
         (media.padding.bottom +
             kBottomNavigationBarHeight +
             media.viewInsets.bottom);
-    debugPrint('Bottom limit: $bottomLimit');
 
     // Calculate available space
     final double bottomSpace = bottomLimit - widgetRect.bottom;
-    debugPrint('Bottom space: $bottomSpace');
     final double topSpace = widgetRect.top - topLimit;
-    debugPrint('Top space: $topSpace');
 
     final double totalHeight = childSize.height + arrowHeight + spacing;
-    debugPrint('Total height: $totalHeight');
 
-    ArrowDirection isArrowUp = .up;
+    ArrowVerticalDirection isArrowUp = .up;
     double y = widgetRect.bottom + spacing;
 
     // Prefer bottom, but check if it fits

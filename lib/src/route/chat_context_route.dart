@@ -1,5 +1,7 @@
-import 'package:chat_context_menu/src/ui/chat_context_menu_vertical_layout.dart';
-import 'package:chat_context_menu/src/ui/chat_context_menu_widget.dart';
+import 'package:chat_context_menu/src/layout/chat_context_menu_horizontal_layout.dart';
+import 'package:chat_context_menu/src/ui/chat_context_menu_horizontal_widget.dart';
+import 'package:chat_context_menu/src/layout/chat_context_menu_vertical_layout.dart';
+import 'package:chat_context_menu/src/ui/chat_context_menu_vertical_widget.dart';
 import 'package:flutter/material.dart';
 
 class ChatContextRoute extends PageRoute {
@@ -23,6 +25,7 @@ class ChatContextRoute extends PageRoute {
   transitionsBuilder;
 
   final BoxConstraints? constraints;
+  final Axis axis;
 
   ChatContextRoute({
     super.settings,
@@ -45,6 +48,7 @@ class ChatContextRoute extends PageRoute {
     required this.horizontalMargin,
     this.transitionsBuilder,
     this.constraints,
+    required this.axis,
   }) : _barrierColor = barrierColor;
 
   @override
@@ -65,6 +69,32 @@ class ChatContextRoute extends PageRoute {
     Animation<double> animation,
     Animation<double> secondaryAnimation,
   ) {
+    if (axis == Axis.horizontal) {
+      return ChatContextMenuHorizontalLayout(
+        widgetRect: widgetRect,
+        padding: padding,
+        arrowHeight: arrowHeight,
+        spacing: spacing,
+        arrowWidth: arrowWidth,
+        borderRadius: borderRadius,
+        verticalMargin: horizontalMargin,
+        childBuilder: (context, arrowOffset, arrowDirection) {
+          return ChatContextMenuHorizontalWidget(
+            items: menuItems,
+            backgroundColor: backgroundColor,
+            borderRadius: borderRadius,
+            padding: padding,
+            arrowOffset: arrowOffset,
+            arrowDirection: arrowDirection,
+            shadows: shadows,
+            arrowHeight: arrowHeight,
+            arrowWidth: arrowWidth,
+            constraints: constraints,
+          );
+        },
+      );
+    }
+
     return ChatContextMenuVerticalLayout(
       widgetRect: widgetRect,
       padding: padding,
@@ -74,7 +104,7 @@ class ChatContextRoute extends PageRoute {
       borderRadius: borderRadius,
       horizontalMargin: horizontalMargin,
       childBuilder: (context, arrowOffset, isArrowUp) {
-        return ChatContextMenuWidget(
+        return ChatContextMenuVerticalWidget(
           items: menuItems,
           backgroundColor: backgroundColor,
           borderRadius: borderRadius,

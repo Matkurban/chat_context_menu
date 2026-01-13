@@ -1,4 +1,4 @@
-import 'package:chat_context_menu/src/model/arrow_direction.dart';
+import 'package:chat_context_menu/src/model/arrow_vertical_direction.dart';
 import 'package:flutter/material.dart';
 
 ///容器的箭头形状
@@ -7,7 +7,7 @@ class ChatContextMenuVerticalShape extends ShapeBorder {
   final double arrowWidth;
   final double arrowHeight;
   final double arrowOffset;
-  final ArrowDirection isArrowUp;
+  final ArrowVerticalDirection isArrowUp;
   final BorderRadius borderRadius;
 
   const ChatContextMenuVerticalShape({
@@ -56,12 +56,12 @@ class ChatContextMenuVerticalShape extends ShapeBorder {
 
     final Path arrowPath = Path();
     switch (isArrowUp) {
-      case ArrowDirection.up:
+      case ArrowVerticalDirection.up:
         arrowPath.moveTo(arrowX - arrowWidth / 2, top);
         arrowPath.lineTo(arrowX, rect.top);
         arrowPath.lineTo(arrowX + arrowWidth / 2, top);
         break;
-      case ArrowDirection.down:
+      case ArrowVerticalDirection.down:
         arrowPath.moveTo(arrowX - arrowWidth / 2, bottom);
         arrowPath.lineTo(arrowX, rect.bottom);
         arrowPath.lineTo(arrowX + arrowWidth / 2, bottom);

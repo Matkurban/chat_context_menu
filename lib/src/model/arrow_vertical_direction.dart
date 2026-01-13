@@ -1,5 +1,5 @@
 ///控制箭头方向的枚举类
-enum ArrowDirection {
+enum ArrowVerticalDirection {
   ///向上
   up,
 

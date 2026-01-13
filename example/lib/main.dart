@@ -35,7 +35,7 @@ class _ChatScreenState extends State<ChatScreen> {
     "Hello!",
     "Hello!",
     "How are you?",
-    "Im Fine",
+    "Im Fine hah ",
     "and you?",
     "Im good too, thanks for asking.",
     "This is a long press context menu demo.",
@@ -68,7 +68,7 @@ class _ChatScreenState extends State<ChatScreen> {
               itemBuilder: (context, index) {
                 final isMe = index % 2 == 0;
                 return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Align(
                     alignment: isMe
                         ? Alignment.centerRight
@@ -77,6 +77,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       barrierColor: Colors.transparent,
                       backgroundColor: colorScheme.surface,
                       borderRadius: BorderRadius.circular(10),
+                      axis: .horizontal,
                       shadows: [
                         BoxShadow(
                           color: colorScheme.onSurface.withValues(alpha: 0.15),
@@ -104,7 +105,6 @@ class _ChatScreenState extends State<ChatScreen> {
                               horizontal: 12,
                               vertical: 8,
                             ),
-                            margin: .symmetric(vertical: 4),
                             decoration: BoxDecoration(
                               color: isMe
                                   ? colorScheme.primary

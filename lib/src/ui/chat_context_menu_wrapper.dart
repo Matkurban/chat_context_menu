@@ -20,6 +20,7 @@ class ChatContextMenuWrapper extends StatefulWidget {
     this.onClose,
     this.horizontalMargin = 10.0,
     this.constraints,
+    this.axis = Axis.vertical,
   });
 
   ///在页面中显示的组件
@@ -92,6 +93,10 @@ class ChatContextMenuWrapper extends StatefulWidget {
   ///Constraints of context menu container
   final BoxConstraints? constraints;
 
+  ///排列方向
+  ///Arrangement direction
+  final Axis axis;
+
   @override
   State<ChatContextMenuWrapper> createState() => _ChatContextMenuWrapperState();
 }
@@ -122,6 +127,7 @@ class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
       transitionsBuilder: widget.transitionsBuilder,
       horizontalMargin: widget.horizontalMargin,
       constraints: widget.constraints,
+      axis: widget.axis,
     );
 
     Navigator.of(context).push(_route!).then((result) {
