@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class ChatContextMenuWidget extends StatelessWidget {
   final Widget items;
   final Color? backgroundColor;
-  final BorderRadius? borderRadius;
+  final BorderRadius borderRadius;
   final EdgeInsets padding;
   final double? arrowOffset;
   final bool isArrowUp;
@@ -16,13 +16,13 @@ class ChatContextMenuWidget extends StatelessWidget {
     super.key,
     required this.items,
     this.backgroundColor,
-    this.borderRadius,
+    required this.borderRadius,
     required this.padding,
     this.arrowOffset,
-    this.isArrowUp = false,
+    required this.isArrowUp,
     this.shadows,
-    this.arrowHeight = 8.0,
-    this.arrowWidth = 12.0,
+    required this.arrowHeight,
+    required this.arrowWidth,
   });
 
   @override
@@ -37,13 +37,11 @@ class ChatContextMenuWidget extends StatelessWidget {
               ? ChatContextMenuShape(
                   arrowOffset: arrowOffset!,
                   isArrowUp: isArrowUp,
-                  borderRadius: borderRadius ?? BorderRadius.circular(8),
+                  borderRadius: borderRadius,
                   arrowHeight: arrowHeight,
                   arrowWidth: arrowWidth,
                 )
-              : RoundedRectangleBorder(
-                  borderRadius: borderRadius ?? BorderRadius.circular(8),
-                ),
+              : RoundedRectangleBorder(borderRadius: borderRadius),
         ),
         child: items,
       ),

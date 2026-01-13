@@ -97,6 +97,7 @@ class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
   void _showMenu() {
     final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
     if (renderBox == null) return;
+    if (_route != null) return;
 
     final Offset offset = renderBox.localToGlobal(Offset.zero);
     final Rect widgetRect = offset & renderBox.size;

@@ -7,7 +7,7 @@ class ChatContextRoute extends PageRoute {
   final Widget menuItems;
   final Color? _barrierColor;
   final Color? backgroundColor;
-  final BorderRadius? borderRadius;
+  final BorderRadius borderRadius;
   final EdgeInsets padding;
   final List<BoxShadow>? shadows;
   final double arrowHeight;
@@ -34,13 +34,13 @@ class ChatContextRoute extends PageRoute {
     required this.menuItems,
     Color? barrierColor,
     this.backgroundColor,
-    this.borderRadius,
+    required this.borderRadius,
     required this.padding,
     this.shadows,
-    this.arrowHeight = 8.0,
-    this.arrowWidth = 12.0,
-    this.spacing = 10.0,
-    this.horizontalMargin = 10.0,
+    required this.arrowHeight,
+    required this.arrowWidth,
+    required this.spacing,
+    required this.horizontalMargin,
     this.transitionsBuilder,
   }) : _barrierColor = barrierColor;
 
@@ -99,16 +99,8 @@ class ChatContextRoute extends PageRoute {
     final double alignX = (center.dx / screenSize.width) * 2 - 1;
     final double alignY = (center.dy / screenSize.height) * 2 - 1;
     final Alignment alignment = Alignment(alignX, alignY);
-    final curve = CurvedAnimation(
-      parent: animation,
-      curve: Curves.fastOutSlowIn,
-    );
-    return transitionsBuilder?.call(
-          context,
-          animation,
-          secondaryAnimation,
-          child,
-        ) ??
+    final curve = CurvedAnimation(parent: animation, curve: Curves.fastOutSlowIn);
+    return transitionsBuilder?.call(context, animation, secondaryAnimation, child) ??
         FadeTransition(
           opacity: curve,
           child: ScaleTransition(

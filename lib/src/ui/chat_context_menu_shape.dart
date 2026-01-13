@@ -8,8 +8,8 @@ class ChatContextMenuShape extends ShapeBorder {
   final BorderRadius borderRadius;
 
   const ChatContextMenuShape({
-    this.arrowWidth = 12.0,
-    this.arrowHeight = 8.0,
+    required this.arrowWidth,
+    required this.arrowHeight,
     required this.arrowOffset,
     required this.isArrowUp,
     required this.borderRadius,
@@ -17,10 +17,7 @@ class ChatContextMenuShape extends ShapeBorder {
 
   @override
   EdgeInsetsGeometry get dimensions {
-    return EdgeInsets.only(
-      top: isArrowUp ? arrowHeight : 0,
-      bottom: isArrowUp ? 0 : arrowHeight,
-    );
+    return EdgeInsets.only(top: isArrowUp ? arrowHeight : 0, bottom: isArrowUp ? 0 : arrowHeight);
   }
 
   @override
