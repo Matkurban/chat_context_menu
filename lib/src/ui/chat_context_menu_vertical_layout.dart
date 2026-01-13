@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:chat_context_menu/src/model/arrow_direction.dart';
 import 'package:flutter/material.dart';
 
-class ChatContextMenuLayout extends StatefulWidget {
-  const ChatContextMenuLayout({
+class ChatContextMenuVerticalLayout extends StatefulWidget {
+  const ChatContextMenuVerticalLayout({
     super.key,
     required this.widgetRect,
     required this.childBuilder,
@@ -32,10 +32,12 @@ class ChatContextMenuLayout extends StatefulWidget {
   final double horizontalMargin;
 
   @override
-  State<ChatContextMenuLayout> createState() => _ChatContextMenuLayoutState();
+  State<ChatContextMenuVerticalLayout> createState() =>
+      _ChatContextMenuVerticalLayoutState();
 }
 
-class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
+class _ChatContextMenuVerticalLayoutState
+    extends State<ChatContextMenuVerticalLayout> {
   final GlobalKey _childKey = GlobalKey();
   Size? _childSize;
   Offset? _childPosition;
@@ -66,17 +68,22 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
     final Rect widgetRect = widget.widgetRect;
 
     final double topLimit = media.padding.top + kToolbarHeight;
+    debugPrint('Top limit: $topLimit');
     final double bottomLimit =
         screenSize.height -
         (media.padding.bottom +
             kBottomNavigationBarHeight +
             media.viewInsets.bottom);
+    debugPrint('Bottom limit: $bottomLimit');
 
     // Calculate available space
     final double bottomSpace = bottomLimit - widgetRect.bottom;
+    debugPrint('Bottom space: $bottomSpace');
     final double topSpace = widgetRect.top - topLimit;
+    debugPrint('Top space: $topSpace');
 
     final double totalHeight = childSize.height + arrowHeight + spacing;
+    debugPrint('Total height: $totalHeight');
 
     ArrowDirection isArrowUp = .up;
     double y = widgetRect.bottom + spacing;

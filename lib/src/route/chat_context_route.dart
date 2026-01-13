@@ -1,4 +1,4 @@
-import 'package:chat_context_menu/src/ui/chat_context_menu_layout.dart';
+import 'package:chat_context_menu/src/ui/chat_context_menu_vertical_layout.dart';
 import 'package:chat_context_menu/src/ui/chat_context_menu_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -65,7 +65,7 @@ class ChatContextRoute extends PageRoute {
     Animation<double> animation,
     Animation<double> secondaryAnimation,
   ) {
-    return ChatContextMenuLayout(
+    return ChatContextMenuVerticalLayout(
       widgetRect: widgetRect,
       padding: padding,
       arrowHeight: arrowHeight,
@@ -118,14 +118,7 @@ class ChatContextRoute extends PageRoute {
           child: ScaleTransition(
             scale: curve,
             alignment: alignment,
-            child: MediaQuery.removePadding(
-              context: context,
-              removeTop: true,
-              removeBottom: true,
-              removeLeft: true,
-              removeRight: true,
-              child: child,
-            ),
+            child: child,
           ),
         );
   }

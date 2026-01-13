@@ -1,5 +1,5 @@
-import 'package:chat_context_menu/src/chat_context_route.dart';
-import 'package:chat_context_menu/src/statement.dart';
+import 'package:chat_context_menu/src/route/chat_context_route.dart';
+import 'package:chat_context_menu/src/model/statement.dart';
 import 'package:flutter/material.dart';
 
 class ChatContextMenuWrapper extends StatefulWidget {
