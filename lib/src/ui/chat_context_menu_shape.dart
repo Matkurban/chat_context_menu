@@ -1,10 +1,11 @@
+import 'package:chat_context_menu/src/model/arrow_direction.dart';
 import 'package:flutter/material.dart';
 
 class ChatContextMenuShape extends ShapeBorder {
   final double arrowWidth;
   final double arrowHeight;
   final double arrowOffset;
-  final bool isArrowUp;
+  final ArrowDirection isArrowUp;
   final BorderRadius borderRadius;
 
   const ChatContextMenuShape({
@@ -18,8 +19,8 @@ class ChatContextMenuShape extends ShapeBorder {
   @override
   EdgeInsetsGeometry get dimensions {
     return EdgeInsets.only(
-      top: isArrowUp ? arrowHeight : 0,
-      bottom: isArrowUp ? 0 : arrowHeight,
+      top: isArrowUp == .up ? arrowHeight : 0,
+      bottom: isArrowUp == .up ? 0 : arrowHeight,
     );
   }
 
@@ -32,8 +33,8 @@ class ChatContextMenuShape extends ShapeBorder {
   Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
     final double left = rect.left;
     final double right = rect.right;
-    final double top = rect.top + (isArrowUp ? arrowHeight : 0);
-    final double bottom = rect.bottom - (isArrowUp ? 0 : arrowHeight);
+    final double top = rect.top + (isArrowUp == .up ? arrowHeight : 0);
+    final double bottom = rect.bottom - (isArrowUp == .up ? 0 : arrowHeight);
 
     final RRect rrect = RRect.fromLTRBAndCorners(
       left,
@@ -50,19 +51,19 @@ class ChatContextMenuShape extends ShapeBorder {
 
     // Draw arrow
     final double arrowX = left + arrowOffset;
-    // Clamp arrowX to be within the rounded corners
-    // We assume the arrow should be within the straight part of the edge
-    // But for simplicity, let's just draw it.
 
     final Path arrowPath = Path();
-    if (isArrowUp) {
-      arrowPath.moveTo(arrowX - arrowWidth / 2, top);
-      arrowPath.lineTo(arrowX, rect.top);
-      arrowPath.lineTo(arrowX + arrowWidth / 2, top);
-    } else {
-      arrowPath.moveTo(arrowX - arrowWidth / 2, bottom);
-      arrowPath.lineTo(arrowX, rect.bottom);
-      arrowPath.lineTo(arrowX + arrowWidth / 2, bottom);
+    switch (isArrowUp) {
+      case ArrowDirection.up:
+        arrowPath.moveTo(arrowX - arrowWidth / 2, top);
+        arrowPath.lineTo(arrowX, rect.top);
+        arrowPath.lineTo(arrowX + arrowWidth / 2, top);
+        break;
+      case ArrowDirection.down:
+        arrowPath.moveTo(arrowX - arrowWidth / 2, bottom);
+        arrowPath.lineTo(arrowX, rect.bottom);
+        arrowPath.lineTo(arrowX + arrowWidth / 2, bottom);
+        break;
     }
     arrowPath.close();
 

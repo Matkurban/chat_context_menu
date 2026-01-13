@@ -1,3 +1,4 @@
+import 'package:chat_context_menu/src/model/arrow_direction.dart';
 import 'package:chat_context_menu/src/ui/chat_context_menu_shape.dart';
 import 'package:flutter/material.dart';
 
@@ -7,7 +8,7 @@ class ChatContextMenuWidget extends StatelessWidget {
   final BorderRadius borderRadius;
   final EdgeInsets padding;
   final double? arrowOffset;
-  final bool isArrowUp;
+  final ArrowDirection isArrowUp;
   final List<BoxShadow>? shadows;
   final double arrowHeight;
   final double arrowWidth;

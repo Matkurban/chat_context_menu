@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:chat_context_menu/src/model/arrow_direction.dart';
 import 'package:flutter/material.dart';
 
 class ChatContextMenuLayout extends StatefulWidget {
@@ -19,7 +20,7 @@ class ChatContextMenuLayout extends StatefulWidget {
   final Widget Function(
     BuildContext context,
     double? arrowOffset,
-    bool isArrowUp,
+    ArrowDirection isArrowUp,
   )
   childBuilder;
 
@@ -39,7 +40,7 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
   Size? _childSize;
   Offset? _childPosition;
   double? _arrowOffset;
-  bool _isArrowUp = false;
+  ArrowDirection _isArrowUp = .down;
 
   EdgeInsets get padding => widget.padding;
   double get arrowHeight => widget.arrowHeight;
@@ -77,7 +78,7 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
 
     final double totalHeight = childSize.height + arrowHeight + spacing;
 
-    bool isArrowUp = true;
+    ArrowDirection isArrowUp = .up;
     double y = widgetRect.bottom + spacing;
 
     // Prefer bottom, but check if it fits
@@ -85,12 +86,12 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
       // If it doesn't fit bottom, try top
       if (topSpace > totalHeight) {
         y = widgetRect.top - childSize.height - arrowHeight - spacing;
-        isArrowUp = false;
+        isArrowUp = .down;
       } else {
         // If it fits neither, pick the one with more space
         if (topSpace > bottomSpace) {
           y = widgetRect.top - childSize.height - arrowHeight - spacing;
-          isArrowUp = false;
+          isArrowUp = .down;
         } else {
           // else keep bottom (default), but clamp to bottomLimit
           if (y + totalHeight > bottomLimit) {
@@ -98,7 +99,7 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
             if (maxY <= widgetRect.bottom) {
               // Not enough room below without covering the anchor; flip to top.
               y = widgetRect.top - childSize.height - arrowHeight - spacing;
-              isArrowUp = false;
+              isArrowUp = .down;
             } else {
               // Clamp within bottom limit while keeping spacing from the anchor.
               y = max(maxY, widgetRect.bottom + spacing);
@@ -159,7 +160,7 @@ class _ChatContextMenuLayoutState extends State<ChatContextMenuLayout> {
             left: 0,
             child: Container(
               key: _childKey,
-              child: widget.childBuilder(context, null, false),
+              child: widget.childBuilder(context, null, .down),
             ),
           ),
         ],
