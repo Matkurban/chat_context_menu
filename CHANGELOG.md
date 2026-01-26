@@ -1,3 +1,7 @@
+## 1.5.1
+
+** Export `shape` class
+
 ## 1.5.0
 
 ** Add `constraints` properties , to set maximum width and height for the context menu
