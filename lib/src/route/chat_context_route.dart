@@ -134,16 +134,28 @@ class ChatContextRoute extends PageRoute {
     Widget child,
   ) {
     final Size screenSize = MediaQuery.of(context).size;
-    final Offset center = widgetRect.center;
+    final Offset center = pointerRect?.center ?? widgetRect.center;
     // Calculate alignment (-1.0 to 1.0)
     final double alignX = (center.dx / screenSize.width) * 2 - 1;
     final double alignY = (center.dy / screenSize.height) * 2 - 1;
     final Alignment alignment = Alignment(alignX, alignY);
-    final curve = CurvedAnimation(parent: animation, curve: Curves.fastOutSlowIn);
-    return transitionsBuilder?.call(context, animation, secondaryAnimation, child) ??
+    final curve = CurvedAnimation(
+      parent: animation,
+      curve: Curves.fastOutSlowIn,
+    );
+    return transitionsBuilder?.call(
+          context,
+          animation,
+          secondaryAnimation,
+          child,
+        ) ??
         FadeTransition(
           opacity: curve,
-          child: ScaleTransition(scale: curve, alignment: alignment, child: child),
+          child: ScaleTransition(
+            scale: curve,
+            alignment: alignment,
+            child: child,
+          ),
         );
   }
 
