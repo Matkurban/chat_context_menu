@@ -41,7 +41,8 @@ class _ChatScreenState extends State<ChatScreen> {
     "This is a long press context menu demo.",
     "Try long pressing on any message.",
     "Try long pressing on any message.",
-    "You can see different options.",
+    "This design pattern helps to separate presentation from business logic. Following the BLoC pattern facilitates testability and reusability. This package abstracts reactive aspects of the pattern allowing developers to focus on writing the business logic.This design pattern helps to separate presentation from business logic. Following the BLoC pattern facilitates testability and reusability. This package abstracts reactive aspects of the pattern allowing developers to focus on writing the business logic.This design pattern helps to separate presentation from business logic. Following the BLoC pattern facilitates testability and reusability. This package abstracts reactive aspects of the pattern allowing developers to focus on writing the business logic.This design pattern helps to separate presentation from business logic. Following the BLoC pattern facilitates testability and reusability. This package abstracts reactive aspects of the pattern allowing developers to focus on writing the business logic.",
+    "This design pattern helps to separate presentation from business logic. Following the BLoC pattern facilitates testability and reusability. This package abstracts reactive aspects of the pattern allowing developers to focus on writing the business logic.This design pattern helps to separate presentation from business logic. Following the BLoC pattern facilitates testability and reusability. This package abstracts reactive aspects of the pattern allowing developers to focus on writing the business logic.This design pattern helps to separate presentation from business logic. Following the BLoC pattern facilitates testability and reusability. This package abstracts reactive aspects of the pattern allowing developers to focus on writing the business logic.This design pattern helps to separate presentation from business logic. Following the BLoC pattern facilitates testability and reusability. This package abstracts reactive aspects of the pattern allowing developers to focus on writing the business logic.",
     "You can see different options.",
     "Like Reply, Copy, Forward, Delete.",
     "It mimics the iOS style context menu.",
@@ -56,73 +57,76 @@ class _ChatScreenState extends State<ChatScreen> {
     final ThemeData theme = Theme.of(context);
     final TextTheme textTheme = theme.textTheme;
     final ColorScheme colorScheme = theme.colorScheme;
+    final Size size = MediaQuery.sizeOf(context);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Chat Context Menu')),
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                final isMe = index % 2 == 0;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Align(
-                    alignment: isMe
-                        ? Alignment.centerRight
-                        : Alignment.centerLeft,
-                    child: ChatContextMenuWrapper(
-                      barrierColor: Colors.transparent,
-                      backgroundColor: colorScheme.surface,
-                      borderRadius: BorderRadius.circular(10),
-                      axis: .horizontal,
-                      shadows: [
-                        BoxShadow(
-                          color: colorScheme.onSurface.withValues(alpha: 0.15),
-                          blurRadius: 32,
-                        ),
-                      ],
-                      menuBuilder: (context, hideMenu) {
-                        return ContextMenuPane(
-                          textTheme: textTheme,
-                          colorScheme: colorScheme,
-                          onReplayTap: hideMenu,
-                          onForwardTap: hideMenu,
-                          onCopyTap: hideMenu,
-                          onDeleteTap: hideMenu,
-                          onMoreTap: hideMenu,
-                          onQuoteTap: hideMenu,
-                          onSelectTap: hideMenu,
-                        );
-                      },
-                      widgetBuilder: (context, showMenu) {
-                        return GestureDetector(
-                          onLongPress: showMenu,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: _messages.length,
+                  itemBuilder: (context, index) {
+                    final isMe = index % 2 == 0;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Align(
+                        alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                        child: ChatContextMenuWrapper(
+                          barrierColor: Colors.transparent,
+                          backgroundColor: colorScheme.surface,
+                          borderRadius: BorderRadius.circular(10),
+                          axis: .vertical,
+                          // constraints: constraints,
+                          layoutConstraints: constraints,
+                          shadows: [
+                            BoxShadow(
+                              color: colorScheme.onSurface.withValues(alpha: 0.15),
+                              blurRadius: 32,
                             ),
-                            decoration: BoxDecoration(
-                              color: isMe
-                                  ? colorScheme.primary
-                                  : colorScheme.surfaceContainerHighest,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              _messages[index],
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: isMe ? colorScheme.onPrimary : null,
+                          ],
+                          menuBuilder: (context, hideMenu) {
+                            return ContextMenuPane(
+                              textTheme: textTheme,
+                              colorScheme: colorScheme,
+                              onReplayTap: hideMenu,
+                              onForwardTap: hideMenu,
+                              onCopyTap: hideMenu,
+                              onDeleteTap: hideMenu,
+                              onMoreTap: hideMenu,
+                              onQuoteTap: hideMenu,
+                              onSelectTap: hideMenu,
+                            );
+                          },
+                          widgetBuilder: (context, showMenu) {
+                            return GestureDetector(
+                              onLongPress: showMenu,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                constraints: BoxConstraints(maxWidth: size.width * 0.7),
+                                decoration: BoxDecoration(
+                                  color: isMe
+                                      ? colorScheme.primary
+                                      : colorScheme.surfaceContainerHighest,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  _messages[index],
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: isMe ? colorScheme.onPrimary : null,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+                            );
+                          },
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
             ),
@@ -141,10 +145,7 @@ class _ChatScreenState extends State<ChatScreen> {
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
         ],
       ),
     );

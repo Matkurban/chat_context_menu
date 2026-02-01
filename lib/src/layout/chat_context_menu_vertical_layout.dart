@@ -7,6 +7,7 @@ class ChatContextMenuVerticalLayout extends StatefulWidget {
   const ChatContextMenuVerticalLayout({
     super.key,
     required this.widgetRect,
+    this.pointerRect,
     required this.childBuilder,
     required this.padding,
     required this.arrowHeight,
@@ -14,14 +15,12 @@ class ChatContextMenuVerticalLayout extends StatefulWidget {
     required this.arrowWidth,
     required this.borderRadius,
     required this.horizontalMargin,
+    this.layoutConstraints,
   });
 
   final Rect widgetRect;
-  final Widget Function(
-    BuildContext context,
-    double? arrowOffset,
-    ArrowVerticalDirection isArrowUp,
-  )
+  final Rect? pointerRect;
+  final Widget Function(BuildContext context, double? arrowOffset, ArrowVerticalDirection isArrowUp)
   childBuilder;
 
   final EdgeInsets padding;
@@ -30,19 +29,19 @@ class ChatContextMenuVerticalLayout extends StatefulWidget {
   final double arrowWidth;
   final BorderRadius borderRadius;
   final double horizontalMargin;
+  final BoxConstraints? layoutConstraints;
 
   @override
-  State<ChatContextMenuVerticalLayout> createState() =>
-      _ChatContextMenuVerticalLayoutState();
+  State<ChatContextMenuVerticalLayout> createState() => _ChatContextMenuVerticalLayoutState();
 }
 
-class _ChatContextMenuVerticalLayoutState
-    extends State<ChatContextMenuVerticalLayout> {
+class _ChatContextMenuVerticalLayoutState extends State<ChatContextMenuVerticalLayout> {
   final GlobalKey _childKey = GlobalKey();
   Size? _childSize;
   Offset? _childPosition;
   double? _arrowOffset;
   ArrowVerticalDirection _isArrowUp = .down;
+  double? _maxHeight;
 
   EdgeInsets get padding => widget.padding;
   double get arrowHeight => widget.arrowHeight;
@@ -58,8 +57,7 @@ class _ChatContextMenuVerticalLayoutState
   }
 
   void _calculatePosition() {
-    final RenderBox? renderBox =
-        _childKey.currentContext?.findRenderObject() as RenderBox?;
+    final RenderBox? renderBox = _childKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox == null) return;
 
     final Size childSize = renderBox.size;
@@ -68,57 +66,83 @@ class _ChatContextMenuVerticalLayoutState
     final Rect widgetRect = widget.widgetRect;
 
     final double topLimit = media.padding.top + kToolbarHeight;
-    final double bottomLimit =
+    final double screenBottomLimit =
         screenSize.height -
-        (media.padding.bottom +
-            kBottomNavigationBarHeight +
-            media.viewInsets.bottom);
+        (media.padding.bottom + kBottomNavigationBarHeight + media.viewInsets.bottom);
+    final double availableHeightFromConstraints =
+        (widget.layoutConstraints != null && widget.layoutConstraints!.maxHeight.isFinite)
+        ? widget.layoutConstraints!.maxHeight
+        : screenBottomLimit - topLimit;
+    final double bottomLimit = topLimit + availableHeightFromConstraints;
+
+    final double availableHeight = bottomLimit - topLimit;
+    final double maxChildHeight = max(0, availableHeight - arrowHeight);
+    final bool usePointerAnchor =
+        widget.layoutConstraints != null &&
+        widget.pointerRect != null &&
+        (widgetRect.height > availableHeight);
+    double constrainedChildHeight = childSize.height;
+    double effectiveSpacing = spacing;
 
     // Calculate available space
-    final double bottomSpace = bottomLimit - widgetRect.bottom;
-    final double topSpace = widgetRect.top - topLimit;
+    final Rect anchorRect = usePointerAnchor ? widget.pointerRect! : widgetRect;
+    final double bottomSpace = bottomLimit - anchorRect.bottom;
+    final double topSpace = anchorRect.top - topLimit;
 
-    final double totalHeight = childSize.height + arrowHeight + spacing;
+    if (constrainedChildHeight > maxChildHeight) {
+      constrainedChildHeight = maxChildHeight;
+      // When content is taller than the available screen height,
+      // drop spacing to keep the menu visible.
+      effectiveSpacing = 0;
+    }
+
+    final double totalHeight = constrainedChildHeight + arrowHeight + effectiveSpacing;
 
     ArrowVerticalDirection isArrowUp = .up;
-    double y = widgetRect.bottom + spacing;
+    double y = anchorRect.bottom + effectiveSpacing;
 
     // Prefer bottom, but check if it fits
     if (y + totalHeight > bottomLimit) {
       // If it doesn't fit bottom, try top
       if (topSpace > totalHeight) {
-        y = widgetRect.top - childSize.height - arrowHeight - spacing;
+        y = anchorRect.top - constrainedChildHeight - arrowHeight - effectiveSpacing;
         isArrowUp = .down;
       } else {
         // If it fits neither, pick the one with more space
         if (topSpace > bottomSpace) {
-          y = widgetRect.top - childSize.height - arrowHeight - spacing;
+          y = anchorRect.top - constrainedChildHeight - arrowHeight - effectiveSpacing;
           isArrowUp = .down;
         } else {
           // else keep bottom (default), but clamp to bottomLimit
           if (y + totalHeight > bottomLimit) {
-            final double maxY = bottomLimit - childSize.height - arrowHeight;
-            if (maxY <= widgetRect.bottom) {
+            final double maxY = bottomLimit - constrainedChildHeight - arrowHeight;
+            if (maxY <= anchorRect.bottom) {
               // Not enough room below without covering the anchor; flip to top.
-              y = widgetRect.top - childSize.height - arrowHeight - spacing;
+              y = anchorRect.top - constrainedChildHeight - arrowHeight - effectiveSpacing;
               isArrowUp = .down;
             } else {
               // Clamp within bottom limit while keeping spacing from the anchor.
-              y = max(maxY, widgetRect.bottom + spacing);
+              y = max(maxY, anchorRect.bottom + effectiveSpacing);
             }
           }
         }
       }
     }
 
-    double x = widgetRect.center.dx - childSize.width / 2;
+    final double menuHeight = constrainedChildHeight + arrowHeight;
+    final double minY = topLimit;
+    final double maxY = bottomLimit - menuHeight;
+    if (y < minY) y = minY;
+    if (y > maxY) y = maxY;
+
+    double x = anchorRect.center.dx - childSize.width / 2;
     if (x < horizontalMargin) x = horizontalMargin;
     if (x + childSize.width > screenSize.width - horizontalMargin) {
       x = screenSize.width - childSize.width - horizontalMargin;
     }
 
     // Calculate arrow offset relative to the child's left edge
-    double arrowOffset = widgetRect.center.dx - x;
+    double arrowOffset = anchorRect.center.dx - x;
 
     // Clamp arrow offset to be within the child using provided radius and width
     // to keep the arrow away from rounded corners.
@@ -131,10 +155,11 @@ class _ChatContextMenuVerticalLayoutState
 
     if (mounted) {
       setState(() {
-        _childSize = childSize;
+        _childSize = Size(childSize.width, constrainedChildHeight);
         _childPosition = Offset(x, y);
         _arrowOffset = arrowOffset;
         _isArrowUp = isArrowUp;
+        _maxHeight = constrainedChildHeight < childSize.height ? constrainedChildHeight : null;
       });
     }
   }
@@ -160,10 +185,7 @@ class _ChatContextMenuVerticalLayoutState
           Positioned(
             top: 0,
             left: 0,
-            child: Container(
-              key: _childKey,
-              child: widget.childBuilder(context, null, .down),
-            ),
+            child: Container(key: _childKey, child: widget.childBuilder(context, null, .down)),
           ),
         ],
       );
@@ -174,7 +196,12 @@ class _ChatContextMenuVerticalLayoutState
         Positioned(
           left: _childPosition!.dx,
           top: _childPosition!.dy,
-          child: widget.childBuilder(context, _arrowOffset, _isArrowUp),
+          child: _maxHeight == null
+              ? widget.childBuilder(context, _arrowOffset, _isArrowUp)
+              : ConstrainedBox(
+                  constraints: BoxConstraints(maxHeight: _maxHeight!),
+                  child: widget.childBuilder(context, _arrowOffset, _isArrowUp),
+                ),
         ),
       ],
     );

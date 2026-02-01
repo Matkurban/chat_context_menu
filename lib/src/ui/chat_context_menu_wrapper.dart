@@ -19,7 +19,8 @@ class ChatContextMenuWrapper extends StatefulWidget {
     this.transitionsBuilder,
     this.onClose,
     this.horizontalMargin = 10.0,
-    this.constraints,
+    this.menuConstraints,
+    this.layoutConstraints,
     this.axis = Axis.vertical,
   });
 
@@ -91,7 +92,11 @@ class ChatContextMenuWrapper extends StatefulWidget {
 
   ///context menu容器的约束
   ///Constraints of context menu container
-  final BoxConstraints? constraints;
+  final BoxConstraints? menuConstraints;
+
+  ///可用屏幕区域的约束（用于布局判定）
+  ///Constraints of available screen space (for layout decisions)
+  final BoxConstraints? layoutConstraints;
 
   ///排列方向
   ///Arrangement direction
@@ -103,6 +108,7 @@ class ChatContextMenuWrapper extends StatefulWidget {
 
 class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
   ChatContextRoute? _route;
+  Offset? _lastPointerDown;
 
   void _showMenu() {
     final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
@@ -111,6 +117,9 @@ class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
 
     final Offset offset = renderBox.localToGlobal(Offset.zero);
     final Rect widgetRect = offset & renderBox.size;
+    final Rect? pointerRect = _lastPointerDown != null
+        ? Rect.fromCenter(center: _lastPointerDown!, width: 1, height: 1)
+        : null;
 
     _route = ChatContextRoute(
       widgetRect: widgetRect,
@@ -126,8 +135,10 @@ class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
       spacing: widget.spacing,
       transitionsBuilder: widget.transitionsBuilder,
       horizontalMargin: widget.horizontalMargin,
-      constraints: widget.constraints,
+      menuConstraints: widget.menuConstraints,
+      layoutConstraints: widget.layoutConstraints,
       axis: widget.axis,
+      pointerRect: pointerRect,
     );
 
     Navigator.of(context).push(_route!).then((result) {
@@ -148,6 +159,12 @@ class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.widgetBuilder(context, _showMenu);
+    return Listener(
+      behavior: HitTestBehavior.translucent,
+      onPointerDown: (event) {
+        _lastPointerDown = event.position;
+      },
+      child: widget.widgetBuilder(context, _showMenu),
+    );
   }
 }

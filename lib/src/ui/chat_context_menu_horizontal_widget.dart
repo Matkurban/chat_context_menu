@@ -14,7 +14,7 @@ class ChatContextMenuHorizontalWidget extends StatelessWidget {
   final List<BoxShadow>? shadows;
   final double arrowHeight;
   final double arrowWidth;
-  final BoxConstraints? constraints;
+  final BoxConstraints? menuConstraints;
 
   const ChatContextMenuHorizontalWidget({
     super.key,
@@ -27,14 +27,14 @@ class ChatContextMenuHorizontalWidget extends StatelessWidget {
     this.shadows,
     required this.arrowHeight,
     required this.arrowWidth,
-    this.constraints,
+    this.menuConstraints,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: padding,
-      constraints: constraints,
+      constraints: menuConstraints,
       decoration: ShapeDecoration(
         color: backgroundColor,
         shadows: shadows,
