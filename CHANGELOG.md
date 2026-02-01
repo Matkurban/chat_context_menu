@@ -1,3 +1,9 @@
+## 1.5.6
+
+** The `constraints` parameter has been renamed to `menuConstraints`
+** Added `layoutConstraints` parameter
+** fix bug
+
 ## 1.5.1
 
 ** Export `shape` class
