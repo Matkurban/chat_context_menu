@@ -77,17 +77,8 @@ class _ChatContextMenuVerticalLayoutState extends State<ChatContextMenuVerticalL
 
     final double availableHeight = bottomLimit - topLimit;
     final double maxChildHeight = max(0, availableHeight - arrowHeight);
-    final bool usePointerAnchor =
-        widget.layoutConstraints != null &&
-        widget.pointerRect != null &&
-        (widgetRect.height > availableHeight);
     double constrainedChildHeight = childSize.height;
     double effectiveSpacing = spacing;
-
-    // Calculate available space
-    final Rect anchorRect = usePointerAnchor ? widget.pointerRect! : widgetRect;
-    final double bottomSpace = bottomLimit - anchorRect.bottom;
-    final double topSpace = anchorRect.top - topLimit;
 
     if (constrainedChildHeight > maxChildHeight) {
       constrainedChildHeight = maxChildHeight;
@@ -97,6 +88,17 @@ class _ChatContextMenuVerticalLayoutState extends State<ChatContextMenuVerticalL
     }
 
     final double totalHeight = constrainedChildHeight + arrowHeight + effectiveSpacing;
+    final double widgetBottomSpace = bottomLimit - widgetRect.bottom;
+    final double widgetTopSpace = widgetRect.top - topLimit;
+    final bool fitsWithWidgetAnchor =
+        widgetTopSpace >= totalHeight || widgetBottomSpace >= totalHeight;
+    final bool usePointerAnchor =
+        widget.layoutConstraints != null && widget.pointerRect != null && !fitsWithWidgetAnchor;
+
+    // Calculate available space
+    final Rect anchorRect = usePointerAnchor ? widget.pointerRect! : widgetRect;
+    final double bottomSpace = bottomLimit - anchorRect.bottom;
+    final double topSpace = anchorRect.top - topLimit;
 
     ArrowVerticalDirection isArrowUp = .up;
     double y = anchorRect.bottom + effectiveSpacing;
