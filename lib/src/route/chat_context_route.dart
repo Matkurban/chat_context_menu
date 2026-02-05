@@ -28,6 +28,7 @@ class ChatContextRoute extends PageRoute {
   final BoxConstraints? layoutConstraints;
   final Axis axis;
   final Rect? pointerRect;
+  final double topPadding;
 
   ChatContextRoute({
     super.settings,
@@ -53,6 +54,7 @@ class ChatContextRoute extends PageRoute {
     this.layoutConstraints,
     required this.axis,
     this.pointerRect,
+    required this.topPadding,
   }) : _barrierColor = barrierColor;
 
   @override
@@ -82,6 +84,7 @@ class ChatContextRoute extends PageRoute {
         arrowWidth: arrowWidth,
         borderRadius: borderRadius,
         verticalMargin: horizontalMargin,
+        topPadding: topPadding,
         childBuilder: (context, arrowOffset, arrowDirection) {
           return ChatContextMenuHorizontalWidget(
             items: menuItems,
@@ -109,6 +112,7 @@ class ChatContextRoute extends PageRoute {
       borderRadius: borderRadius,
       horizontalMargin: horizontalMargin,
       layoutConstraints: layoutConstraints,
+      topPadding: topPadding,
       childBuilder: (context, arrowOffset, isArrowUp) {
         return ChatContextMenuVerticalWidget(
           items: menuItems,

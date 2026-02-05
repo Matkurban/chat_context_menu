@@ -16,6 +16,7 @@ class ChatContextMenuHorizontalLayout extends StatefulWidget {
     required this.arrowWidth,
     required this.borderRadius,
     required this.verticalMargin,
+    required this.topPadding,
   });
 
   final Rect widgetRect;
@@ -32,6 +33,7 @@ class ChatContextMenuHorizontalLayout extends StatefulWidget {
   final double arrowWidth;
   final BorderRadius borderRadius;
   final double verticalMargin;
+  final double topPadding;
 
   @override
   State<ChatContextMenuHorizontalLayout> createState() =>
@@ -73,7 +75,7 @@ class _ChatContextMenuHorizontalLayoutState
     final double rightLimit =
         screenSize.width - media.padding.right - verticalMargin;
 
-    final double topLimit = media.padding.top + kToolbarHeight;
+    final double topLimit = media.padding.top + widget.topPadding;
     final double bottomLimit =
         screenSize.height -
         (media.padding.bottom +

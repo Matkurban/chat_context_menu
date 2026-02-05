@@ -1,3 +1,8 @@
+## 1.7.0
+
+** Add topPadding parameter
+
+
 ## 1.6.0
 
 ** Fix the issue of duplicate calculations in spacing

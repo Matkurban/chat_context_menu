@@ -22,6 +22,7 @@ class ChatContextMenuWrapper extends StatefulWidget {
     this.menuConstraints,
     this.layoutConstraints,
     this.axis = Axis.vertical,
+    this.topPadding = kToolbarHeight,
   });
 
   ///在页面中显示的组件
@@ -102,6 +103,12 @@ class ChatContextMenuWrapper extends StatefulWidget {
   ///Arrangement direction
   final Axis axis;
 
+  ///顶部安全区域的额外边距
+  ///默认为 kToolbarHeight，当在 AppBar 中使用时可设为 0
+  ///Extra padding for top safe area
+  ///Defaults to kToolbarHeight, can be set to 0 when used inside AppBar
+  final double topPadding;
+
   @override
   State<ChatContextMenuWrapper> createState() => _ChatContextMenuWrapperState();
 }
@@ -139,6 +146,7 @@ class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
       layoutConstraints: widget.layoutConstraints,
       axis: widget.axis,
       pointerRect: pointerRect,
+      topPadding: widget.topPadding,
     );
 
     Navigator.of(context).push(_route!).then((result) {
