@@ -67,10 +67,16 @@ class _ChatScreenState extends State<ChatScreen> {
             backgroundColor: colorScheme.surface,
             spacing: 0,
             widgetBuilder: (BuildContext context, void Function() showMenu) {
-              return IconButton(icon: const Icon(Icons.more_vert), onPressed: showMenu);
+              return IconButton(
+                icon: const Icon(Icons.more_vert),
+                onPressed: showMenu,
+              );
             },
             shadows: [
-              BoxShadow(color: colorScheme.onSurface.withValues(alpha: 0.15), blurRadius: 32),
+              BoxShadow(
+                color: colorScheme.onSurface.withValues(alpha: 0.15),
+                blurRadius: 32,
+              ),
             ],
             menuBuilder: (BuildContext context, void Function() hideMenu) {
               return ContextMenuPane(
@@ -101,7 +107,9 @@ class _ChatScreenState extends State<ChatScreen> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Align(
-                        alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                        alignment: isMe
+                            ? Alignment.centerRight
+                            : Alignment.centerLeft,
                         child: ChatContextMenuWrapper(
                           barrierColor: Colors.transparent,
                           backgroundColor: colorScheme.surface,
@@ -112,7 +120,9 @@ class _ChatScreenState extends State<ChatScreen> {
                           spacing: 2,
                           shadows: [
                             BoxShadow(
-                              color: colorScheme.onSurface.withValues(alpha: 0.15),
+                              color: colorScheme.onSurface.withValues(
+                                alpha: 0.15,
+                              ),
                               blurRadius: 32,
                             ),
                           ],
@@ -133,8 +143,13 @@ class _ChatScreenState extends State<ChatScreen> {
                             return GestureDetector(
                               onLongPress: showMenu,
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                constraints: BoxConstraints(maxWidth: size.width * 0.7),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                                constraints: BoxConstraints(
+                                  maxWidth: size.width * 0.7,
+                                ),
                                 decoration: BoxDecoration(
                                   color: isMe
                                       ? colorScheme.primary
@@ -173,7 +188,10 @@ class _ChatScreenState extends State<ChatScreen> {
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
         ],
       ),
     );
