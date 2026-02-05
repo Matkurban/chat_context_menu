@@ -1,3 +1,7 @@
+## 1.6.0
+
+** Fix the issue of duplicate calculations in spacing
+
 ## 1.5.6
 
 ** The `constraints` parameter has been renamed to `menuConstraints`
