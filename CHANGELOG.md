@@ -1,5 +1,9 @@
 # Chat Context Menu ChangeLog
 
+## 1.7.2
+
+* Use pointer (finger press) position as anchor when the widget is taller than available space for the context menu
+
 ## 1.7.1
 
 * Fix `CurvedAnimation` listener leak in route transitions — replaced with `animation.drive(CurveTween(...))`

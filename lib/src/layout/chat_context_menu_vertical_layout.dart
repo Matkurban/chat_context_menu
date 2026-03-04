@@ -103,9 +103,7 @@ class _ChatContextMenuVerticalLayoutState
     final bool fitsWithWidgetAnchor =
         widgetTopSpace >= totalHeight || widgetBottomSpace >= totalHeight;
     final bool usePointerAnchor =
-        widget.layoutConstraints != null &&
-        widget.pointerRect != null &&
-        !fitsWithWidgetAnchor;
+        widget.pointerRect != null && !fitsWithWidgetAnchor;
 
     // Calculate available space
     final Rect anchorRect = usePointerAnchor ? widget.pointerRect! : widgetRect;
