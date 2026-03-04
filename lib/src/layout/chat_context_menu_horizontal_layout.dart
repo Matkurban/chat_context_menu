@@ -15,7 +15,7 @@ class ChatContextMenuHorizontalLayout extends StatefulWidget {
     required this.spacing,
     required this.arrowWidth,
     required this.borderRadius,
-    required this.verticalMargin,
+    required this.horizontalMargin,
     required this.topPadding,
   });
 
@@ -32,7 +32,7 @@ class ChatContextMenuHorizontalLayout extends StatefulWidget {
   final double spacing;
   final double arrowWidth;
   final BorderRadius borderRadius;
-  final double verticalMargin;
+  final double horizontalMargin;
   final double topPadding;
 
   @override
@@ -53,7 +53,7 @@ class _ChatContextMenuHorizontalLayoutState
   double get spacing => widget.spacing;
   double get arrowWidth => widget.arrowWidth;
   BorderRadius get borderRadius => widget.borderRadius;
-  double get verticalMargin => widget.verticalMargin;
+  double get horizontalMargin => widget.horizontalMargin;
 
   @override
   void initState() {
@@ -71,16 +71,13 @@ class _ChatContextMenuHorizontalLayoutState
     final Size screenSize = media.size;
     final Rect widgetRect = widget.widgetRect;
 
-    final double leftLimit = media.padding.left + verticalMargin;
+    final double leftLimit = media.padding.left + horizontalMargin;
     final double rightLimit =
-        screenSize.width - media.padding.right - verticalMargin;
+        screenSize.width - media.padding.right - horizontalMargin;
 
     final double topLimit = media.padding.top + widget.topPadding;
     final double bottomLimit =
-        screenSize.height -
-        (media.padding.bottom +
-            kBottomNavigationBarHeight +
-            media.viewInsets.bottom);
+        screenSize.height - (media.padding.bottom + media.viewInsets.bottom);
 
     // Calculate available space on left and right
     // Menu width includes arrow height since arrow is part of the shape
@@ -136,22 +133,22 @@ class _ChatContextMenuHorizontalLayoutState
 
     // 检查顶部对齐时，底部是否有足够空间
     final bool fitsWithTopAlign =
-        topAlignedY + childSize.height <= bottomLimit - verticalMargin;
+        topAlignedY + childSize.height <= bottomLimit - horizontalMargin;
 
     if (fitsWithTopAlign) {
       // 顶部对齐，底部空间足够
       y = topAlignedY;
       // 确保不超出顶部边界
-      if (y < topLimit + verticalMargin) {
-        y = topLimit + verticalMargin;
+      if (y < topLimit + horizontalMargin) {
+        y = topLimit + horizontalMargin;
       }
     } else {
       // 底部空间不足，改为底部对齐
       // context_menu 底部与子组件底部对齐
       y = widgetRect.bottom - childSize.height;
       // 确保不超出顶部边界
-      if (y < topLimit + verticalMargin) {
-        y = topLimit + verticalMargin;
+      if (y < topLimit + horizontalMargin) {
+        y = topLimit + horizontalMargin;
       }
     }
 

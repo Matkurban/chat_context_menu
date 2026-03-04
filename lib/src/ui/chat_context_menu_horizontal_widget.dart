@@ -45,7 +45,6 @@ class ChatContextMenuHorizontalWidget extends StatelessWidget {
                 borderRadius: borderRadius,
                 arrowHeight: arrowHeight,
                 arrowWidth: arrowWidth,
-                padding: padding,
               )
             : RoundedRectangleBorder(borderRadius: borderRadius),
       ),

@@ -151,6 +151,7 @@ class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
 
     Navigator.of(context).push(_route!).then((result) {
       _route = null;
+      if (!mounted) return;
       widget.onClose?.call(result);
     });
   }
@@ -163,6 +164,15 @@ class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
         Navigator.of(context).removeRoute(_route!);
       }
     }
+  }
+
+  @override
+  void dispose() {
+    if (_route != null && _route!.isActive) {
+      _route!.navigator?.removeRoute(_route!);
+      _route = null;
+    }
+    super.dispose();
   }
 
   @override

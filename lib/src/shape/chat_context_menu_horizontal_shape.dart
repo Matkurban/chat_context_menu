@@ -9,7 +9,6 @@ class ChatContextMenuHorizontalShape extends ShapeBorder {
   final double arrowOffset;
   final ArrowHorizontalDirection arrowDirection;
   final BorderRadius borderRadius;
-  final EdgeInsets padding;
 
   const ChatContextMenuHorizontalShape({
     required this.arrowWidth,
@@ -17,7 +16,6 @@ class ChatContextMenuHorizontalShape extends ShapeBorder {
     required this.arrowOffset,
     required this.arrowDirection,
     required this.borderRadius,
-    this.padding = EdgeInsets.zero,
   });
 
   @override
@@ -30,7 +28,17 @@ class ChatContextMenuHorizontalShape extends ShapeBorder {
 
   @override
   Path getInnerPath(Rect rect, {TextDirection? textDirection}) {
-    return getOuterPath(rect, textDirection: textDirection);
+    final EdgeInsetsGeometry insets = dimensions;
+    final Rect innerRect = insets.resolve(textDirection).deflateRect(rect);
+    return Path()..addRRect(
+      RRect.fromRectAndCorners(
+        innerRect,
+        topLeft: borderRadius.topLeft,
+        topRight: borderRadius.topRight,
+        bottomLeft: borderRadius.bottomLeft,
+        bottomRight: borderRadius.bottomRight,
+      ),
+    );
   }
 
   @override
@@ -57,8 +65,8 @@ class ChatContextMenuHorizontalShape extends ShapeBorder {
 
     final Path path = Path()..addRRect(rrect);
 
-    // Draw arrow - arrowOffset 已经包含 padding.top 的补偿
-    final double arrowY = top + arrowOffset + padding.top;
+    // Draw arrow at the computed offset from the menu's top edge.
+    final double arrowY = top + arrowOffset;
 
     final Path arrowPath = Path();
     switch (arrowDirection) {
@@ -91,7 +99,6 @@ class ChatContextMenuHorizontalShape extends ShapeBorder {
       arrowOffset: arrowOffset * t,
       arrowDirection: arrowDirection,
       borderRadius: borderRadius * t,
-      padding: padding * t,
     );
   }
 }

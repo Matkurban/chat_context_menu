@@ -8,6 +8,7 @@ class ChatContextRoute extends PageRoute {
   final Rect widgetRect;
   final Widget menuItems;
   final Color? _barrierColor;
+  final bool _barrierDismissible;
   final Color? backgroundColor;
   final BorderRadius borderRadius;
   final EdgeInsets padding;
@@ -37,7 +38,7 @@ class ChatContextRoute extends PageRoute {
     super.directionalTraversalEdgeBehavior,
     super.fullscreenDialog,
     super.allowSnapshotting,
-    super.barrierDismissible,
+    bool barrierDismissible = true,
     required this.widgetRect,
     required this.menuItems,
     Color? barrierColor,
@@ -55,10 +56,11 @@ class ChatContextRoute extends PageRoute {
     required this.axis,
     this.pointerRect,
     required this.topPadding,
-  }) : _barrierColor = barrierColor;
+  }) : _barrierColor = barrierColor,
+       _barrierDismissible = barrierDismissible;
 
   @override
-  bool get barrierDismissible => true;
+  bool get barrierDismissible => _barrierDismissible;
 
   @override
   Color? get barrierColor => _barrierColor;
@@ -83,7 +85,7 @@ class ChatContextRoute extends PageRoute {
         spacing: spacing,
         arrowWidth: arrowWidth,
         borderRadius: borderRadius,
-        verticalMargin: horizontalMargin,
+        horizontalMargin: horizontalMargin,
         topPadding: topPadding,
         childBuilder: (context, arrowOffset, arrowDirection) {
           return ChatContextMenuHorizontalWidget(
@@ -143,9 +145,8 @@ class ChatContextRoute extends PageRoute {
     final double alignX = (center.dx / screenSize.width) * 2 - 1;
     final double alignY = (center.dy / screenSize.height) * 2 - 1;
     final Alignment alignment = Alignment(alignX, alignY);
-    final curve = CurvedAnimation(
-      parent: animation,
-      curve: Curves.fastOutSlowIn,
+    final Animation<double> curve = animation.drive(
+      CurveTween(curve: Curves.fastOutSlowIn),
     );
     return transitionsBuilder?.call(
           context,

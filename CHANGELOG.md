@@ -1,3 +1,13 @@
+## 1.7.1
+
+* Fix `CurvedAnimation` listener leak in route transitions — replaced with `animation.drive(CurveTween(...))`
+* Fix `barrierDismissible` parameter being ignored (getter was hardcoded to `true`)
+* Fix potential crash when widget is disposed while menu is closing (added `mounted` check)
+* Add `dispose` to `ChatContextMenuWrapperState` to clean up active route on widget removal
+* Rename `verticalMargin` to `horizontalMargin` in `ChatContextMenuHorizontalLayout` for correct semantics
+* Fix `getInnerPath` in both shape classes to properly return inset path
+* Remove unused `padding` parameter from `ChatContextMenuHorizontalShape`
+
 ## 1.7.0
 
 ** Add topPadding parameter

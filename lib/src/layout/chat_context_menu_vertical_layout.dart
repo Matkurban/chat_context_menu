@@ -76,10 +76,7 @@ class _ChatContextMenuVerticalLayoutState
 
     final double topLimit = media.padding.top + widget.topPadding;
     final double screenBottomLimit =
-        screenSize.height -
-        (media.padding.bottom +
-            kBottomNavigationBarHeight +
-            media.viewInsets.bottom);
+        screenSize.height - (media.padding.bottom + media.viewInsets.bottom);
     final double availableHeightFromConstraints =
         (widget.layoutConstraints != null &&
             widget.layoutConstraints!.maxHeight.isFinite)
@@ -216,9 +213,12 @@ class _ChatContextMenuVerticalLayoutState
           Positioned(
             top: 0,
             left: 0,
-            child: Container(
-              key: _childKey,
-              child: widget.childBuilder(context, null, .down),
+            child: Opacity(
+              opacity: 0,
+              child: Container(
+                key: _childKey,
+                child: widget.childBuilder(context, null, .down),
+              ),
             ),
           ),
         ],

@@ -28,7 +28,17 @@ class ChatContextMenuVerticalShape extends ShapeBorder {
 
   @override
   Path getInnerPath(Rect rect, {TextDirection? textDirection}) {
-    return getOuterPath(rect, textDirection: textDirection);
+    final EdgeInsetsGeometry insets = dimensions;
+    final Rect innerRect = insets.resolve(textDirection).deflateRect(rect);
+    return Path()..addRRect(
+      RRect.fromRectAndCorners(
+        innerRect,
+        topLeft: borderRadius.topLeft,
+        topRight: borderRadius.topRight,
+        bottomLeft: borderRadius.bottomLeft,
+        bottomRight: borderRadius.bottomRight,
+      ),
+    );
   }
 
   @override
