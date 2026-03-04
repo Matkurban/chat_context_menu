@@ -1,3 +1,5 @@
+# Chat Context Menu ChangeLog
+
 ## 1.7.1
 
 * Fix `CurvedAnimation` listener leak in route transitions — replaced with `animation.drive(CurveTween(...))`
@@ -12,14 +14,13 @@
 
 ** Add topPadding parameter
 
-
 ## 1.6.0
 
 ** Fix the issue of duplicate calculations in spacing
 
 ## 1.5.6
 
-** The `constraints` parameter has been renamed to `menuConstraints`
+**The `constraints` parameter has been renamed to `menuConstraints`
 ** Added `layoutConstraints` parameter
 ** fix bug
 
@@ -29,7 +30,7 @@
 
 ## 1.5.0
 
-** Add `constraints` properties , to set maximum width and height for the context menu
+**Add `constraints` properties , to set maximum width and height for the context menu
 ** Add `axis` properties , to set the direction of the context menu (vertical or horizontal)
 
 ## 1.4.0
@@ -54,9 +55,8 @@
 
 ## 1.0.0
 
-*   Initial release of `chat_context_menu`.
-*   Added `ChatContextMenuWrapper` for easy integration.
-*   Supported customizable menu content via `menuBuilder`.
-*   Implemented automatic positioning with arrow indicator.
-*   Added customization options for colors and border radius.
-
+* Initial release of `chat_context_menu`.
+* Added `ChatContextMenuWrapper` for easy integration.
+* Supported customizable menu content via `menuBuilder`.
+* Implemented automatic positioning with arrow indicator.
+* Added customization options for colors and border radius.
