@@ -79,6 +79,7 @@ class ChatContextMenuWrapper extends StatefulWidget {
     BuildContext context,
     Animation<double> animation,
     Animation<double> secondaryAnimation,
+    Alignment alignment,
     Widget child,
   )?
   transitionsBuilder;
