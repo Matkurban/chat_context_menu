@@ -1,5 +1,10 @@
 # Chat Context Menu ChangeLog
 
+## 1.7.4
+
+* transitionsBuilder add centerOffset parameter to control the animation origin point
+
+
 ## 1.7.3
 
 * transitionsBuilder add alignment parameter to control the animation origin point
