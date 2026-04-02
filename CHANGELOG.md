@@ -1,5 +1,21 @@
 # Chat Context Menu ChangeLog
 
+## 2.0.0
+
+* Add `ChatSelectableText` widget — a text widget with built-in text selection and context menu support
+* Text selection with draggable handles (base & extent) for adjustable selection range
+* Customizable selection highlight color and handle color
+* Context menu with arrow indicator, using the same positioning logic as `ChatContextMenuWrapper`
+* Platform-adaptive trigger modes:
+  - Mobile: `MobileTriggerMode` — `tap`, `doubleTap`, `longPress` (default: `longPress`)
+  - Desktop: `DesktopTriggerMode` — `rightClick`, `leftClick` (default: `rightClick`)
+* Menu-only animation (text and selection appear immediately, only the menu panel animates)
+* Customizable menu appearance: `menuBackgroundColor`, `menuBorderRadius`, `menuPadding`, `menuShadows`
+* Customizable arrow: `arrowHeight`, `arrowWidth`, `spacing`, `horizontalMargin`
+* `onSelectionChanged` callback provides the currently selected text
+* `onMenuClosed` callback triggered when the menu is dismissed
+* Custom `transitionsBuilder` for menu animation
+
 ## 1.7.4
 
 * transitionsBuilder add centerOffset parameter to control the animation origin point

@@ -11,7 +11,7 @@ import 'package:example/main.dart';
 
 void main() {
   testWidgets('Long press opens context menu', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(const HomePage());
 
     expect(find.text('Chat Context Menu'), findsOneWidget);
 

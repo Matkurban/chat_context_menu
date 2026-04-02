@@ -17,6 +17,7 @@ class ChatContextMenuWrapper extends StatefulWidget {
     this.arrowWidth = 12.0,
     this.spacing = 6.0,
     this.transitionsBuilder,
+    this.transitionDurations = const Duration(milliseconds: 150),
     this.onClose,
     this.horizontalMargin = 10.0,
     this.menuConstraints,
@@ -85,6 +86,10 @@ class ChatContextMenuWrapper extends StatefulWidget {
   )?
   transitionsBuilder;
 
+  ///菜单动画时长
+  ///Duration of menu animation
+  final Duration transitionDurations;
+
   ///关闭时触发的回调
   ///Callback triggered when closed
   final void Function(dynamic result)? onClose;
@@ -132,7 +137,11 @@ class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
 
     _route = ChatContextRoute(
       widgetRect: widgetRect,
-      menuItems: widget.menuBuilder(context, _hideMenu),
+      menuItems: Material(
+        type: MaterialType.transparency,
+        color: Colors.transparent,
+        child: widget.menuBuilder(context, _hideMenu),
+      ),
       barrierColor: widget.barrierColor,
       backgroundColor: widget.backgroundColor,
       borderRadius: widget.borderRadius,
@@ -143,6 +152,7 @@ class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
       arrowWidth: widget.arrowWidth,
       spacing: widget.spacing,
       transitionsBuilder: widget.transitionsBuilder,
+      transitionDurations: widget.transitionDurations,
       horizontalMargin: widget.horizontalMargin,
       menuConstraints: widget.menuConstraints,
       layoutConstraints: widget.layoutConstraints,

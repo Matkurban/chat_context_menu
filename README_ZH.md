@@ -1,38 +1,36 @@
 # Chat Context Menu
 
-[![中文文档](https://img.shields.io/badge/文档-简体中文-blue)](README_ZH.md)
+一个提供 iOS 风格聊天上下文菜单的 Flutter 组件包，支持自定义外观和动画。该组件包处理菜单定位、箭头指示器和背景遮罩，你只需提供任意 Widget 作为菜单内容。
 
-A Flutter package that provides an iOS-style chat context menu with customizable appearance and animations. This package handles the positioning, arrow indicator, and background blur/dimming, allowing you to provide any widget as the menu content.
+## 功能特性
 
-## Features
+*   **iOS 风格上下文菜单：** 流畅的动画和布局，类似原生 iOS 上下文菜单。
+*   **自动定位：** 菜单自动定位在目标组件附近，智能处理溢出情况。
+*   **箭头指示器：** 可选的箭头指向目标组件。
+*   **自定义外观：** 可配置背景颜色、圆角和遮罩颜色。
+*   **灵活的内容：** 你提供菜单内容的 Widget，完全控制菜单项和布局。
+*   **简单集成：** 使用 `ChatContextMenuWrapper` 包裹任意组件即可启用上下文菜单。
+*   **可选文本：** `ChatSelectableText` 提供带拖动手柄的文本选择和上下文菜单，非常适合聊天气泡。
+*   **平台自适应触发：** 可配置移动端（单击 / 双击 / 长按）和桌面端（右键 / 左键）的触发方式。
 
-*   **iOS-style Context Menu:** Smooth animations and layout similar to native iOS context menus.
-*   **Automatic Positioning:** The menu is automatically positioned near the target widget, with smart overflow handling.
-*   **Arrow Indicator:** An optional arrow points to the target widget.
-*   **Customizable Appearance:** Configure background color, border radius, and barrier color.
-*   **Flexible Content:** You provide the widget for the menu content, giving you full control over the items and layout.
-*   **Easy Integration:** Wrap any widget with `ChatContextMenuWrapper` to enable the context menu.
-*   **Selectable Text:** `ChatSelectableText` provides text selection with draggable handles and a context menu, ideal for chat bubbles.
-*   **Platform-Adaptive Triggers:** Configurable trigger modes for mobile (tap / double-tap / long-press) and desktop (right-click / left-click).
-
-## Screenshots
+## 截图
 
 |                    ScreenShot                    |                    ScreenShot                    |         ScreenShot                    ｜          |
 |:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|
 | ![Screenshot 1](doc/screenshot/screenshot_1.jpg) | ![Screenshot 2](doc/screenshot/screenshot_2.jpg) | ![Screenshot 2](doc/screenshot/screenshot_3.jpg) |
 
-## Getting started
+## 开始使用
 
-Add `chat_context_menu` to your `pubspec.yaml`:
+在 `pubspec.yaml` 中添加 `chat_context_menu`：
 
 ```yaml
 dependencies:
   chat_context_menu: ^last_version
 ```
 
-## Usage
+## 用法
 
-Wrap the widget you want to trigger the menu (usually a chat bubble) with `ChatContextMenuWrapper`.
+使用 `ChatContextMenuWrapper` 包裹你想触发菜单的组件（通常是聊天气泡）。
 
 ```dart
 import 'package:chat_context_menu/chat_context_menu.dart';
@@ -191,25 +189,25 @@ class _ChatScreenState extends State<ChatScreen> {
 
 ```
 
-## Customization
+## 自定义
 
-You can customize the `ChatContextMenuWrapper` with the following properties:
+你可以通过以下属性自定义 `ChatContextMenuWrapper`：
 
-*   `menuBuilder`: A builder function that returns the widget to display in the menu. It provides a `hideMenu` callback.
-*   `barrierColor`: Color of the background overlay.
-*   `backgroundColor`: Background color of the menu container.
-*   `borderRadius`: Border radius of the menu container.
-*   `padding`: Padding inside the menu container.
+*   `menuBuilder`：返回菜单内容 Widget 的构建函数，提供 `hideMenu` 回调。
+*   `barrierColor`：背景遮罩颜色。
+*   `backgroundColor`：菜单容器的背景颜色。
+*   `borderRadius`：菜单容器的圆角。
+*   `padding`：菜单容器的内边距。
 
 ## ChatSelectableText
 
-A text widget with built-in text selection and context menu support. Users can select text with draggable handles and perform operations on the selected text.
+一个内置文本选择和上下文菜单的文本组件。用户可以通过拖动手柄选择文本，并对选中的文本执行操作。
 
-### Basic Usage
+### 基础用法
 
 ```dart
 ChatSelectableText(
-  'Long press to select text and see the context menu.',
+  '长按选择文本并查看上下文菜单。',
   style: TextStyle(fontSize: 16),
   menuBackgroundColor: Colors.white,
   menuShadows: [
@@ -238,22 +236,22 @@ ChatSelectableText(
 )
 ```
 
-### Custom Selection Colors
+### 自定义选中颜色
 
 ```dart
 ChatSelectableText(
-  'Custom selection and handle colors.',
+  '自定义选中区域和手柄颜色。',
   style: TextStyle(fontSize: 16),
   selectionColor: Colors.orange.withValues(alpha: 0.35),
   handleColor: Colors.deepOrange,
   menuBackgroundColor: Colors.white,
   menuBuilder: (context, selectedText, hideMenu) {
-    return Text('Selected: $selectedText');
+    return Text('选中: $selectedText');
   },
 )
 ```
 
-### In Chat Bubbles
+### 在聊天气泡中使用
 
 ```dart
 ChatSelectableText(
@@ -274,62 +272,61 @@ ChatSelectableText(
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        TextButton(onPressed: () { hideMenu(); }, child: Text('Copy')),
-        TextButton(onPressed: () { hideMenu(); }, child: Text('Share')),
+        TextButton(onPressed: () { hideMenu(); }, child: Text('复制')),
+        TextButton(onPressed: () { hideMenu(); }, child: Text('分享')),
       ],
     );
   },
   onSelectionChanged: (text) {
-    debugPrint('Selected: $text');
+    debugPrint('选中: $text');
   },
 )
 ```
 
-### Trigger Modes
+### 触发方式
 
 ```dart
-// Double tap trigger (mobile)
+// 双击触发（移动端）
 ChatSelectableText(
-  'Double tap to select.',
+  '双击选择文本。',
   mobileTriggerMode: MobileTriggerMode.doubleTap,
   menuBuilder: (context, selectedText, hideMenu) => Text(selectedText),
 )
 
-// Left click trigger (desktop)
+// 左键点击触发（桌面端）
 ChatSelectableText(
-  'Left click to select.',
+  '左键点击选择文本。',
   desktopTriggerMode: DesktopTriggerMode.leftClick,
   menuBuilder: (context, selectedText, hideMenu) => Text(selectedText),
 )
 ```
 
-### ChatSelectableText Properties
+### ChatSelectableText 属性
 
-| Property              | Type                                                  | Default                    | Description                      |
-|-----------------------|-------------------------------------------------------|----------------------------|----------------------------------|
-| `data`                | `String`                                              | required                   | Text content                     |
-| `style`               | `TextStyle?`                                          | `null`                     | Text style                       |
-| `selectionColor`      | `Color?`                                              | theme primary (30% alpha)  | Selection highlight color        |
-| `handleColor`         | `Color?`                                              | theme primary              | Drag handle color                |
-| `handleSize`          | `double`                                              | `16.0`                     | Handle widget size               |
-| `menuBuilder`         | `Widget Function(BuildContext, String, VoidCallback)` | required                   | Menu content builder             |
-| `menuBackgroundColor` | `Color?`                                              | `null`                     | Menu background color            |
-| `menuBorderRadius`    | `BorderRadius`                                        | `BorderRadius.circular(8)` | Menu corner radius               |
-| `menuPadding`         | `EdgeInsets`                                          | `EdgeInsets.all(8)`        | Menu internal padding            |
-| `menuShadows`         | `List<BoxShadow>?`                                    | `null`                     | Menu shadow                      |
-| `arrowHeight`         | `double`                                              | `8.0`                      | Arrow indicator height           |
-| `arrowWidth`          | `double`                                              | `12.0`                     | Arrow indicator width            |
-| `spacing`             | `double`                                              | `6.0`                      | Space between menu and selection |
-| `horizontalMargin`    | `double`                                              | `10.0`                     | Min margin from screen edges     |
-| `mobileTriggerMode`   | `MobileTriggerMode`                                   | `longPress`                | Mobile trigger mode              |
-| `desktopTriggerMode`  | `DesktopTriggerMode`                                  | `rightClick`               | Desktop trigger mode             |
-| `onSelectionChanged`  | `ValueChanged<String>?`                               | `null`                     | Selection change callback        |
-| `onMenuClosed`        | `VoidCallback?`                                       | `null`                     | Menu closed callback             |
-| `barrierColor`        | `Color?`                                              | `transparent`              | Overlay barrier color            |
-| `transitionsBuilder`  | `Function?`                                           | `null`                     | Custom menu animation            |
-| `transitionDurations` | `Duration`                                            | `150ms`                    | Menu animation duration          |
+| 属性                    | 类型                                                    | 默认值                        | 说明        |
+|-----------------------|-------------------------------------------------------|----------------------------|-----------|
+| `data`                | `String`                                              | 必填                         | 文本内容      |
+| `style`               | `TextStyle?`                                          | `null`                     | 文本样式      |
+| `selectionColor`      | `Color?`                                              | 主题色 (30% 透明度)              | 选中高亮颜色    |
+| `handleColor`         | `Color?`                                              | 主题色                        | 拖动手柄颜色    |
+| `handleSize`          | `double`                                              | `16.0`                     | 手柄大小      |
+| `menuBuilder`         | `Widget Function(BuildContext, String, VoidCallback)` | 必填                         | 菜单内容构建函数  |
+| `menuBackgroundColor` | `Color?`                                              | `null`                     | 菜单背景颜色    |
+| `menuBorderRadius`    | `BorderRadius`                                        | `BorderRadius.circular(8)` | 菜单圆角      |
+| `menuPadding`         | `EdgeInsets`                                          | `EdgeInsets.all(8)`        | 菜单内边距     |
+| `menuShadows`         | `List<BoxShadow>?`                                    | `null`                     | 菜单阴影      |
+| `arrowHeight`         | `double`                                              | `8.0`                      | 箭头指示器高度   |
+| `arrowWidth`          | `double`                                              | `12.0`                     | 箭头指示器宽度   |
+| `spacing`             | `double`                                              | `6.0`                      | 菜单与选区的间距  |
+| `horizontalMargin`    | `double`                                              | `10.0`                     | 距屏幕边缘最小留白 |
+| `mobileTriggerMode`   | `MobileTriggerMode`                                   | `longPress`                | 移动端触发方式   |
+| `desktopTriggerMode`  | `DesktopTriggerMode`                                  | `rightClick`               | 桌面端触发方式   |
+| `onSelectionChanged`  | `ValueChanged<String>?`                               | `null`                     | 选中文本变化回调  |
+| `onMenuClosed`        | `VoidCallback?`                                       | `null`                     | 菜单关闭回调    |
+| `barrierColor`        | `Color?`                                              | `transparent`              | 遮罩层颜色     |
+| `transitionsBuilder`  | `Function?`                                           | `null`                     | 自定义菜单动画   |
+| `transitionDurations` | `Duration`                                            | `150ms`                    | 菜单动画时长    |
 
-## Additional information
+## 更多信息
 
-For more details, check the `example` folder in the repository.
-
+更多详情请查看仓库中的 `example` 文件夹。

@@ -26,7 +26,7 @@ class ChatContextRoute extends PageRoute {
     Widget child,
   )?
   transitionsBuilder;
-
+  final Duration transitionDurations;
   final BoxConstraints? menuConstraints;
   final BoxConstraints? layoutConstraints;
   final Axis axis;
@@ -53,6 +53,7 @@ class ChatContextRoute extends PageRoute {
     required this.spacing,
     required this.horizontalMargin,
     this.transitionsBuilder,
+    required this.transitionDurations,
     this.menuConstraints,
     this.layoutConstraints,
     required this.axis,
@@ -172,5 +173,5 @@ class ChatContextRoute extends PageRoute {
   bool get maintainState => false;
 
   @override
-  Duration get transitionDuration => const Duration(milliseconds: 250);
+  Duration get transitionDuration => transitionDurations;
 }
