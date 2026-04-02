@@ -5,9 +5,9 @@ homepage: https://github.com/Matkurban/chat_context_menu.git
 repository: https://github.com/Matkurban/chat_context_menu.git
 topics:
   - chat
-  - chat_context_menu
-  - context_menu
-  - chat_selectable_text
+  - chat-context-menu
+  - context-menu
+  - chat-selectable-text
   - menu
 
 screenshots:
