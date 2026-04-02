@@ -3,7 +3,12 @@ description: "A Flutter package that provides chat context menu with customizabl
 version: 2.0.0
 homepage: https://github.com/Matkurban/chat_context_menu.git
 repository: https://github.com/Matkurban/chat_context_menu.git
-topics: [ chat,chat_context_menu,context_menu,chat_selectable_text ]
+topics:
+  - chat
+  - chat_context_menu
+  - context_menu
+  - chat_selectable_text
+  - menu
 
 screenshots:
   - description: 'show context menu'
