@@ -36,12 +36,10 @@ class ChatContextMenuHorizontalLayout extends StatefulWidget {
   final double topPadding;
 
   @override
-  State<ChatContextMenuHorizontalLayout> createState() =>
-      _ChatContextMenuHorizontalLayoutState();
+  State<ChatContextMenuHorizontalLayout> createState() => _ChatContextMenuHorizontalLayoutState();
 }
 
-class _ChatContextMenuHorizontalLayoutState
-    extends State<ChatContextMenuHorizontalLayout> {
+class _ChatContextMenuHorizontalLayoutState extends State<ChatContextMenuHorizontalLayout> {
   final GlobalKey _childKey = GlobalKey();
   Size? _childSize;
   Offset? _childPosition;
@@ -62,8 +60,7 @@ class _ChatContextMenuHorizontalLayoutState
   }
 
   void _calculatePosition() {
-    final RenderBox? renderBox =
-        _childKey.currentContext?.findRenderObject() as RenderBox?;
+    final RenderBox? renderBox = _childKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox == null) return;
 
     final Size childSize = renderBox.size;
@@ -72,12 +69,10 @@ class _ChatContextMenuHorizontalLayoutState
     final Rect widgetRect = widget.widgetRect;
 
     final double leftLimit = media.padding.left + horizontalMargin;
-    final double rightLimit =
-        screenSize.width - media.padding.right - horizontalMargin;
+    final double rightLimit = screenSize.width - media.padding.right - horizontalMargin;
 
     final double topLimit = media.padding.top + widget.topPadding;
-    final double bottomLimit =
-        screenSize.height - (media.padding.bottom + media.viewInsets.bottom);
+    final double bottomLimit = screenSize.height - (media.padding.bottom + media.viewInsets.bottom);
 
     // Calculate available space on left and right
     // Menu width includes arrow height since arrow is part of the shape
@@ -132,8 +127,7 @@ class _ChatContextMenuHorizontalLayoutState
     final double topAlignedY = widgetRect.top;
 
     // 检查顶部对齐时，底部是否有足够空间
-    final bool fitsWithTopAlign =
-        topAlignedY + childSize.height <= bottomLimit - horizontalMargin;
+    final bool fitsWithTopAlign = topAlignedY + childSize.height <= bottomLimit - horizontalMargin;
 
     if (fitsWithTopAlign) {
       // 顶部对齐，底部空间足够
@@ -200,11 +194,7 @@ class _ChatContextMenuHorizontalLayoutState
               opacity: 0,
               child: Container(
                 key: _childKey,
-                child: widget.childBuilder(
-                  context,
-                  null,
-                  ArrowHorizontalDirection.left,
-                ),
+                child: widget.childBuilder(context, null, ArrowHorizontalDirection.left),
               ),
             ),
           ),

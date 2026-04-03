@@ -2,7 +2,7 @@ import 'package:chat_context_menu/chat_context_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-///文本选择示例页面
+///可选择文本自定义菜单示例
 ///Example page demonstrating ChatSelectableText
 class ChatSelectableTextPage extends StatefulWidget {
   const ChatSelectableTextPage({super.key});
@@ -26,8 +26,7 @@ class _ChatSelectableTextPageState extends State<ChatSelectableTextPage> {
         padding: const EdgeInsets.all(16),
         children: [
           ///基础用法
-          ///Basic usage
-          Text('Basic Usage (Long Press)', style: textTheme.titleMedium),
+          Text('Basic Usage (Native Selection)', style: textTheme.titleMedium),
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.all(12),
@@ -36,8 +35,10 @@ class _ChatSelectableTextPageState extends State<ChatSelectableTextPage> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: ChatSelectableText(
-              'This is a basic selectable text. Long press to select text and see the context menu appear. You can drag the handles to adjust the selection range.',
-              style: TextStyle(fontSize: 16, color: colorScheme.onSurface),
+              'This uses Flutter\'s native SelectableText with a custom context menu. '
+              'Long press or double tap to select text, then you\'ll see a custom menu '
+              'instead of the default system toolbar. The selection handles are native Flutter handles.',
+              style: TextStyle(fontSize: 30, color: colorScheme.onSurface),
               menuBackgroundColor: colorScheme.surface,
               menuShadows: [
                 BoxShadow(
@@ -45,11 +46,12 @@ class _ChatSelectableTextPageState extends State<ChatSelectableTextPage> {
                   blurRadius: 32,
                 ),
               ],
-              menuBuilder: (context, selectedText, hideMenu) {
+              menuBuilder: (context, selectedText, hideMenu, selectAll) {
                 return _buildMenuPane(
                   colorScheme: colorScheme,
                   selectedText: selectedText,
                   hideMenu: hideMenu,
+                  selectAll: selectAll,
                 );
               },
               onSelectionChanged: (text) {
@@ -60,9 +62,8 @@ class _ChatSelectableTextPageState extends State<ChatSelectableTextPage> {
 
           const SizedBox(height: 24),
 
-          ///自定义颜色
-          ///Custom colors
-          Text('Custom Selection Color', style: textTheme.titleMedium),
+          ///长文本
+          Text('Long Text (Scrollable)', style: textTheme.titleMedium),
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.all(12),
@@ -71,10 +72,17 @@ class _ChatSelectableTextPageState extends State<ChatSelectableTextPage> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: ChatSelectableText(
-              'This example uses custom selection and handle colors. The selection highlight is orange and the handles are deep orange.',
-              style: TextStyle(fontSize: 30, color: colorScheme.onSurface),
-              selectionColor: Colors.orange.withValues(alpha: 0.35),
-              handleColor: Colors.deepOrange,
+              'Flutter is Google\'s UI toolkit for building natively compiled applications '
+              'for mobile, web, and desktop from a single codebase. Flutter works with existing '
+              'code, is used by developers and organizations around the world, and is free and '
+              'open source. Flutter uses Dart as its programming language. Dart is a client-optimized '
+              'language for fast apps on any platform. It is developed by Google and is used to build '
+              'mobile, desktop, server, and web applications. Dart is an object-oriented, class-based, '
+              'garbage-collected language with C-style syntax. Dart can compile to either native code '
+              'or JavaScript. It supports interfaces, mixins, abstract classes, reified generics, and '
+              'type inference. Flutter provides a rich set of widgets that implement Material Design and '
+              'Cupertino (iOS-style) design patterns. These widgets look and feel native on each platform.',
+              style: TextStyle(fontSize: 22, color: colorScheme.onSurface),
               menuBackgroundColor: colorScheme.surface,
               menuShadows: [
                 BoxShadow(
@@ -82,11 +90,13 @@ class _ChatSelectableTextPageState extends State<ChatSelectableTextPage> {
                   blurRadius: 32,
                 ),
               ],
-              menuBuilder: (context, selectedText, hideMenu) {
+              menuBuilder: (context, selectedText, hideMenu, selectAll) {
+                debugPrint('Selected text: $selectedText');
                 return _buildMenuPane(
                   colorScheme: colorScheme,
                   selectedText: selectedText,
                   hideMenu: hideMenu,
+                  selectAll: selectAll,
                 );
               },
             ),
@@ -94,68 +104,24 @@ class _ChatSelectableTextPageState extends State<ChatSelectableTextPage> {
 
           const SizedBox(height: 24),
 
-          ///双击触发
-          ///Double tap trigger
-          Text('Double Tap Trigger', style: textTheme.titleMedium),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: ChatSelectableText(
-              'Double tap this text to trigger selection mode. This demonstrates the doubleTap trigger mode for mobile platforms.',
-              style: TextStyle(fontSize: 16, color: colorScheme.onSurface),
-              mobileTriggerMode: MobileTriggerMode.doubleTap,
-              menuBackgroundColor: colorScheme.surface,
-              menuShadows: [
-                BoxShadow(
-                  color: colorScheme.onSurface.withValues(alpha: 0.15),
-                  blurRadius: 32,
-                ),
-              ],
-              menuBuilder: (context, selectedText, hideMenu) {
-                debugPrint("选择的文本: $selectedText");
-                return _buildMenuPane(
-                  colorScheme: colorScheme,
-                  selectedText: selectedText,
-                  hideMenu: hideMenu,
-                );
-              },
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          ///聊天气泡中的使用
-          ///Usage in chat bubbles
+          ///聊天气泡
           Text('Chat Bubble Example', style: textTheme.titleMedium),
           const SizedBox(height: 8),
           _buildChatBubble(
             text:
-                'This design pattern helps to separate presentation from business logic. Following the BLoC pattern facilitates testability and reusability.',
+                'Native SelectableText makes text selection easy with built-in handles and gestures.',
             isMe: false,
             colorScheme: colorScheme,
           ),
           const SizedBox(height: 8),
           _buildChatBubble(
-            text: 'That sounds great! I love how clean the architecture is.',
+            text: 'And the custom menu looks great too!',
             isMe: true,
-            colorScheme: colorScheme,
-          ),
-          const SizedBox(height: 8),
-          _buildChatBubble(
-            text:
-                'Yes, it also makes it easier to write unit tests and swap out implementations when needed.',
-            isMe: false,
             colorScheme: colorScheme,
           ),
 
           const SizedBox(height: 24),
 
-          ///显示最后选中的文本
-          ///Show last selected text
           if (_lastSelectedText.isNotEmpty) ...[
             Text('Last Selected Text:', style: textTheme.titleMedium),
             const SizedBox(height: 8),
@@ -205,10 +171,6 @@ class _ChatSelectableTextPageState extends State<ChatSelectableTextPage> {
             fontSize: 16,
             color: isMe ? colorScheme.onPrimary : colorScheme.onSurface,
           ),
-          selectionColor: isMe
-              ? Colors.white.withValues(alpha: 0.3)
-              : colorScheme.primary.withValues(alpha: 0.3),
-          handleColor: isMe ? Colors.white : colorScheme.primary,
           menuBackgroundColor: colorScheme.surface,
           menuShadows: [
             BoxShadow(
@@ -216,15 +178,13 @@ class _ChatSelectableTextPageState extends State<ChatSelectableTextPage> {
               blurRadius: 32,
             ),
           ],
-          menuBuilder: (context, selectedText, hideMenu) {
+          menuBuilder: (context, selectedText, hideMenu, selectAll) {
             return _buildMenuPane(
               colorScheme: colorScheme,
               selectedText: selectedText,
               hideMenu: hideMenu,
+              selectAll: selectAll,
             );
-          },
-          onSelectionChanged: (text) {
-            setState(() => _lastSelectedText = text);
           },
         ),
       ),
@@ -235,6 +195,7 @@ class _ChatSelectableTextPageState extends State<ChatSelectableTextPage> {
     required ColorScheme colorScheme,
     required String selectedText,
     required VoidCallback hideMenu,
+    required VoidCallback selectAll,
   }) {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -258,9 +219,7 @@ class _ChatSelectableTextPageState extends State<ChatSelectableTextPage> {
           icon: Icons.select_all_outlined,
           label: 'Select All',
           colorScheme: colorScheme,
-          onTap: () {
-            hideMenu();
-          },
+          onTap: selectAll,
         ),
         _MenuButton(
           icon: Icons.search_outlined,

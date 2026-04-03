@@ -1,20 +1,23 @@
 # Chat Context Menu ChangeLog
 
-## 2.0.0
+## 2.1.0
 
-* Add `ChatSelectableText` widget — a text widget with built-in text selection and context menu support
-* Text selection with draggable handles (base & extent) for adjustable selection range
-* Customizable selection highlight color and handle color
-* Context menu with arrow indicator, using the same positioning logic as `ChatContextMenuWrapper`
-* Platform-adaptive trigger modes:
-  - Mobile: `MobileTriggerMode` — `tap`, `doubleTap`, `longPress` (default: `longPress`)
-  - Desktop: `DesktopTriggerMode` — `rightClick`, `leftClick` (default: `rightClick`)
-* Menu-only animation (text and selection appear immediately, only the menu panel animates)
-* Customizable menu appearance: `menuBackgroundColor`, `menuBorderRadius`, `menuPadding`, `menuShadows`
-* Customizable arrow: `arrowHeight`, `arrowWidth`, `spacing`, `horizontalMargin`
-* `onSelectionChanged` callback provides the currently selected text
-* `onMenuClosed` callback triggered when the menu is dismissed
-* Custom `transitionsBuilder` for menu animation
+* Add `ChatSelectableText` widget — a fully custom selectable text widget built from the ground up
+  - Uses `RichText` for rendering, `TextPainter` for selection geometry, `OverlayEntry` for handles/menu, `CompositedTransformFollower` for positioning
+  - Text selection with draggable handles (base & extent) for adjustable selection range
+  - Customizable selection highlight color (`selectionColor`) and handle color (`handleColor`)
+  - Context menu with arrow indicator, smart positioning with pointer-position fallback for long text
+  - `selectAllOnActivate` property — when `true` (default), selects all text on activation; when `false`, selects the tapped word
+  - `selectAll` callback provided in `menuBuilder` for programmatic select-all from the menu
+  - Auto-scroll when dragging handles near viewport edges (`autoScrollEdgeExtent`, `autoScrollSpeed`)
+  - Haptic feedback on selection activation (`enableHapticFeedback`)
+  - Handle visibility — handles are automatically hidden when scrolled outside the viewport
+  - Menu-only animation (text and selection appear immediately, only the menu panel animates)
+  - Customizable menu appearance: `menuBackgroundColor`, `menuBorderRadius`, `menuPadding`, `menuShadows`
+  - Customizable arrow: `arrowHeight`, `arrowWidth`, `spacing`, `horizontalMargin`
+  - `onSelectionChanged` callback provides the currently selected text
+  - `onMenuClosed` callback triggered when the menu is dismissed
+  - Custom `transitionsBuilder` for menu animation
 
 ## 1.7.4
 

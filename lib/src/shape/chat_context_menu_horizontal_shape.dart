@@ -44,11 +44,9 @@ class ChatContextMenuHorizontalShape extends ShapeBorder {
   @override
   Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
     final double left =
-        rect.left +
-        (arrowDirection == ArrowHorizontalDirection.left ? arrowHeight : 0);
+        rect.left + (arrowDirection == ArrowHorizontalDirection.left ? arrowHeight : 0);
     final double right =
-        rect.right -
-        (arrowDirection == ArrowHorizontalDirection.right ? arrowHeight : 0);
+        rect.right - (arrowDirection == ArrowHorizontalDirection.right ? arrowHeight : 0);
     final double top = rect.top;
     final double bottom = rect.bottom;
 

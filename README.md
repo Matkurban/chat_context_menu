@@ -12,8 +12,8 @@ A Flutter package that provides an iOS-style chat context menu with customizable
 *   **Customizable Appearance:** Configure background color, border radius, and barrier color.
 *   **Flexible Content:** You provide the widget for the menu content, giving you full control over the items and layout.
 *   **Easy Integration:** Wrap any widget with `ChatContextMenuWrapper` to enable the context menu.
-*   **Selectable Text:** `ChatSelectableText` provides text selection with draggable handles and a context menu, ideal for chat bubbles.
-*   **Platform-Adaptive Triggers:** Configurable trigger modes for mobile (tap / double-tap / long-press) and desktop (right-click / left-click).
+*   **Selectable Text:** `ChatSelectableText` provides fully custom text selection with draggable handles, auto-scroll, and a context menu with smart positioning — ideal for chat bubbles.
+*   **Platform-Adaptive Triggers:** Configurable trigger modes for mobile (tap / double-tap / long-press) and desktop (right-click / left-click) on `ChatContextMenuWrapper`.
 
 ## Screenshots
 
@@ -203,7 +203,7 @@ You can customize the `ChatContextMenuWrapper` with the following properties:
 
 ## ChatSelectableText
 
-A text widget with built-in text selection and context menu support. Users can select text with draggable handles and perform operations on the selected text.
+A fully custom selectable text widget built from the ground up. Users can long-press to activate selection, adjust the range with draggable handles, and perform operations on the selected text via a context menu.
 
 ### Basic Usage
 
@@ -215,7 +215,7 @@ ChatSelectableText(
   menuShadows: [
     BoxShadow(color: Colors.black12, blurRadius: 32),
   ],
-  menuBuilder: (context, selectedText, hideMenu) {
+  menuBuilder: (context, selectedText, hideMenu, selectAll) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -227,10 +227,8 @@ ChatSelectableText(
           },
         ),
         IconButton(
-          icon: Icon(Icons.share),
-          onPressed: () {
-            hideMenu();
-          },
+          icon: Icon(Icons.select_all),
+          onPressed: selectAll,
         ),
       ],
     );
@@ -247,7 +245,7 @@ ChatSelectableText(
   selectionColor: Colors.orange.withValues(alpha: 0.35),
   handleColor: Colors.deepOrange,
   menuBackgroundColor: Colors.white,
-  menuBuilder: (context, selectedText, hideMenu) {
+  menuBuilder: (context, selectedText, hideMenu, selectAll) {
     return Text('Selected: $selectedText');
   },
 )
@@ -270,12 +268,12 @@ ChatSelectableText(
   menuShadows: [
     BoxShadow(color: Colors.black12, blurRadius: 32),
   ],
-  menuBuilder: (context, selectedText, hideMenu) {
+  menuBuilder: (context, selectedText, hideMenu, selectAll) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         TextButton(onPressed: () { hideMenu(); }, child: Text('Copy')),
-        TextButton(onPressed: () { hideMenu(); }, child: Text('Share')),
+        TextButton(onPressed: selectAll, child: Text('Select All')),
       ],
     );
   },
@@ -285,49 +283,51 @@ ChatSelectableText(
 )
 ```
 
-### Trigger Modes
+### Word Selection Mode
 
 ```dart
-// Double tap trigger (mobile)
+// Select only the tapped word instead of all text
 ChatSelectableText(
-  'Double tap to select.',
-  mobileTriggerMode: MobileTriggerMode.doubleTap,
-  menuBuilder: (context, selectedText, hideMenu) => Text(selectedText),
-)
-
-// Left click trigger (desktop)
-ChatSelectableText(
-  'Left click to select.',
-  desktopTriggerMode: DesktopTriggerMode.leftClick,
-  menuBuilder: (context, selectedText, hideMenu) => Text(selectedText),
+  'Long press a word to select just that word.',
+  selectAllOnActivate: false,
+  menuBuilder: (context, selectedText, hideMenu, selectAll) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        TextButton(onPressed: () { hideMenu(); }, child: Text('Copy')),
+        TextButton(onPressed: selectAll, child: Text('Select All')),
+      ],
+    );
+  },
 )
 ```
 
 ### ChatSelectableText Properties
 
-| Property              | Type                                                  | Default                    | Description                      |
-|-----------------------|-------------------------------------------------------|----------------------------|----------------------------------|
-| `data`                | `String`                                              | required                   | Text content                     |
-| `style`               | `TextStyle?`                                          | `null`                     | Text style                       |
-| `selectionColor`      | `Color?`                                              | theme primary (30% alpha)  | Selection highlight color        |
-| `handleColor`         | `Color?`                                              | theme primary              | Drag handle color                |
-| `handleSize`          | `double`                                              | `16.0`                     | Handle widget size               |
-| `menuBuilder`         | `Widget Function(BuildContext, String, VoidCallback)` | required                   | Menu content builder             |
-| `menuBackgroundColor` | `Color?`                                              | `null`                     | Menu background color            |
-| `menuBorderRadius`    | `BorderRadius`                                        | `BorderRadius.circular(8)` | Menu corner radius               |
-| `menuPadding`         | `EdgeInsets`                                          | `EdgeInsets.all(8)`        | Menu internal padding            |
-| `menuShadows`         | `List<BoxShadow>?`                                    | `null`                     | Menu shadow                      |
-| `arrowHeight`         | `double`                                              | `8.0`                      | Arrow indicator height           |
-| `arrowWidth`          | `double`                                              | `12.0`                     | Arrow indicator width            |
-| `spacing`             | `double`                                              | `6.0`                      | Space between menu and selection |
-| `horizontalMargin`    | `double`                                              | `10.0`                     | Min margin from screen edges     |
-| `mobileTriggerMode`   | `MobileTriggerMode`                                   | `longPress`                | Mobile trigger mode              |
-| `desktopTriggerMode`  | `DesktopTriggerMode`                                  | `rightClick`               | Desktop trigger mode             |
-| `onSelectionChanged`  | `ValueChanged<String>?`                               | `null`                     | Selection change callback        |
-| `onMenuClosed`        | `VoidCallback?`                                       | `null`                     | Menu closed callback             |
-| `barrierColor`        | `Color?`                                              | `transparent`              | Overlay barrier color            |
-| `transitionsBuilder`  | `Function?`                                           | `null`                     | Custom menu animation            |
-| `transitionDurations` | `Duration`                                            | `150ms`                    | Menu animation duration          |
+| Property              | Type                                                                | Default                    | Description                                          |
+|-----------------------|---------------------------------------------------------------------|----------------------------|------------------------------------------------------|
+| `data`                | `String`                                                            | required                   | Text content                                         |
+| `style`               | `TextStyle?`                                                        | `null`                     | Text style                                           |
+| `selectionColor`      | `Color?`                                                            | theme primary (30% alpha)  | Selection highlight color                            |
+| `handleColor`         | `Color?`                                                            | theme primary              | Drag handle color                                    |
+| `handleSize`          | `double`                                                            | `16.0`                     | Handle widget size                                   |
+| `selectAllOnActivate` | `bool`                                                              | `true`                     | Select all text on activation, or just tapped word   |
+| `autoScrollEdgeExtent`| `double`                                                            | `48.0`                     | Distance from edge to trigger auto-scroll            |
+| `autoScrollSpeed`     | `double`                                                            | `10.0`                     | Auto-scroll speed in pixels per frame                |
+| `enableHapticFeedback`| `bool`                                                              | `true`                     | Haptic feedback on selection activation               |
+| `menuBuilder`         | `Widget Function(BuildContext, String, VoidCallback, VoidCallback)` | required                   | Menu content builder (context, text, hide, selectAll)|
+| `menuBackgroundColor` | `Color?`                                                            | `null`                     | Menu background color                                |
+| `menuBorderRadius`    | `BorderRadius`                                                      | `BorderRadius.circular(8)` | Menu corner radius                                   |
+| `menuPadding`         | `EdgeInsets`                                                        | `EdgeInsets.all(8)`        | Menu internal padding                                |
+| `menuShadows`         | `List<BoxShadow>?`                                                  | `null`                     | Menu shadow                                          |
+| `arrowHeight`         | `double`                                                            | `8.0`                      | Arrow indicator height                               |
+| `arrowWidth`          | `double`                                                            | `12.0`                     | Arrow indicator width                                |
+| `spacing`             | `double`                                                            | `6.0`                      | Space between menu and selection                     |
+| `horizontalMargin`    | `double`                                                            | `10.0`                     | Min margin from screen edges                         |
+| `onSelectionChanged`  | `ValueChanged<String>?`                                             | `null`                     | Selection change callback                            |
+| `onMenuClosed`        | `VoidCallback?`                                                     | `null`                     | Menu closed callback                                 |
+| `transitionsBuilder`  | `Function?`                                                         | `null`                     | Custom menu animation                                |
+| `transitionDuration`  | `Duration`                                                          | `150ms`                    | Menu animation duration                              |
 
 ## Additional information
 

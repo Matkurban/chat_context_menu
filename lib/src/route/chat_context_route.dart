@@ -148,9 +148,7 @@ class ChatContextRoute extends PageRoute {
     final double alignX = (center.dx / screenSize.width) * 2 - 1;
     final double alignY = (center.dy / screenSize.height) * 2 - 1;
     final Alignment alignment = Alignment(alignX, alignY);
-    final Animation<double> curve = animation.drive(
-      CurveTween(curve: Curves.fastOutSlowIn),
-    );
+    final Animation<double> curve = animation.drive(CurveTween(curve: Curves.fastOutSlowIn));
     return transitionsBuilder?.call(
           context,
           animation,
@@ -161,11 +159,7 @@ class ChatContextRoute extends PageRoute {
         ) ??
         FadeTransition(
           opacity: curve,
-          child: ScaleTransition(
-            scale: curve,
-            alignment: alignment,
-            child: child,
-          ),
+          child: ScaleTransition(scale: curve, alignment: alignment, child: child),
         );
   }
 

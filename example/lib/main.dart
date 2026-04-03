@@ -69,13 +69,10 @@ class _HomePageState extends State<HomePage> {
         currentIndex: currentIndex,
         onTap: onTabTapped,
         items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'ContextMenu'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            label: 'ChatContextMenu',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'ChatSelectableText',
+            icon: Icon(Icons.text_fields),
+            label: 'Selectable',
           ),
         ],
       ),
