@@ -40,6 +40,7 @@ class _ChatSelectableTextPageState extends State<ChatSelectableTextPage> {
               'instead of the default system toolbar. The selection handles are native Flutter handles.',
               style: TextStyle(fontSize: 30, color: colorScheme.onSurface),
               menuBackgroundColor: colorScheme.surface,
+              handleSize: 24,
               menuShadows: [
                 BoxShadow(
                   color: colorScheme.onSurface.withValues(alpha: 0.15),

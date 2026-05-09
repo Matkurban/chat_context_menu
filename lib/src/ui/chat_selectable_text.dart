@@ -32,7 +32,7 @@ class ChatSelectableText extends StatefulWidget {
     this.selectionColor,
     this.handleColor,
     this.handleSize = 16.0,
-    this.autoScrollEdgeExtent = 48.0,
+    this.autoScrollEdgeExtent = 0.0,
     this.autoScrollSpeed = 10.0,
     this.enableHapticFeedback = true,
     required this.menuBuilder,
@@ -46,7 +46,7 @@ class ChatSelectableText extends StatefulWidget {
     this.menuShadows,
     this.arrowHeight = 8.0,
     this.arrowWidth = 12.0,
-    this.spacing = 6.0,
+    this.spacing = 0.0,
     this.horizontalMargin = 10.0,
   });
 
@@ -168,31 +168,43 @@ class ChatSelectableText extends StatefulWidget {
 
 class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProviderStateMixin {
   final LayerLink _layerLink = LayerLink();
+
   TextPainter? _textPainter;
+
   TextSelection _selection = const TextSelection.collapsed(offset: -1);
+
   bool _isActive = false;
 
   OverlayEntry? _handleBaseEntry;
+
   OverlayEntry? _handleExtentEntry;
+
   OverlayEntry? _menuEntry;
+
   OverlayEntry? _barrierEntry;
 
   AnimationController? _menuAnimationController;
 
   final GlobalKey _menuMeasureKey = GlobalKey();
+
   Size? _menuSize;
 
   bool _isDraggingBase = false;
+
   bool _isDraggingExtent = false;
 
   Offset? _activationGlobalPosition;
 
   ScrollPosition? _scrollPosition;
+
   bool _isScrolling = false;
 
   Ticker? _autoScrollTicker;
+
   double _autoScrollDirection = 0; // -1 up, +1 down, 0 stop
+
   Offset? _lastDragGlobalPosition;
+
   bool _lastDragIsBase = false;
 
   @override
@@ -380,7 +392,7 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
     }
   }
 
-  void _handleDragAutoScroll(Offset globalPosition) {
+  void _handleDragAutoScroll(Offset globalPosition,bool isBase) {
     final viewport = _getViewportRect();
     if (viewport == null || _scrollPosition == null) return;
 
@@ -509,8 +521,6 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
     final int offset = isBase ? _selection.baseOffset : _selection.extentOffset;
     final caretOffset = _textPainter!.getOffsetForCaret(TextPosition(offset: offset), Rect.zero);
     final double lineHeight = _textPainter!.preferredLineHeight;
-    final double circleRadius = widget.handleSize / 3;
-    final double totalHeight = lineHeight + circleRadius * 2;
 
     // 检查手柄是否在可见视口内
     final Rect? viewport = _getViewportRect();
@@ -523,7 +533,7 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
     }
 
     final double handleX = caretOffset.dx - widget.handleSize / 2;
-    final double handleY = isBase ? caretOffset.dy - totalHeight + lineHeight : caretOffset.dy;
+    final double handleY = isBase ? caretOffset.dy  : caretOffset.dy;
 
     final ThemeData theme = Theme.of(context);
     final Color handleColor = widget.handleColor ?? theme.colorScheme.primary;
@@ -556,7 +566,7 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
             _lastDragGlobalPosition = globalPos;
             _lastDragIsBase = isBase;
 
-            _handleDragAutoScroll(globalPos);
+            _handleDragAutoScroll(globalPos,isBase);
             _updateSelectionFromDrag(globalPos, isBase);
           },
           onPanEnd: (_) {
@@ -807,14 +817,9 @@ class _SelectionHandle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double circleRadius = size / 3;
-    final double totalHeight = lineHeight + circleRadius * 2;
-    return SizedBox(
-      width: size,
-      height: totalHeight,
-      child: CustomPaint(
-        painter: _HandlePainter(color: color, isBase: isBase),
-      ),
+    return CustomPaint(
+      size: Size(size, lineHeight),
+      painter: _HandlePainter(color: color, isBase: isBase),
     );
   }
 }
@@ -831,21 +836,18 @@ class _HandlePainter extends CustomPainter {
       ..color = color
       ..style = PaintingStyle.fill;
 
-    final double w = size.width;
-    final double h = size.height;
-    final double radius = w / 3;
-    final double lineWidth = 2.0;
+    final double radius = size.width / 3;
+    final double lineWidth = 3.0;
 
     if (isBase) {
-      final double cx = w / 2;
-      final double circleY = radius;
-      final double lineH = h - radius * 2;
-      canvas.drawCircle(Offset(cx, circleY), radius, paint);
+      final double cx = size.width / 2;
+      final double lineH = size.height - radius * 2;
+      canvas.drawCircle(Offset(cx, size.width / 3), radius, paint);
       canvas.drawRect(Rect.fromLTWH(cx - lineWidth / 2, radius * 2, lineWidth, lineH), paint);
     } else {
-      final double cx = w / 2;
-      final double circleY = h - radius;
-      final double lineH = h - radius * 2;
+      final double cx = size.width / 2;
+      final double circleY = size.height - radius;
+      final double lineH = size.height - radius * 2;
       canvas.drawRect(Rect.fromLTWH(cx - lineWidth / 2, 0, lineWidth, lineH), paint);
       canvas.drawCircle(Offset(cx, circleY), radius, paint);
     }

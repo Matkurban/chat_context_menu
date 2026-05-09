@@ -90,12 +90,10 @@ class _ChatContextMenuPageState extends State<ChatContextMenuPage> {
                             ? Alignment.centerRight
                             : Alignment.centerLeft,
                         child: ChatContextMenuWrapper(
-                          barrierColor: Colors.transparent,
+                          barrierColor: Colors.black26,
                           backgroundColor: colorScheme.surface,
                           borderRadius: BorderRadius.circular(10),
                           axis: .vertical,
-                          // constraints: constraints,
-                          // layoutConstraints: constraints,
                           spacing: 2,
                           shadows: [
                             BoxShadow(
