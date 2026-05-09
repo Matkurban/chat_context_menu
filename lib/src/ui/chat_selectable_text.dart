@@ -376,6 +376,22 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
       _stopAutoScroll();
       return;
     }
+
+    // 如果选区已经扩展到对应的文本边界，则不再滚动。
+    // Stop auto-scrolling when the selection has already reached the
+    // corresponding text boundary so we don't keep scrolling past it.
+    if (_lastDragIsBase) {
+      if (_selection.baseOffset <= 0) {
+        _stopAutoScroll();
+        return;
+      }
+    } else {
+      if (_selection.extentOffset >= widget.data.length) {
+        _stopAutoScroll();
+        return;
+      }
+    }
+
     final double delta = _autoScrollDirection * widget.autoScrollSpeed;
     final double newOffset = (_scrollPosition!.pixels + delta).clamp(
       _scrollPosition!.minScrollExtent,
@@ -392,17 +408,38 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
     }
   }
 
-  void _handleDragAutoScroll(Offset globalPosition,bool isBase) {
+  void _handleDragAutoScroll(Offset globalPosition, bool isBase) {
     final viewport = _getViewportRect();
     if (viewport == null || _scrollPosition == null) return;
 
-    final double edge = widget.autoScrollEdgeExtent;
-    if (globalPosition.dy < viewport.top + edge) {
-      _startAutoScroll(-1);
-    } else if (globalPosition.dy > viewport.bottom - edge) {
-      _startAutoScroll(1);
+    // 选区已扩展到对应文本边界时，无需再触发滚动。
+    // If the selection has already reached the corresponding text
+    // boundary, do not trigger auto-scroll again.
+    if (isBase) {
+      if (_selection.baseOffset <= 0) {
+        _stopAutoScroll();
+        return;
+      }
     } else {
-      _stopAutoScroll();
+      if (_selection.extentOffset >= widget.data.length) {
+        _stopAutoScroll();
+        return;
+      }
+    }
+
+    final double edge = widget.autoScrollEdgeExtent;
+    if (isBase) {
+      if (globalPosition.dy < viewport.top + edge) {
+        _startAutoScroll(-1);
+      } else {
+        _stopAutoScroll();
+      }
+    } else {
+      if (globalPosition.dy > viewport.bottom - edge) {
+        _startAutoScroll(1);
+      } else {
+        _stopAutoScroll();
+      }
     }
   }
 
