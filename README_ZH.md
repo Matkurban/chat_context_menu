@@ -12,6 +12,7 @@
 *   **简单集成：** 使用 `ChatContextMenuWrapper` 包裹任意组件即可启用上下文菜单。
 *   **可选文本：** `ChatSelectableText` 提供完全自定义的文本选择，支持拖动手柄、自动滚动和智能定位的上下文菜单，非常适合聊天气泡。
 *   **平台自适应触发：** `ChatContextMenuWrapper` 可配置移动端（单击 / 双击 / 长按）和桌面端（右键 / 左键）的触发方式。
+*   **遮罩锚点开孔（默认开启）：** 当 `barrierColor` 非全透明时，遮罩会在包裹的锚点区域留出镂空，视觉上不被压暗且可继续接收点击；点击半透明区域可在当前路由侧关闭菜单。可用 `excludeAnchorFromBarrier: false` 关闭，用 `barrierAnchorPadding` 调整开孔外接矩形，用 `barrierAnchorBorderRadius` 与气泡圆角对齐裁剪形状。
 
 ## 截图
 
@@ -195,6 +196,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
 *   `menuBuilder`：返回菜单内容 Widget 的构建函数，提供 `hideMenu` 回调。
 *   `barrierColor`：背景遮罩颜色。
+*   `excludeAnchorFromBarrier`：为 `true`（默认）时，遮罩在锚点上镂空，不占满该区域的透明度与手势；设为 `false` 可恢复整块全屏遮罩的旧行为。
+*   `barrierAnchorPadding`：在测得的锚点矩形四周增加/缩减开孔用的 `EdgeInsets`。
+*   `barrierAnchorBorderRadius`：可选；与气泡 `BoxDecoration` 一致的圆角，用于开孔形状与半透明区外点击-dismiss 的区域判定。
 *   `backgroundColor`：菜单容器的背景颜色。
 *   `borderRadius`：菜单容器的圆角。
 *   `padding`：菜单容器的内边距。

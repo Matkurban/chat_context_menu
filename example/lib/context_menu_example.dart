@@ -93,6 +93,7 @@ class _ChatContextMenuPageState extends State<ChatContextMenuPage> {
                           barrierColor: Colors.black26,
                           backgroundColor: colorScheme.surface,
                           borderRadius: BorderRadius.circular(10),
+                          barrierAnchorBorderRadius: BorderRadius.circular(8),
                           axis: .vertical,
                           spacing: 2,
                           shadows: [

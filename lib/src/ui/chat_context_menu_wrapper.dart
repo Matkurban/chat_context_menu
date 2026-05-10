@@ -1,3 +1,4 @@
+import 'package:chat_context_menu/src/route/anchor_viewport_clip.dart';
 import 'package:chat_context_menu/src/route/chat_context_route.dart';
 import 'package:chat_context_menu/src/model/statement.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,9 @@ class ChatContextMenuWrapper extends StatefulWidget {
     this.layoutConstraints,
     this.axis = Axis.vertical,
     this.topPadding = kToolbarHeight,
+    this.excludeAnchorFromBarrier = true,
+    this.barrierAnchorPadding = EdgeInsets.zero,
+    this.barrierAnchorBorderRadius,
   });
 
   ///在页面中显示的组件
@@ -116,6 +120,16 @@ class ChatContextMenuWrapper extends StatefulWidget {
   ///Defaults to kToolbarHeight, can be set to 0 when used inside AppBar
   final double topPadding;
 
+  ///When true (default), the modal barrier omits anchor [widgetRect] (plus padding) so it
+  /// stays visible and interactive like the floating menu surface.
+  final bool excludeAnchorFromBarrier;
+
+  ///Inflates the barrier cutout around the measured anchor rectangle.
+  final EdgeInsets barrierAnchorPadding;
+
+  ///Optional corner radii for the cutout; match your bubble [BoxDecoration.borderRadius].
+  final BorderRadius? barrierAnchorBorderRadius;
+
   @override
   State<ChatContextMenuWrapper> createState() => _ChatContextMenuWrapperState();
 }
@@ -130,7 +144,12 @@ class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
     if (_route != null) return;
 
     final Offset offset = renderBox.localToGlobal(Offset.zero);
-    final Rect widgetRect = offset & renderBox.size;
+    final Rect rawWidgetRect = offset & renderBox.size;
+    final Rect widgetRect = clipAnchorGlobalRectForHole(
+      context: context,
+      anchorGlobal: rawWidgetRect,
+      anchorRenderBox: renderBox,
+    );
     final Rect? pointerRect = _lastPointerDown != null
         ? Rect.fromCenter(center: _lastPointerDown!, width: 1, height: 1)
         : null;
@@ -159,6 +178,9 @@ class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
       axis: widget.axis,
       pointerRect: pointerRect,
       topPadding: widget.topPadding,
+      excludeAnchorFromBarrier: widget.excludeAnchorFromBarrier,
+      barrierAnchorPadding: widget.barrierAnchorPadding,
+      barrierAnchorBorderRadius: widget.barrierAnchorBorderRadius,
     );
 
     Navigator.of(context).push(_route!).then((result) {

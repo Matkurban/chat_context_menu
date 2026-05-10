@@ -14,6 +14,7 @@ A Flutter package that provides an iOS-style chat context menu with customizable
 *   **Easy Integration:** Wrap any widget with `ChatContextMenuWrapper` to enable the context menu.
 *   **Selectable Text:** `ChatSelectableText` provides fully custom text selection with draggable handles, auto-scroll, and a context menu with smart positioning — ideal for chat bubbles.
 *   **Platform-Adaptive Triggers:** Configurable trigger modes for mobile (tap / double-tap / long-press) and desktop (right-click / left-click) on `ChatContextMenuWrapper`.
+*   **Barrier anchor cutout (default on):** With a non-transparent `barrierColor`, the dimming layer leaves a hole over the wrapped anchor so it stays vivid and tappable like the menu above. Taps outside the anchor on the shaded area dismiss the sheet (inside the modal layer). Turn this off with `excludeAnchorFromBarrier: false`, adjust the rectangular bounds with `barrierAnchorPadding`, or match bubble corners using `barrierAnchorBorderRadius`.
 
 ## Screenshots
 
@@ -197,6 +198,9 @@ You can customize the `ChatContextMenuWrapper` with the following properties:
 
 *   `menuBuilder`: A builder function that returns the widget to display in the menu. It provides a `hideMenu` callback.
 *   `barrierColor`: Color of the background overlay.
+*   `excludeAnchorFromBarrier`: When `true` (default), the overlay does not obscure or block pointer events on the wrapped anchor (use `false` for a full-screen barrier like before).
+*   `barrierAnchorPadding`: `EdgeInsets` applied around the measured anchor rect to expand or shrink the barrier cutout.
+*   `barrierAnchorBorderRadius`: Optional bubble corner radius for both the punched hole outline and dismiss hit-testing (typically match your bubble `BorderRadius.circular(...)`).
 *   `backgroundColor`: Background color of the menu container.
 *   `borderRadius`: Border radius of the menu container.
 *   `padding`: Padding inside the menu container.
