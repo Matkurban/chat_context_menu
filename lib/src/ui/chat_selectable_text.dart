@@ -570,7 +570,7 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
     }
 
     final double handleX = caretOffset.dx - widget.handleSize / 2;
-    final double handleY = isBase ? caretOffset.dy  : caretOffset.dy;
+    final double handleY = isBase ? caretOffset.dy : caretOffset.dy;
 
     final ThemeData theme = Theme.of(context);
     final Color handleColor = widget.handleColor ?? theme.colorScheme.primary;
@@ -603,7 +603,7 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
             _lastDragGlobalPosition = globalPos;
             _lastDragIsBase = isBase;
 
-            _handleDragAutoScroll(globalPos,isBase);
+            _handleDragAutoScroll(globalPos, isBase);
             _updateSelectionFromDrag(globalPos, isBase);
           },
           onPanEnd: (_) {

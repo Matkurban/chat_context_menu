@@ -42,8 +42,9 @@ void main() {
     expect(find.byIcon(Icons.delete), findsOneWidget);
   });
 
-  testWidgets('Anchor stays tappable when barrier uses cutout (excludeAnchorFromBarrier)',
-      (WidgetTester tester) async {
+  testWidgets('Anchor stays tappable when barrier uses cutout (excludeAnchorFromBarrier)', (
+    WidgetTester tester,
+  ) async {
     const Key anchorKey = Key('anchor');
 
     var anchorTaps = 0;
@@ -97,7 +98,9 @@ void main() {
     expect(anchorTaps, 1);
   });
 
-  testWidgets('Tapping shaded area closes menu when barrier has cutout', (WidgetTester tester) async {
+  testWidgets('Tapping shaded area closes menu when barrier has cutout', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -107,17 +110,12 @@ void main() {
               menuBuilder: (context, hideMenu) {
                 return Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text('Copy scrim dismiss'),
-                  ],
+                  children: [const Text('Copy scrim dismiss')],
                 );
               },
               barrierAnchorBorderRadius: BorderRadius.circular(12),
               widgetBuilder: (context, showMenu) {
-                return GestureDetector(
-                  onLongPress: showMenu,
-                  child: const Text('Hold me'),
-                );
+                return GestureDetector(onLongPress: showMenu, child: const Text('Hold me'));
               },
             ),
           ),
@@ -135,7 +133,9 @@ void main() {
     expect(find.text('Copy scrim dismiss'), findsNothing);
   });
 
-  testWidgets('Tall list bubble widgetRect is clipped to scroll viewport', (WidgetTester tester) async {
+  testWidgets('Tall list bubble widgetRect is clipped to scroll viewport', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(

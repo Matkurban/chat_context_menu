@@ -56,8 +56,7 @@ class HoleModalBarrier extends StatelessWidget {
                 holeRectOverlay = holeRectLogical.intersect(viewportLocal);
               }
 
-              final TextDirection td =
-                  Directionality.maybeOf(layoutContext) ?? TextDirection.ltr;
+              final TextDirection td = Directionality.maybeOf(layoutContext) ?? TextDirection.ltr;
               final RRect holeShape = anchoredHoleShape(
                 holeLocalIntersectedViewport: holeRectOverlay.intersect(viewportLocal),
                 borderRadius: anchorBorderRadius,
@@ -106,13 +105,10 @@ class HoleBarrierPainterLayer extends LeafRenderObjectWidget {
 }
 
 class RenderHoleBarrierPainter extends RenderBox {
-  RenderHoleBarrierPainter({
-    required Rect viewport,
-    required RRect holeShape,
-    required Color color,
-  }) : _viewport = viewport,
-       _holeShape = holeShape,
-       _color = color;
+  RenderHoleBarrierPainter({required Rect viewport, required RRect holeShape, required Color color})
+    : _viewport = viewport,
+      _holeShape = holeShape,
+      _color = color;
 
   Rect _viewport;
   RRect _holeShape;
@@ -164,11 +160,10 @@ class RenderHoleBarrierPainter extends RenderBox {
   void paint(PaintingContext context, Offset offset) {
     if (_color.a == 0) return;
     final Rect background = Offset.zero & size;
-    final Path path =
-        Path()
-          ..addRect(background.shift(offset))
-          ..addRRect(_holeShape.shift(offset))
-          ..fillType = PathFillType.evenOdd;
+    final Path path = Path()
+      ..addRect(background.shift(offset))
+      ..addRRect(_holeShape.shift(offset))
+      ..fillType = PathFillType.evenOdd;
     context.canvas.drawPath(path, Paint()..color = _color);
   }
 

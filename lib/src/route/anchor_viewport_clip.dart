@@ -16,8 +16,7 @@ Rect clipAnchorGlobalRectForHole({
 }) {
   Rect result = anchorGlobal;
 
-  final RenderAbstractViewport? abstractViewport =
-      RenderAbstractViewport.maybeOf(anchorRenderBox);
+  final RenderAbstractViewport? abstractViewport = RenderAbstractViewport.maybeOf(anchorRenderBox);
   if (abstractViewport != null) {
     final RenderBox viewportBox = abstractViewport as RenderBox;
     final Rect viewportGlobal = viewportBox.localToGlobal(Offset.zero) & viewportBox.size;

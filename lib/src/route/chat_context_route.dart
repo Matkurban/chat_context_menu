@@ -117,8 +117,7 @@ class ChatContextRoute extends PageRoute {
 
   /// Do not gate on [offstage]: [buildPage] must always include the scrim when using a hole
   /// barrier, since [Offstage] already suppresses hit-testing until the route is onstage.
-  bool get _useHoleBarrier =>
-      excludeAnchorFromBarrier && (_barrierColor?.a ?? 0) != 0;
+  bool get _useHoleBarrier => excludeAnchorFromBarrier && (_barrierColor?.a ?? 0) != 0;
 
   @override
   Widget buildPage(
