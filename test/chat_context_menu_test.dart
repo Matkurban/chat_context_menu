@@ -58,6 +58,7 @@ void main() {
               padding: const EdgeInsets.only(bottom: 80),
               child: ChatContextMenuWrapper(
                 barrierColor: Colors.black54,
+                excludeAnchorFromBarrier: true,
                 menuBuilder: (context, hideMenu) {
                   return Column(
                     mainAxisSize: MainAxisSize.min,
@@ -107,6 +108,7 @@ void main() {
           body: Center(
             child: ChatContextMenuWrapper(
               barrierColor: Colors.black54,
+              excludeAnchorFromBarrier: true,
               menuBuilder: (context, hideMenu) {
                 return Column(
                   mainAxisSize: MainAxisSize.min,

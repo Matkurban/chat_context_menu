@@ -14,7 +14,7 @@ A Flutter package that provides an iOS-style chat context menu with customizable
 *   **Easy Integration:** Wrap any widget with `ChatContextMenuWrapper` to enable the context menu.
 *   **Selectable Text:** `ChatSelectableText` provides fully custom text selection with draggable handles, auto-scroll, and a context menu with smart positioning — ideal for chat bubbles.
 *   **Platform-Adaptive Triggers:** Configurable trigger modes for mobile (tap / double-tap / long-press) and desktop (right-click / left-click) on `ChatContextMenuWrapper`.
-*   **Barrier anchor cutout (default on):** With a non-transparent `barrierColor`, the dimming layer leaves a hole over the wrapped anchor so it stays vivid and tappable like the menu above. Taps outside the anchor on the shaded area dismiss the sheet (inside the modal layer). Turn this off with `excludeAnchorFromBarrier: false`, adjust the rectangular bounds with `barrierAnchorPadding`, or match bubble corners using `barrierAnchorBorderRadius`.
+*   **Barrier anchor cutout (opt-in):** Set `excludeAnchorFromBarrier: true` with a non-transparent `barrierColor` to punch a hole over the anchor, keep it bright and tappable, and dismiss on shaded taps (in-route dismiss scrim). Use `barrierAnchorPadding` / `barrierAnchorBorderRadius` to size and round the cutout. When `false` (default), the barrier is a classic full sheet over the previous route.
 
 ## Screenshots
 
@@ -198,7 +198,7 @@ You can customize the `ChatContextMenuWrapper` with the following properties:
 
 *   `menuBuilder`: A builder function that returns the widget to display in the menu. It provides a `hideMenu` callback.
 *   `barrierColor`: Color of the background overlay.
-*   `excludeAnchorFromBarrier`: When `true` (default), the overlay does not obscure or block pointer events on the wrapped anchor (use `false` for a full-screen barrier like before).
+*   `excludeAnchorFromBarrier`: When `true`, the overlay leaves a cutout over the anchor (see Usage notes). Default is `false` (standard modal dimming over the anchor as well).
 *   `barrierAnchorPadding`: `EdgeInsets` applied around the measured anchor rect to expand or shrink the barrier cutout.
 *   `barrierAnchorBorderRadius`: Optional bubble corner radius for both the punched hole outline and dismiss hit-testing (typically match your bubble `BorderRadius.circular(...)`).
 *   `backgroundColor`: Background color of the menu container.
@@ -210,21 +210,21 @@ You can customize the `ChatContextMenuWrapper` with the following properties:
 
 **Barrier with anchor cutout (recommended for chat bubbles)**
 
-* Set a non-transparent `barrierColor` and keep `excludeAnchorFromBarrier: true` (default). The overlay draws a **hole** over the wrapped anchor and uses an in-route dismiss layer so taps on the **shaded area** call `Navigator.maybePop` reliably (the hole geometry is shared by painting and hit-testing).
+* Set a non-transparent `barrierColor` and **`excludeAnchorFromBarrier: true`**. The overlay draws a **hole** over the wrapped anchor and uses an in-route dismiss layer so taps on the **shaded area** call `Navigator.maybePop` reliably (the hole geometry is shared by painting and hit-testing).
 * Set `barrierAnchorBorderRadius` to match your bubble’s `BoxDecoration.borderRadius` so the cutout outline matches the bubble; if they differ, corners look misaligned.
 * Use `barrierAnchorPadding` to slightly inflate or shrink the cutout if you need extra breathing room around the widget.
 
 **Long or scrollable content**
 
-* A tall message in a `ListView` still lays out at full content height; the package **clips the anchor rect to the nearest scroll viewport** (`RenderAbstractViewport`) and the `MediaQuery` window before opening the route, so the hole does not “brighten” the input bar or other UI **below** the list. If you use unusual clipping (nested scrollables, custom viewports), verify the result in your layout.
+* This applies when **`excludeAnchorFromBarrier` is true**: a tall message in a `ListView` still lays out at full content height; the package **clips the anchor rect to the nearest scroll viewport** (`RenderAbstractViewport`) and the `MediaQuery` window before opening the route, so the hole does not “brighten” the input bar or other UI **below** the list. If you use unusual clipping (nested scrollables, custom viewports), verify the result in your layout.
 
-**When to turn the cutout off**
+**Default without cutout**
 
-* Set `excludeAnchorFromBarrier: false` for a classic full-screen modal barrier (no hole); the anchor is then dimmed like the rest of the screen.
+* With **`excludeAnchorFromBarrier: false`** (default), you get Flutter’s usual modal barrier: the anchor is dimmed like the rest of the screen (no hole, no in-route dismiss scrim for that mode).
 
 **Menu wrapper scope**
 
-* `ChatContextMenuWrapper` measures the **outer** `Listener` around `widgetBuilder`. The trigger widget should be the same subtree you want to treat as the anchor; avoid wrapping an unnecessarily large parent if you only want a small bubble to stay bright.
+* `ChatContextMenuWrapper` measures the **outer** `Listener` around `widgetBuilder`. The trigger widget should be the same subtree you want to treat as the anchor; if you use a cutout, avoid wrapping an unnecessarily large parent or the hole will be oversized.
 
 ## ChatSelectableText
 

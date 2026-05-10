@@ -25,7 +25,7 @@ class ChatContextMenuWrapper extends StatefulWidget {
     this.layoutConstraints,
     this.axis = Axis.vertical,
     this.topPadding = kToolbarHeight,
-    this.excludeAnchorFromBarrier = true,
+    this.excludeAnchorFromBarrier = false,
     this.barrierAnchorPadding = EdgeInsets.zero,
     this.barrierAnchorBorderRadius,
   });
@@ -120,8 +120,8 @@ class ChatContextMenuWrapper extends StatefulWidget {
   ///Defaults to kToolbarHeight, can be set to 0 when used inside AppBar
   final double topPadding;
 
-  ///When true (default), the modal barrier omits anchor [widgetRect] (plus padding) so it
-  /// stays visible and interactive like the floating menu surface.
+  ///When true, the modal barrier omits anchor [widgetRect] (plus [barrierAnchorPadding]) so it
+  /// stays visible and interactive like the floating menu surface. Default is false (full-screen barrier).
   final bool excludeAnchorFromBarrier;
 
   ///Inflates the barrier cutout around the measured anchor rectangle.

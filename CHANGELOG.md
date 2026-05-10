@@ -1,6 +1,6 @@
 # Chat Context Menu ChangeLog
 
-## 2.2.0
+## 2.3.0
 
 * **Hole barrier and dismiss scrim** — When `excludeAnchorFromBarrier` is true and `barrierColor` is non-transparent, the modal uses a punched overlay plus an in-route full-screen dismiss layer (`HoleModalDismissScrim`) so taps on the dimmed area reliably close the menu (fixes hits not reaching the underlying barrier stack entry). Barrier painting remains in `HoleModalBarrier` (hit-test transparent); dismiss uses the same hole geometry as the visual cutout.
 * **`barrierAnchorBorderRadius` on `ChatContextMenuWrapper`** — Optional `BorderRadius` for the anchor cutout so the hole can match rounded chat bubbles (`RRect` painting and hit testing via `anchoredHoleShape` / `intersectHoleOverlayLocal`).

@@ -12,7 +12,7 @@
 *   **简单集成：** 使用 `ChatContextMenuWrapper` 包裹任意组件即可启用上下文菜单。
 *   **可选文本：** `ChatSelectableText` 提供完全自定义的文本选择，支持拖动手柄、自动滚动和智能定位的上下文菜单，非常适合聊天气泡。
 *   **平台自适应触发：** `ChatContextMenuWrapper` 可配置移动端（单击 / 双击 / 长按）和桌面端（右键 / 左键）的触发方式。
-*   **遮罩锚点开孔（默认开启）：** 当 `barrierColor` 非全透明时，遮罩会在包裹的锚点区域留出镂空，视觉上不被压暗且可继续接收点击；点击半透明区域可在当前路由侧关闭菜单。可用 `excludeAnchorFromBarrier: false` 关闭，用 `barrierAnchorPadding` 调整开孔外接矩形，用 `barrierAnchorBorderRadius` 与气泡圆角对齐裁剪形状。
+*   **遮罩锚点开孔（可选）：** 将 `excludeAnchorFromBarrier` 设为 `true` 且 `barrierColor` 非全透明时，遮罩在锚点处镂空，锚点保持明亮可点，点击半透明区域可关闭菜单；可用 `barrierAnchorPadding`、`barrierAnchorBorderRadius` 调整开孔。默认为 `false`，即传统整块半透明遮罩（锚点也会被压暗）。
 
 ## 截图
 
@@ -196,7 +196,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
 *   `menuBuilder`：返回菜单内容 Widget 的构建函数，提供 `hideMenu` 回调。
 *   `barrierColor`：背景遮罩颜色。
-*   `excludeAnchorFromBarrier`：为 `true`（默认）时，遮罩在锚点上镂空，不占满该区域的透明度与手势；设为 `false` 可恢复整块全屏遮罩的旧行为。
+*   `excludeAnchorFromBarrier`：为 `true` 时遮罩在锚点上镂空（见下文「使用与注意事项」）；默认 `false`，锚点与整屏一同被遮罩压暗（与常规 `ModalRoute` 一致）。
 *   `barrierAnchorPadding`：在测得的锚点矩形四周增加/缩减开孔用的 `EdgeInsets`。
 *   `barrierAnchorBorderRadius`：可选；与气泡 `BoxDecoration` 一致的圆角，用于开孔形状与半透明区外点击-dismiss 的区域判定。
 *   `backgroundColor`：菜单容器的背景颜色。
@@ -208,21 +208,21 @@ class _ChatScreenState extends State<ChatScreen> {
 
 **带锚点开孔的遮罩（聊天气泡推荐）**
 
-* 将 `barrierColor` 设为非全透明，并保持 `excludeAnchorFromBarrier: true`（默认）。遮罩会在锚点位置**镂空**，并在路由页内增加全屏 dismiss 层，使点击**半透明区域**能稳定关闭菜单（开孔几何同时用于绘制与命中判定）。
+* 将 `barrierColor` 设为非全透明，并显式设置 **`excludeAnchorFromBarrier: true`**。遮罩会在锚点位置**镂空**，并在路由页内增加全屏 dismiss 层，使点击**半透明区域**能稳定关闭菜单（开孔几何同时用于绘制与命中判定）。
 * 将 `barrierAnchorBorderRadius` 与气泡 `BoxDecoration.borderRadius` 对齐，否则开孔轮廓与气泡圆角不一致。
 * 若需要微调开孔相对锚点的大小，可使用 `barrierAnchorPadding`。
 
 **列表内超长内容**
 
-* `ListView` 等列表中的高气泡仍可能按**全文高度**参与布局；本包在打开菜单前会将锚点全局矩形与**最近滚动视口**（`RenderAbstractViewport`）及 `MediaQuery` 范围求交，避免开孔向下“透”到输入框、底栏等区域。若使用嵌套滚动、自定义视口等特殊结构，请在实际页面中检查效果。
+* 仅在 **`excludeAnchorFromBarrier: true`** 时：`ListView` 等列表中的高气泡仍可能按**全文高度**参与布局；本包在打开菜单前会将锚点全局矩形与**最近滚动视口**（`RenderAbstractViewport`）及 `MediaQuery` 范围求交，避免开孔向下“透”到输入框、底栏等区域。若使用嵌套滚动、自定义视口等特殊结构，请在实际页面中检查效果。
 
-**关闭开孔行为**
+**默认无开孔**
 
-* 若需要传统整块全屏遮罩、不保留锚点亮区，可设置 `excludeAnchorFromBarrier: false`。
+* **`excludeAnchorFromBarrier: false`（默认）** 时为常规模态遮罩：锚点与背景一并被压暗，无镂空、无开孔专用的 in-route dismiss 层。
 
 **包裹范围**
 
-* `ChatContextMenuWrapper` 以包住 `widgetBuilder` 的**整颗**子树尺寸作为锚点。若只希望小气泡作为锚点，勿在外层包过大容器，以免开孔范围过大。
+* `ChatContextMenuWrapper` 以包住 `widgetBuilder` 的**整颗**子树尺寸作为锚点。若使用开孔，且只希望小气泡作为锚点，勿在外层包过大容器，以免开孔范围过大。
 
 ## ChatSelectableText
 

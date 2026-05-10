@@ -35,8 +35,8 @@ class ChatContextRoute extends PageRoute {
   final Rect? pointerRect;
   final double topPadding;
 
-  /// When true (default), the barrier does not obscure or intercept hits on the anchor
-  /// [widgetRect] (plus [barrierAnchorPadding]).
+  /// When true, the barrier does not obscure or intercept hits on the anchor
+  /// [widgetRect] (plus [barrierAnchorPadding]). Default is false (standard full-screen barrier).
   final bool excludeAnchorFromBarrier;
 
   /// Inflation applied around [widgetRect] for the barrier cutout.
@@ -71,7 +71,7 @@ class ChatContextRoute extends PageRoute {
     required this.axis,
     this.pointerRect,
     required this.topPadding,
-    this.excludeAnchorFromBarrier = true,
+    this.excludeAnchorFromBarrier = false,
     this.barrierAnchorPadding = EdgeInsets.zero,
     this.barrierAnchorBorderRadius,
   }) : _barrierColor = barrierColor,

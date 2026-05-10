@@ -91,6 +91,7 @@ class _ChatContextMenuPageState extends State<ChatContextMenuPage> {
                             : Alignment.centerLeft,
                         child: ChatContextMenuWrapper(
                           barrierColor: Colors.black26,
+                          excludeAnchorFromBarrier: true,
                           backgroundColor: colorScheme.surface,
                           borderRadius: BorderRadius.circular(10),
                           barrierAnchorBorderRadius: BorderRadius.circular(8),
