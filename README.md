@@ -204,6 +204,27 @@ You can customize the `ChatContextMenuWrapper` with the following properties:
 *   `backgroundColor`: Background color of the menu container.
 *   `borderRadius`: Border radius of the menu container.
 *   `padding`: Padding inside the menu container.
+*   `barrierDismissible`: When `true` (default), tapping the dimmed area closes the menu; when `false`, taps play the system alert sound and the menu stays open (aligned with Flutter’s `ModalBarrier` behavior).
+
+## Usage notes
+
+**Barrier with anchor cutout (recommended for chat bubbles)**
+
+* Set a non-transparent `barrierColor` and keep `excludeAnchorFromBarrier: true` (default). The overlay draws a **hole** over the wrapped anchor and uses an in-route dismiss layer so taps on the **shaded area** call `Navigator.maybePop` reliably (the hole geometry is shared by painting and hit-testing).
+* Set `barrierAnchorBorderRadius` to match your bubble’s `BoxDecoration.borderRadius` so the cutout outline matches the bubble; if they differ, corners look misaligned.
+* Use `barrierAnchorPadding` to slightly inflate or shrink the cutout if you need extra breathing room around the widget.
+
+**Long or scrollable content**
+
+* A tall message in a `ListView` still lays out at full content height; the package **clips the anchor rect to the nearest scroll viewport** (`RenderAbstractViewport`) and the `MediaQuery` window before opening the route, so the hole does not “brighten” the input bar or other UI **below** the list. If you use unusual clipping (nested scrollables, custom viewports), verify the result in your layout.
+
+**When to turn the cutout off**
+
+* Set `excludeAnchorFromBarrier: false` for a classic full-screen modal barrier (no hole); the anchor is then dimmed like the rest of the screen.
+
+**Menu wrapper scope**
+
+* `ChatContextMenuWrapper` measures the **outer** `Listener` around `widgetBuilder`. The trigger widget should be the same subtree you want to treat as the anchor; avoid wrapping an unnecessarily large parent if you only want a small bubble to stay bright.
 
 ## ChatSelectableText
 

@@ -1,5 +1,13 @@
 # Chat Context Menu ChangeLog
 
+## 2.2.0
+
+* **Hole barrier and dismiss scrim** — When `excludeAnchorFromBarrier` is true and `barrierColor` is non-transparent, the modal uses a punched overlay plus an in-route full-screen dismiss layer (`HoleModalDismissScrim`) so taps on the dimmed area reliably close the menu (fixes hits not reaching the underlying barrier stack entry). Barrier painting remains in `HoleModalBarrier` (hit-test transparent); dismiss uses the same hole geometry as the visual cutout.
+* **`barrierAnchorBorderRadius` on `ChatContextMenuWrapper`** — Optional `BorderRadius` for the anchor cutout so the hole can match rounded chat bubbles (`RRect` painting and hit testing via `anchoredHoleShape` / `intersectHoleOverlayLocal`).
+* **Anchor rect clipping** — Before pushing the route, the anchor global `Rect` is clipped with `clipAnchorGlobalRectForHole`: intersect with the innermost `RenderAbstractViewport` (e.g. `ListView` viewport) and with `MediaQuery` size, so very tall list items no longer “punch” the overlay through the input bar or other UI below the scroll viewport.
+* **Route `offstage` gating** — `_useHoleBarrier` no longer requires `!offstage`; the dismiss scrim stays in the page subtree while `Offstage` still suppresses interaction until the route is onstage.
+* Example: `barrierAnchorBorderRadius` aligned with bubble decoration (`BorderRadius.circular(10)` in the chat demo).
+
 ## 2.1.0
 
 * Add `ChatSelectableText` widget — a fully custom selectable text widget built from the ground up

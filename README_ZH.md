@@ -202,6 +202,27 @@ class _ChatScreenState extends State<ChatScreen> {
 *   `backgroundColor`：菜单容器的背景颜色。
 *   `borderRadius`：菜单容器的圆角。
 *   `padding`：菜单容器的内边距。
+*   `barrierDismissible`：为 `true`（默认）时点遮罩暗区会尝试 `Navigator.maybePop` 关闭菜单；为 `false` 时播放系统提示音且不关闭（与 Flutter `ModalBarrier` 语义一致）。
+
+## 使用与注意事项
+
+**带锚点开孔的遮罩（聊天气泡推荐）**
+
+* 将 `barrierColor` 设为非全透明，并保持 `excludeAnchorFromBarrier: true`（默认）。遮罩会在锚点位置**镂空**，并在路由页内增加全屏 dismiss 层，使点击**半透明区域**能稳定关闭菜单（开孔几何同时用于绘制与命中判定）。
+* 将 `barrierAnchorBorderRadius` 与气泡 `BoxDecoration.borderRadius` 对齐，否则开孔轮廓与气泡圆角不一致。
+* 若需要微调开孔相对锚点的大小，可使用 `barrierAnchorPadding`。
+
+**列表内超长内容**
+
+* `ListView` 等列表中的高气泡仍可能按**全文高度**参与布局；本包在打开菜单前会将锚点全局矩形与**最近滚动视口**（`RenderAbstractViewport`）及 `MediaQuery` 范围求交，避免开孔向下“透”到输入框、底栏等区域。若使用嵌套滚动、自定义视口等特殊结构，请在实际页面中检查效果。
+
+**关闭开孔行为**
+
+* 若需要传统整块全屏遮罩、不保留锚点亮区，可设置 `excludeAnchorFromBarrier: false`。
+
+**包裹范围**
+
+* `ChatContextMenuWrapper` 以包住 `widgetBuilder` 的**整颗**子树尺寸作为锚点。若只希望小气泡作为锚点，勿在外层包过大容器，以免开孔范围过大。
 
 ## ChatSelectableText
 
