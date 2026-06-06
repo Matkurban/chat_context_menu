@@ -45,12 +45,17 @@ class _ChatContextMenuPageState extends State<ChatContextMenuPage> {
           ChatContextMenuWrapper(
             backgroundColor: colorScheme.surface,
             spacing: 0,
-            widgetBuilder: (BuildContext context, void Function() showMenu) {
-              return IconButton(
-                icon: const Icon(Icons.more_vert),
-                onPressed: showMenu,
-              );
-            },
+            widgetBuilder:
+                (
+                  BuildContext context,
+                  void Function() showMenu,
+                  void Function() hideMenu,
+                ) {
+                  return IconButton(
+                    icon: const Icon(Icons.more_vert),
+                    onPressed: showMenu,
+                  );
+                },
             shadows: [
               BoxShadow(
                 color: colorScheme.onSurface.withValues(alpha: 0.15),
@@ -118,7 +123,7 @@ class _ChatContextMenuPageState extends State<ChatContextMenuPage> {
                               onSelectTap: hideMenu,
                             );
                           },
-                          widgetBuilder: (context, showMenu) {
+                          widgetBuilder: (context, showMenu, hideMenu) {
                             return GestureDetector(
                               onLongPress: showMenu,
                               child: Container(

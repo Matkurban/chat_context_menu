@@ -1,5 +1,21 @@
 # Chat Context Menu ChangeLog
 
+## 3.0.0
+
+* **BREAKING: `hideMenu` on `widgetBuilder`** — `ContextMenuWidgetBuilder` now receives a third `hideMenu` callback alongside `showMenu`. Callers must update their `widgetBuilder` signature; use `_` if the callback is not needed. `hideMenu` closes the menu only when it is already open (no-op otherwise), matching the behavior of `menuBuilder`'s `hideMenu`.
+* **Tests** — Added a widget test verifying `hideMenu` from `widgetBuilder` when the menu is closed and when it is open.
+* **Docs** — Updated README / README_ZH examples and customization notes for the new `widgetBuilder` API.
+
+### Migration
+
+```dart
+// Before (2.x)
+widgetBuilder: (context, showMenu) { ... }
+
+// After (3.0.0)
+widgetBuilder: (context, showMenu, hideMenu) { ... }
+```
+
 ## 2.3.0
 
 * **Hole barrier and dismiss scrim** — When `excludeAnchorFromBarrier` is true and `barrierColor` is non-transparent, the modal uses a punched overlay plus an in-route full-screen dismiss layer (`HoleModalDismissScrim`) so taps on the dimmed area reliably close the menu (fixes hits not reaching the underlying barrier stack entry). Barrier painting remains in `HoleModalBarrier` (hit-test transparent); dismiss uses the same hole geometry as the visual cutout.

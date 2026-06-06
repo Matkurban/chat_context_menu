@@ -132,7 +132,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           onSelectTap: hideMenu,
                         );
                       },
-                      widgetBuilder: (context, showMenu) {
+                      widgetBuilder: (context, showMenu, hideMenu) {
                         return GestureDetector(
                           onLongPress: showMenu,
                           child: Container(
@@ -194,6 +194,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
 你可以通过以下属性自定义 `ChatContextMenuWrapper`：
 
+*   `widgetBuilder`：锚点组件的构建函数，提供 `showMenu` 与 `hideMenu` 回调（菜单未打开时调用 `hideMenu` 无效果）。
 *   `menuBuilder`：返回菜单内容 Widget 的构建函数，提供 `hideMenu` 回调。
 *   `barrierColor`：背景遮罩颜色。
 *   `excludeAnchorFromBarrier`：为 `true` 时遮罩在锚点上镂空（见下文「使用与注意事项」）；默认 `false`，锚点与整屏一同被遮罩压暗（与常规 `ModalRoute` 一致）。

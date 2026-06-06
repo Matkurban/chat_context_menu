@@ -22,7 +22,7 @@ void main() {
                   ],
                 );
               },
-              widgetBuilder: (context, showMenu) {
+              widgetBuilder: (context, showMenu, hideMenu) {
                 return GestureDetector(onLongPress: showMenu, child: const Text('Long press me'));
               },
             ),
@@ -68,7 +68,7 @@ void main() {
                     ],
                   );
                 },
-                widgetBuilder: (context, showMenu) {
+                widgetBuilder: (context, showMenu, hideMenu) {
                   return GestureDetector(
                     key: anchorKey,
                     onTap: () => anchorTaps++,
@@ -99,6 +99,40 @@ void main() {
     expect(anchorTaps, 1);
   });
 
+  testWidgets('hideMenu from widgetBuilder closes menu when open', (WidgetTester tester) async {
+    VoidCallback? hideMenuFromAnchor;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: ChatContextMenuWrapper(
+              menuBuilder: (context, hideMenu) {
+                return const Text('Menu open');
+              },
+              widgetBuilder: (context, showMenu, hideMenu) {
+                hideMenuFromAnchor = hideMenu;
+                return GestureDetector(onLongPress: showMenu, child: const Text('Open menu'));
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+
+    hideMenuFromAnchor!();
+    await tester.pumpAndSettle();
+    expect(find.text('Menu open'), findsNothing);
+
+    await tester.longPress(find.text('Open menu'));
+    await tester.pumpAndSettle();
+    expect(find.text('Menu open'), findsOneWidget);
+
+    hideMenuFromAnchor!();
+    await tester.pumpAndSettle();
+    expect(find.text('Menu open'), findsNothing);
+  });
+
   testWidgets('Tapping shaded area closes menu when barrier has cutout', (
     WidgetTester tester,
   ) async {
@@ -116,7 +150,7 @@ void main() {
                 );
               },
               barrierAnchorBorderRadius: BorderRadius.circular(12),
-              widgetBuilder: (context, showMenu) {
+              widgetBuilder: (context, showMenu, hideMenu) {
                 return GestureDetector(onLongPress: showMenu, child: const Text('Hold me'));
               },
             ),
@@ -154,17 +188,18 @@ void main() {
                       menuBuilder: (BuildContext c, void Function() h) {
                         return const Text('Action');
                       },
-                      widgetBuilder: (BuildContext c, void Function() showMenu) {
-                        return GestureDetector(
-                          onLongPress: showMenu,
-                          child: Container(
-                            height: 500,
-                            color: Colors.green,
-                            alignment: Alignment.topCenter,
-                            child: const Text('tall'),
-                          ),
-                        );
-                      },
+                      widgetBuilder:
+                          (BuildContext c, void Function() showMenu, void Function() hideMenu) {
+                            return GestureDetector(
+                              onLongPress: showMenu,
+                              child: Container(
+                                height: 500,
+                                color: Colors.green,
+                                alignment: Alignment.topCenter,
+                                child: const Text('tall'),
+                              ),
+                            );
+                          },
                     ),
                   ],
                 ),

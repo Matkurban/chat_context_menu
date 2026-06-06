@@ -216,7 +216,7 @@ class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
       onPointerDown: (event) {
         _lastPointerDown = event.position;
       },
-      child: widget.widgetBuilder(context, _showMenu),
+      child: widget.widgetBuilder(context, _showMenu, _hideMenu),
     );
   }
 }

@@ -134,7 +134,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           onSelectTap: hideMenu,
                         );
                       },
-                      widgetBuilder: (context, showMenu) {
+                      widgetBuilder: (context, showMenu, hideMenu) {
                         return GestureDetector(
                           onLongPress: showMenu,
                           child: Container(
@@ -196,6 +196,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
 You can customize the `ChatContextMenuWrapper` with the following properties:
 
+*   `widgetBuilder`: A builder function for the anchor widget. It provides `showMenu` and `hideMenu` callbacks (`hideMenu` is a no-op when the menu is not open).
 *   `menuBuilder`: A builder function that returns the widget to display in the menu. It provides a `hideMenu` callback.
 *   `barrierColor`: Color of the background overlay.
 *   `excludeAnchorFromBarrier`: When `true`, the overlay leaves a cutout over the anchor (see Usage notes). Default is `false` (standard modal dimming over the anchor as well).
