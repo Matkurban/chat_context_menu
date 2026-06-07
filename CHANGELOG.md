@@ -1,5 +1,10 @@
 # Chat Context Menu ChangeLog
 
+## 3.0.1
+
+* **Fix `ChatSelectableText` menu overflow** — Menu positioning now measures the full menu shell (`menuPadding` + content), matching `ChatContextMenuWrapper` / `ChatContextMenuVerticalLayout`. Previously only `menuBuilder` content was measured, so horizontal edge clamping underestimated the rendered width and the menu could extend past the screen edge (e.g. right-aligned chat bubbles).
+* **Tests** — Added `test/chat_selectable_text_test.dart` to assert the menu stays within `horizontalMargin` at the screen edge.
+
 ## 3.0.0
 
 * **BREAKING: `hideMenu` on `widgetBuilder`** — `ContextMenuWidgetBuilder` now receives a third `hideMenu` callback alongside `showMenu`. Callers must update their `widgetBuilder` signature; use `_` if the callback is not needed. `hideMenu` closes the menu only when it is already open (no-op otherwise), matching the behavior of `menuBuilder`'s `hideMenu`.

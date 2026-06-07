@@ -685,9 +685,17 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
         child: Opacity(
           opacity: 0,
           child: Material(
-            key: _menuMeasureKey,
             type: MaterialType.transparency,
-            child: widget.menuBuilder(context, _selectedText, _hideMenu, _selectAll),
+            child: _buildMenuShell(
+              key: _menuMeasureKey,
+              padding: widget.menuPadding,
+              borderRadius: widget.menuBorderRadius,
+              backgroundColor: widget.menuBackgroundColor,
+              shadows: widget.menuShadows,
+              arrowHeight: widget.arrowHeight,
+              arrowWidth: widget.arrowWidth,
+              child: widget.menuBuilder(context, _selectedText, _hideMenu, _selectAll),
+            ),
           ),
         ),
       );
@@ -896,6 +904,40 @@ class _HandlePainter extends CustomPainter {
   }
 }
 
+// ─── 菜单外壳 ───
+
+Widget _buildMenuShell({
+  Key? key,
+  required Widget child,
+  Color? backgroundColor,
+  required BorderRadius borderRadius,
+  required EdgeInsets padding,
+  List<BoxShadow>? shadows,
+  double? arrowOffset,
+  ArrowVerticalDirection? arrowDirection,
+  required double arrowHeight,
+  required double arrowWidth,
+}) {
+  return Container(
+    key: key,
+    padding: padding,
+    decoration: ShapeDecoration(
+      color: backgroundColor,
+      shadows: shadows,
+      shape: arrowOffset != null && arrowDirection != null
+          ? ChatContextMenuVerticalShape(
+              arrowOffset: arrowOffset,
+              isArrowUp: arrowDirection,
+              borderRadius: borderRadius,
+              arrowHeight: arrowHeight,
+              arrowWidth: arrowWidth,
+            )
+          : RoundedRectangleBorder(borderRadius: borderRadius),
+    ),
+    child: child,
+  );
+}
+
 // ─── 菜单定位 ───
 
 class _PositionedMenu extends StatelessWidget {
@@ -1059,19 +1101,15 @@ class _PositionedMenu extends StatelessWidget {
     final Widget menuWidget = Material(
       type: MaterialType.transparency,
       color: Colors.transparent,
-      child: Container(
+      child: _buildMenuShell(
         padding: menuPadding,
-        decoration: ShapeDecoration(
-          color: menuBackgroundColor,
-          shadows: menuShadows,
-          shape: ChatContextMenuVerticalShape(
-            arrowOffset: arrowOffset,
-            isArrowUp: arrowDirection,
-            borderRadius: menuBorderRadius,
-            arrowHeight: arrowHeight,
-            arrowWidth: arrowWidth,
-          ),
-        ),
+        borderRadius: menuBorderRadius,
+        backgroundColor: menuBackgroundColor,
+        shadows: menuShadows,
+        arrowOffset: arrowOffset,
+        arrowDirection: arrowDirection,
+        arrowHeight: arrowHeight,
+        arrowWidth: arrowWidth,
         child: menuBuilder(context, selectedText, onHideMenu, onSelectAll),
       ),
     );

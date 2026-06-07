@@ -120,6 +120,8 @@ class _ChatSelectableTextPageState extends State<ChatSelectableTextPage> {
             isMe: true,
             colorScheme: colorScheme,
           ),
+          const SizedBox(height: 8),
+          _buildChatBubble(text: 'And', isMe: true, colorScheme: colorScheme),
 
           const SizedBox(height: 24),
 
