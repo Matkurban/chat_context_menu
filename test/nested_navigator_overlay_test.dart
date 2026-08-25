@@ -201,8 +201,7 @@ void main() {
     final NavigatorState rootNavigator = Navigator.of(wrapElement, rootNavigator: true);
     final RenderBox overlayBox = rootNavigator.overlay!.context.findRenderObject()! as RenderBox;
 
-    final Rect raw =
-        anchorBox.localToGlobal(Offset.zero, ancestor: overlayBox) & anchorBox.size;
+    final Rect raw = anchorBox.localToGlobal(Offset.zero, ancestor: overlayBox) & anchorBox.size;
     final Rect clipped = clipAnchorRectForHole(
       context: wrapElement,
       anchorRect: raw,

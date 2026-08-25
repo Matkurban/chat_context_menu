@@ -158,10 +158,7 @@ class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
     if (renderBox == null) return;
     if (_route != null) return;
 
-    final NavigatorState navigator = Navigator.of(
-      context,
-      rootNavigator: widget.useRootNavigator,
-    );
+    final NavigatorState navigator = Navigator.of(context, rootNavigator: widget.useRootNavigator);
     // Measure the anchor in the target Navigator's Overlay coordinate space instead of window
     // coordinates: with nested Navigators (multi-pane desktop layouts) the overlay origin is not
     // the window origin, and `localToGlobal(..., ancestor: overlayBox)` also accounts for any
