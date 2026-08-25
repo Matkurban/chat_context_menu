@@ -64,7 +64,13 @@ class _ChatContextMenuVerticalLayoutState extends State<ChatContextMenuVerticalL
 
     final Size childSize = renderBox.size;
     final MediaQueryData media = MediaQuery.of(context);
-    final Size screenSize = media.size;
+    // The layout fills the route page, which fills the target Navigator's Overlay. Use that size
+    // as the available area: [widgetRect] is overlay-local, and with nested Navigators the
+    // overlay may be smaller than the MediaQuery window.
+    final RenderBox? layoutBox = context.findRenderObject() as RenderBox?;
+    final Size screenSize = (layoutBox != null && layoutBox.hasSize && layoutBox.size.isFinite)
+        ? layoutBox.size
+        : media.size;
     final Rect widgetRect = widget.widgetRect;
 
     final double topLimit = media.padding.top + widget.topPadding;

@@ -206,6 +206,7 @@ You can customize the `ChatContextMenuWrapper` with the following properties:
 *   `borderRadius`: Border radius of the menu container.
 *   `padding`: Padding inside the menu container.
 *   `barrierDismissible`: When `true` (default), tapping the dimmed area closes the menu; when `false`, taps play the system alert sound and the menu stays open (aligned with Flutter’s `ModalBarrier` behavior).
+*   `useRootNavigator`: When `true`, the menu route is pushed onto the **root** `Navigator` instead of the nearest one. Default is `false`. See “Nested Navigators / desktop multi-pane layouts” below.
 
 ## Usage notes
 
@@ -226,6 +227,13 @@ You can customize the `ChatContextMenuWrapper` with the following properties:
 **Menu wrapper scope**
 
 * `ChatContextMenuWrapper` measures the **outer** `Listener` around `widgetBuilder`. The trigger widget should be the same subtree you want to treat as the anchor; if you use a cutout, avoid wrapping an unnecessarily large parent or the hole will be oversized.
+
+**Nested Navigators / desktop multi-pane layouts**
+
+* Anchor coordinates are always measured in the **target Navigator's Overlay coordinate space**, so the menu positions correctly even when the anchor sits inside a nested `Navigator` that is offset by `Transform`s or padded shells. With a single full-window Navigator (typical mobile apps) this equals window coordinates — no behavior change.
+* If the nearest Navigator's overlay is **clipped** (e.g. a desktop split-view where each pane hosts its own Navigator inside `ClipRect` / a clipped `Material` card), pass **`useRootNavigator: true`** so the menu and barrier render in the root overlay, cover the whole window, and are not cut off at the pane border. For `ChatSelectableText`, use **`useRootOverlay: true`** for the same effect.
+* With `excludeAnchorFromBarrier: true`, the cutout is additionally clamped to every clipping ancestor between the anchor and the overlay (scroll viewports, `ClipRect`/`ClipRRect`, clipped `Material`), so the hole never extends past the visible pane area.
+* Triggering the menu while a pane-slide animation is running snapshots the anchor position at that moment; the menu will not follow the animation but stays consistent and dismissable.
 
 ## ChatSelectableText
 
@@ -350,6 +358,7 @@ ChatSelectableText(
 | `arrowWidth`          | `double`                                                            | `12.0`                     | Arrow indicator width                                |
 | `spacing`             | `double`                                                            | `6.0`                      | Space between menu and selection                     |
 | `horizontalMargin`    | `double`                                                            | `10.0`                     | Min margin from screen edges                         |
+| `useRootOverlay`      | `bool`                                                              | `false`                    | Insert handles/menu/barrier into the root Overlay (for nested Navigators, see notes above) |
 | `onSelectionChanged`  | `ValueChanged<String>?`                                             | `null`                     | Selection change callback                            |
 | `onMenuClosed`        | `VoidCallback?`                                                     | `null`                     | Menu closed callback                                 |
 | `transitionsBuilder`  | `Function?`                                                         | `null`                     | Custom menu animation                                |

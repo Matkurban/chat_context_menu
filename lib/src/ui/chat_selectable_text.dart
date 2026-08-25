@@ -48,6 +48,7 @@ class ChatSelectableText extends StatefulWidget {
     this.arrowWidth = 12.0,
     this.spacing = 0.0,
     this.horizontalMargin = 10.0,
+    this.useRootOverlay = false,
   });
 
   ///文本内容
@@ -162,6 +163,20 @@ class ChatSelectableText extends StatefulWidget {
   ///距屏幕左右的最小留白
   final double horizontalMargin;
 
+  ///是否把手柄、菜单与遮罩插入根 Overlay。
+  ///默认为 false(使用最近的 Overlay,保持既有行为)。当文本位于嵌套 Navigator 内
+  ///(如桌面端多栏布局,每栏各自有 Navigator 且被 ClipRect 等包裹)时,设为 true 可让
+  ///菜单与遮罩覆盖整个窗口、不被栏边界裁剪。
+  ///无论使用哪个 Overlay,菜单定位坐标都会换算到该 Overlay 的坐标系。
+  ///
+  ///Whether to insert handles, menu and barrier into the root [Overlay].
+  ///Defaults to false (nearest Overlay, preserving previous behavior). Set it to true when the
+  ///text lives inside a nested Navigator (e.g. desktop multi-pane layouts where each pane hosts
+  ///its own Navigator wrapped in ClipRect), so the menu and barrier cover the whole window
+  ///instead of being clipped to a single pane.
+  ///Menu positioning is always computed in the coordinate space of the chosen Overlay.
+  final bool useRootOverlay;
+
   @override
   State<ChatSelectableText> createState() => _ChatSelectableTextState();
 }
@@ -272,12 +287,38 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
     return widget.data.substring(_selection.start, _selection.end);
   }
 
+  ///窗口全局坐标(用于手势/滚动视口判断,与 PointerEvent.position 同一坐标系)
   Offset _getTextGlobalOffset() {
     final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
     if (renderBox != null && renderBox.attached) {
       return renderBox.localToGlobal(Offset.zero);
     }
     return Offset.zero;
+  }
+
+  OverlayState get _targetOverlay => Overlay.of(context, rootOverlay: widget.useRootOverlay);
+
+  RenderBox? _overlayRenderBox() {
+    final OverlayState? overlay = Overlay.maybeOf(context, rootOverlay: widget.useRootOverlay);
+    final RenderObject? renderObject = overlay?.context.findRenderObject();
+    return renderObject is RenderBox ? renderObject : null;
+  }
+
+  ///文本在目标 Overlay 坐标系中的偏移(用于菜单定位;嵌套 Navigator 下 Overlay 原点
+  ///不等于窗口原点)
+  ///Text offset in the target Overlay's coordinate space (used for menu positioning; with nested
+  ///Navigators the overlay origin differs from the window origin).
+  Offset _getTextOverlayOffset() {
+    final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
+    if (renderBox != null && renderBox.attached) {
+      return renderBox.localToGlobal(Offset.zero, ancestor: _overlayRenderBox());
+    }
+    return Offset.zero;
+  }
+
+  ///把窗口全局坐标换算到目标 Overlay 坐标系
+  Offset _globalToOverlay(Offset global) {
+    return _overlayRenderBox()?.globalToLocal(global) ?? global;
   }
 
   void _updateSelection(TextSelection newSelection) {
@@ -523,7 +564,7 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
         ),
       ),
     );
-    Overlay.of(context).insert(_barrierEntry!);
+    _targetOverlay.insert(_barrierEntry!);
   }
 
   // ─── 手柄 ───
@@ -535,7 +576,7 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
     _handleBaseEntry = OverlayEntry(builder: (_) => _buildHandleFollower(isBase: true));
     _handleExtentEntry = OverlayEntry(builder: (_) => _buildHandleFollower(isBase: false));
 
-    final overlay = Overlay.of(context);
+    final overlay = _targetOverlay;
     overlay.insert(_handleBaseEntry!);
     overlay.insert(_handleExtentEntry!);
   }
@@ -642,7 +683,7 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
     _menuSize = null;
 
     _menuEntry = OverlayEntry(builder: (_) => _buildMenu());
-    Overlay.of(context).insert(_menuEntry!);
+    _targetOverlay.insert(_menuEntry!);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _measureMenu();
@@ -701,11 +742,15 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
       );
     }
 
+    final RenderBox? overlayBox = _overlayRenderBox();
     return _PositionedMenu(
       textPainter: _textPainter!,
       selection: _selection,
-      getTextGlobalOffset: _getTextGlobalOffset,
-      pointerGlobalPosition: _activationGlobalPosition,
+      getTextOverlayOffset: _getTextOverlayOffset,
+      pointerOverlayPosition: _activationGlobalPosition != null
+          ? _globalToOverlay(_activationGlobalPosition!)
+          : null,
+      overlaySize: (overlayBox != null && overlayBox.hasSize) ? overlayBox.size : null,
       handleSize: widget.handleSize,
       menuSize: _menuSize,
       menuBuilder: widget.menuBuilder,
@@ -944,8 +989,9 @@ class _PositionedMenu extends StatelessWidget {
   const _PositionedMenu({
     required this.textPainter,
     required this.selection,
-    required this.getTextGlobalOffset,
-    this.pointerGlobalPosition,
+    required this.getTextOverlayOffset,
+    this.pointerOverlayPosition,
+    this.overlaySize,
     required this.handleSize,
     required this.menuSize,
     required this.menuBuilder,
@@ -966,8 +1012,15 @@ class _PositionedMenu extends StatelessWidget {
 
   final TextPainter textPainter;
   final TextSelection selection;
-  final Offset Function() getTextGlobalOffset;
-  final Offset? pointerGlobalPosition;
+
+  ///文本在所属 Overlay 坐标系中的偏移(菜单 Positioned 的坐标系)
+  final Offset Function() getTextOverlayOffset;
+
+  ///激活按压位置(Overlay 坐标系)
+  final Offset? pointerOverlayPosition;
+
+  ///所属 Overlay 的尺寸;为 null 时回退到 MediaQuery.size
+  final Size? overlaySize;
   final double handleSize;
   final Size? menuSize;
   final Widget Function(
@@ -1000,13 +1053,15 @@ class _PositionedMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Size screenSize = MediaQuery.of(context).size;
+    // All positions below are in the hosting Overlay's coordinate space; the Positioned result is
+    // interpreted in the same space, so nested-Navigator overlays position correctly.
+    final Size screenSize = overlaySize ?? MediaQuery.of(context).size;
     final double screenWidth = screenSize.width;
     final double screenHeight = screenSize.height;
     final double topPadding = MediaQuery.of(context).padding.top;
     final double bottomPadding = MediaQuery.of(context).padding.bottom;
 
-    final Offset textGlobal = getTextGlobalOffset();
+    final Offset textGlobal = getTextOverlayOffset();
 
     final baseCaretOffset = textPainter.getOffsetForCaret(
       TextPosition(offset: selection.baseOffset),
@@ -1040,18 +1095,18 @@ class _PositionedMenu extends StatelessWidget {
 
     // 如果选区上下放不下菜单且有按压位置，回退到按压位置
     final double lineHeight = textPainter.preferredLineHeight;
-    final bool usePointerAnchor = !fitsWithSelectionAnchor && pointerGlobalPosition != null;
+    final bool usePointerAnchor = !fitsWithSelectionAnchor && pointerOverlayPosition != null;
 
     final double anchorTopScreen;
     final double anchorBottomScreen;
     final double anchorCenterXScreen;
 
     if (usePointerAnchor) {
-      final double pointerLocalY = pointerGlobalPosition!.dy - textGlobal.dy;
+      final double pointerLocalY = pointerOverlayPosition!.dy - textGlobal.dy;
       final double lineTop = (pointerLocalY / lineHeight).floorToDouble() * lineHeight;
       anchorTopScreen = textGlobal.dy + lineTop;
       anchorBottomScreen = anchorTopScreen + lineHeight;
-      anchorCenterXScreen = pointerGlobalPosition!.dx;
+      anchorCenterXScreen = pointerOverlayPosition!.dx;
     } else {
       anchorTopScreen = selectionTopScreen;
       anchorBottomScreen = selectionBottomScreen;

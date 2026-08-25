@@ -217,9 +217,9 @@ void main() {
     final Element wrapElement = tester.element(wrap);
     final RenderBox anchorBox = wrapElement.findRenderObject()! as RenderBox;
     final Rect raw = anchorBox.localToGlobal(Offset.zero) & anchorBox.size;
-    final Rect clipped = clipAnchorGlobalRectForHole(
+    final Rect clipped = clipAnchorRectForHole(
       context: wrapElement,
-      anchorGlobal: raw,
+      anchorRect: raw,
       anchorRenderBox: anchorBox,
     );
 

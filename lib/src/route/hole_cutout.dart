@@ -1,17 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Maps [holeRectGlobal] through [overlayBox] then intersects [viewportLocal] (`Offset.zero & size`).
-Rect intersectHoleOverlayLocal({
-  required RenderBox overlayBox,
-  required Rect holeRectGlobal,
-  required Rect viewportLocal,
-}) {
-  final Offset topLeft = overlayBox.globalToLocal(holeRectGlobal.topLeft);
-  final Offset bottomRight = overlayBox.globalToLocal(holeRectGlobal.bottomRight);
-  final Rect mapped = Rect.fromLTRB(topLeft.dx, topLeft.dy, bottomRight.dx, bottomRight.dy);
-  return mapped.intersect(viewportLocal);
-}
-
 /// Cutout in **viewport-local** coordinates.
 RRect anchoredHoleShape({
   required Rect holeLocalIntersectedViewport,

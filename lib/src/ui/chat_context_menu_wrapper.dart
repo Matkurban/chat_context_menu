@@ -28,6 +28,7 @@ class ChatContextMenuWrapper extends StatefulWidget {
     this.excludeAnchorFromBarrier = false,
     this.barrierAnchorPadding = EdgeInsets.zero,
     this.barrierAnchorBorderRadius,
+    this.useRootNavigator = false,
   });
 
   ///在页面中显示的组件
@@ -130,6 +131,20 @@ class ChatContextMenuWrapper extends StatefulWidget {
   ///Optional corner radii for the cutout; match your bubble [BoxDecoration.borderRadius].
   final BorderRadius? barrierAnchorBorderRadius;
 
+  ///是否把菜单路由推到根 Navigator。
+  ///默认为 false(推到最近的 Navigator,保持既有行为)。当锚点位于嵌套 Navigator 内
+  ///(如桌面端多栏/分栏布局,每一栏各自有 Navigator 且被 ClipRect、Transform 等包裹)时,
+  ///设为 true 可让菜单与遮罩覆盖整个窗口、不被栏边界裁剪。
+  ///无论推到哪个 Navigator,锚点坐标都会换算到目标 Navigator 的 Overlay 坐标系。
+  ///
+  ///Whether to push the menu route onto the root [Navigator].
+  ///Defaults to false (nearest Navigator, preserving previous behavior). Set it to true when the
+  ///anchor lives inside a nested Navigator (e.g. desktop multi-pane layouts where each pane hosts
+  ///its own Navigator wrapped in ClipRect/Transform), so the menu and barrier cover the whole
+  ///window instead of being clipped to a single pane.
+  ///The anchor rect is always measured in the target Navigator's Overlay coordinate space.
+  final bool useRootNavigator;
+
   @override
   State<ChatContextMenuWrapper> createState() => _ChatContextMenuWrapperState();
 }
@@ -143,15 +158,31 @@ class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
     if (renderBox == null) return;
     if (_route != null) return;
 
-    final Offset offset = renderBox.localToGlobal(Offset.zero);
-    final Rect rawWidgetRect = offset & renderBox.size;
-    final Rect widgetRect = clipAnchorGlobalRectForHole(
-      context: context,
-      anchorGlobal: rawWidgetRect,
-      anchorRenderBox: renderBox,
+    final NavigatorState navigator = Navigator.of(
+      context,
+      rootNavigator: widget.useRootNavigator,
     );
-    final Rect? pointerRect = _lastPointerDown != null
-        ? Rect.fromCenter(center: _lastPointerDown!, width: 1, height: 1)
+    // Measure the anchor in the target Navigator's Overlay coordinate space instead of window
+    // coordinates: with nested Navigators (multi-pane desktop layouts) the overlay origin is not
+    // the window origin, and `localToGlobal(..., ancestor: overlayBox)` also accounts for any
+    // Transform/padding between the anchor and the overlay.
+    final RenderObject? overlayRenderObject = navigator.overlay?.context.findRenderObject();
+    final RenderBox? overlayBox = overlayRenderObject is RenderBox ? overlayRenderObject : null;
+
+    final Offset offset = renderBox.localToGlobal(Offset.zero, ancestor: overlayBox);
+    final Rect rawWidgetRect = offset & renderBox.size;
+    final Rect widgetRect = clipAnchorRectForHole(
+      context: context,
+      anchorRect: rawWidgetRect,
+      anchorRenderBox: renderBox,
+      overlayBox: overlayBox,
+    );
+    // Pointer positions arrive in window coordinates; map them into the same overlay space.
+    final Offset? pointerInOverlay = _lastPointerDown == null
+        ? null
+        : (overlayBox?.globalToLocal(_lastPointerDown!) ?? _lastPointerDown!);
+    final Rect? pointerRect = pointerInOverlay != null
+        ? Rect.fromCenter(center: pointerInOverlay, width: 1, height: 1)
         : null;
 
     _route = ChatContextRoute(
@@ -183,7 +214,7 @@ class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
       barrierAnchorBorderRadius: widget.barrierAnchorBorderRadius,
     );
 
-    Navigator.of(context).push(_route!).then((result) {
+    navigator.push(_route!).then((result) {
       _route = null;
       if (!mounted) return;
       widget.onClose?.call(result);
@@ -191,12 +222,16 @@ class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
   }
 
   void _hideMenu() {
-    if (_route != null) {
-      if (_route!.isCurrent) {
-        Navigator.of(context).pop();
-      } else {
-        Navigator.of(context).removeRoute(_route!);
-      }
+    final ChatContextRoute? route = _route;
+    if (route == null) return;
+    // Use the navigator the route was pushed onto: with useRootNavigator it may differ from the
+    // nearest Navigator of this context.
+    final NavigatorState? navigator = route.navigator;
+    if (navigator == null) return;
+    if (route.isCurrent) {
+      navigator.pop();
+    } else {
+      navigator.removeRoute(route);
     }
   }
 

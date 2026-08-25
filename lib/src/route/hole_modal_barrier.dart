@@ -25,7 +25,8 @@ class HoleModalBarrier extends StatelessWidget {
   /// Typically `animation!.drive(ColorTween(...).chain(CurveTween(curve: barrierCurve)))`.
   final Animation<Color?> animation;
 
-  /// Hole in overlay logical coordinates (same space as anchor `Rect` from `localToGlobal`).
+  /// Hole in the coordinate space of the Overlay hosting this barrier (the barrier fills the
+  /// overlay, so its own local space matches the overlay's).
   final Rect holeRectLogical;
 
   /// Matches the anchored widget silhouette (same as `Container`/`Material` bubble radius).
@@ -40,25 +41,13 @@ class HoleModalBarrier extends StatelessWidget {
           return LayoutBuilder(
             builder: (BuildContext layoutContext, BoxConstraints constraints) {
               final Rect viewportLocal = Offset.zero & constraints.biggest;
-              Rect holeRectOverlay;
-
-              final OverlayState? overlay = Overlay.maybeOf(layoutContext);
-              if (overlay != null &&
-                  viewportLocal.width > 0 &&
-                  viewportLocal.height > 0 &&
-                  overlay.context.findRenderObject() is RenderBox) {
-                holeRectOverlay = intersectHoleOverlayLocal(
-                  overlayBox: overlay.context.findRenderObject()! as RenderBox,
-                  holeRectGlobal: holeRectLogical,
-                  viewportLocal: viewportLocal,
-                );
-              } else {
-                holeRectOverlay = holeRectLogical.intersect(viewportLocal);
-              }
+              // [holeRectLogical] is already overlay-local; the barrier fills the overlay, so
+              // clamping to our own bounds is all that is needed.
+              final Rect holeRectOverlay = holeRectLogical.intersect(viewportLocal);
 
               final TextDirection td = Directionality.maybeOf(layoutContext) ?? TextDirection.ltr;
               final RRect holeShape = anchoredHoleShape(
-                holeLocalIntersectedViewport: holeRectOverlay.intersect(viewportLocal),
+                holeLocalIntersectedViewport: holeRectOverlay,
                 borderRadius: anchorBorderRadius,
                 textDirection: td,
               );

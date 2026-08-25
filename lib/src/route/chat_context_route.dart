@@ -7,6 +7,9 @@ import 'package:chat_context_menu/src/ui/chat_context_menu_vertical_widget.dart'
 import 'package:flutter/material.dart';
 
 class ChatContextRoute extends PageRoute {
+  /// Anchor rect in the coordinate space of the Overlay of the Navigator this route is pushed
+  /// onto (`localToGlobal(Offset.zero, ancestor: overlayBox)`). With a single full-window
+  /// Navigator this equals window coordinates.
   final Rect widgetRect;
   final Widget menuItems;
   final Color? _barrierColor;
@@ -32,6 +35,8 @@ class ChatContextRoute extends PageRoute {
   final BoxConstraints? menuConstraints;
   final BoxConstraints? layoutConstraints;
   final Axis axis;
+
+  /// Pointer-down rect in the same overlay coordinate space as [widgetRect].
   final Rect? pointerRect;
   final double topPadding;
 
@@ -192,7 +197,7 @@ class ChatContextRoute extends PageRoute {
       children: <Widget>[
         Positioned.fill(
           child: HoleModalDismissScrim(
-            holeRectGlobal: holeLogical,
+            holeRectLocal: holeLogical,
             anchorBorderRadius: barrierAnchorBorderRadius,
             dismissible: barrierDismissible,
           ),
@@ -209,25 +214,33 @@ class ChatContextRoute extends PageRoute {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    final Size screenSize = MediaQuery.of(context).size;
-    final Offset center = pointerRect?.center ?? widgetRect.center;
-    // Calculate alignment (-1.0 to 1.0)
-    final double alignX = (center.dx / screenSize.width) * 2 - 1;
-    final double alignY = (center.dy / screenSize.height) * 2 - 1;
-    final Alignment alignment = Alignment(alignX, alignY);
-    final Animation<double> curve = animation.drive(CurveTween(curve: Curves.fastOutSlowIn));
-    return transitionsBuilder?.call(
-          context,
-          animation,
-          secondaryAnimation,
-          center,
-          alignment,
-          child,
-        ) ??
-        FadeTransition(
-          opacity: curve,
-          child: ScaleTransition(scale: curve, alignment: alignment, child: child),
-        );
+    // Use the actual overlay constraints instead of MediaQuery.size: [widgetRect]/[pointerRect]
+    // are overlay-local, and with nested Navigators the overlay may be smaller than the window.
+    return LayoutBuilder(
+      builder: (BuildContext layoutContext, BoxConstraints constraints) {
+        final Size overlaySize = constraints.biggest.isFinite
+            ? constraints.biggest
+            : MediaQuery.of(layoutContext).size;
+        final Offset center = pointerRect?.center ?? widgetRect.center;
+        // Calculate alignment (-1.0 to 1.0)
+        final double alignX = (center.dx / overlaySize.width) * 2 - 1;
+        final double alignY = (center.dy / overlaySize.height) * 2 - 1;
+        final Alignment alignment = Alignment(alignX, alignY);
+        final Animation<double> curve = animation.drive(CurveTween(curve: Curves.fastOutSlowIn));
+        return transitionsBuilder?.call(
+              layoutContext,
+              animation,
+              secondaryAnimation,
+              center,
+              alignment,
+              child,
+            ) ??
+            FadeTransition(
+              opacity: curve,
+              child: ScaleTransition(scale: curve, alignment: alignment, child: child),
+            );
+      },
+    );
   }
 
   @override

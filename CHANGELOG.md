@@ -1,5 +1,15 @@
 # Chat Context Menu ChangeLog
 
+## 3.1.0
+
+* **Nested Navigator / desktop multi-pane support** — Fixes broken menu positioning and clipping when the anchor lives inside a nested `Navigator` (e.g. desktop "sliding window" layouts where each pane hosts its own Navigator wrapped in `ClipRect`/`Transform.translate`/clipped `Material`).
+  * **`useRootNavigator` on `ChatContextMenuWrapper`** (default `false`) — Pushes the menu route onto the root `Navigator` so the menu and barrier cover the whole window instead of being clipped to a single pane.
+  * **`useRootOverlay` on `ChatSelectableText`** (default `false`) — Inserts selection handles, menu and barrier into the root `Overlay` for the same reason.
+  * **Overlay-space coordinates everywhere** — The anchor rect and pointer position are now measured in the **target Navigator's Overlay coordinate space** (`localToGlobal(..., ancestor: overlayBox)`) instead of raw window coordinates, so menus position correctly regardless of which Navigator the route is pushed onto. Layouts and `buildTransitions` use the actual overlay size instead of `MediaQuery.of(context).size`.
+  * **Clip-aware barrier cutout** — `clipAnchorRectForHole` (renamed from `clipAnchorGlobalRectForHole`) now walks the render tree from the anchor to the overlay and intersects with every clipping ancestor (`RenderAbstractViewport`, `ClipRect`/`ClipRRect`/`ClipOval`/`ClipPath`, `Material`/`PhysicalModel` with a non-none `clipBehavior`), so with `excludeAnchorFromBarrier: true` the hole never extends past the visible pane bounds.
+  * Backward compatible: with a single full-window Navigator (typical mobile apps) the overlay origin equals the window origin, so behavior is unchanged. Internal `HoleModalDismissScrim.holeRectGlobal` was renamed to `holeRectLocal` and the `intersectHoleOverlayLocal` helper was removed (holes are already overlay-local).
+* **Tests** — Added `test/nested_navigator_overlay_test.dart` covering a minimal sliding-pane reproduction (`ClipRect > OverflowBox > Transform.translate > panes with nested Navigators`): menu alignment with/without `useRootNavigator`, hole-barrier hit-testing across panes, clip-chain clamping, and `ChatSelectableText` with `useRootOverlay`.
+
 ## 3.0.1
 
 * **Fix `ChatSelectableText` menu overflow** — Menu positioning now measures the full menu shell (`menuPadding` + content), matching `ChatContextMenuWrapper` / `ChatContextMenuVerticalLayout`. Previously only `menuBuilder` content was measured, so horizontal edge clamping underestimated the rendered width and the menu could extend past the screen edge (e.g. right-aligned chat bubbles).

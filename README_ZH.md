@@ -204,6 +204,7 @@ class _ChatScreenState extends State<ChatScreen> {
 *   `borderRadius`：菜单容器的圆角。
 *   `padding`：菜单容器的内边距。
 *   `barrierDismissible`：为 `true`（默认）时点遮罩暗区会尝试 `Navigator.maybePop` 关闭菜单；为 `false` 时播放系统提示音且不关闭（与 Flutter `ModalBarrier` 语义一致）。
+*   `useRootNavigator`：为 `true` 时把菜单路由推到**根** `Navigator` 而不是最近的 Navigator，默认 `false`。见下文「嵌套 Navigator / 桌面多栏布局」。
 
 ## 使用与注意事项
 
@@ -224,6 +225,13 @@ class _ChatScreenState extends State<ChatScreen> {
 **包裹范围**
 
 * `ChatContextMenuWrapper` 以包住 `widgetBuilder` 的**整颗**子树尺寸作为锚点。若使用开孔，且只希望小气泡作为锚点，勿在外层包过大容器，以免开孔范围过大。
+
+**嵌套 Navigator / 桌面多栏布局**
+
+* 锚点坐标始终换算到**目标 Navigator 的 Overlay 坐标系**，因此即使锚点位于被 `Transform` 平移、外层有留白壳层的嵌套 `Navigator` 内，菜单也能正确定位。单个全窗 Navigator（常见移动端）时 Overlay 原点即窗口原点，行为不变。
+* 若最近 Navigator 的 Overlay 被**裁剪**（如桌面分栏布局：每栏各自的 Navigator 被 `ClipRect` / 裁剪的 `Material` 卡片包裹），请传 **`useRootNavigator: true`**，菜单与遮罩会渲染在根 Overlay 中、覆盖整个窗口、不被栏边界切断。`ChatSelectableText` 对应使用 **`useRootOverlay: true`**。
+* `excludeAnchorFromBarrier: true` 时，开孔还会与锚点到 Overlay 之间的所有裁剪祖先（滚动视口、`ClipRect`/`ClipRRect`、裁剪的 `Material`）求交，保证洞不越出气泡所在栏的可见区域。
+* 栏滑动动画进行中触发菜单时，锚点位置按触发瞬间快照；菜单不会跟随动画，但保持一致且可正常关闭。
 
 ## ChatSelectableText
 
@@ -348,6 +356,7 @@ ChatSelectableText(
 | `arrowWidth`           | `double`                                                            | `12.0`                     | 箭头指示器宽度            |
 | `spacing`              | `double`                                                            | `6.0`                      | 菜单与选区的间距           |
 | `horizontalMargin`     | `double`                                                            | `10.0`                     | 距屏幕边缘最小留白          |
+| `useRootOverlay`       | `bool`                                                              | `false`                    | 手柄/菜单/遮罩插入根 Overlay（嵌套 Navigator 场景，见上文说明）|
 | `onSelectionChanged`   | `ValueChanged<String>?`                                             | `null`                     | 选中文本变化回调           |
 | `onMenuClosed`         | `VoidCallback?`                                                     | `null`                     | 菜单关闭回调             |
 | `transitionsBuilder`   | `Function?`                                                         | `null`                     | 自定义菜单动画            |

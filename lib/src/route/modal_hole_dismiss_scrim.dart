@@ -9,12 +9,14 @@ import 'package:flutter/services.dart';
 class HoleModalDismissScrim extends StatelessWidget {
   const HoleModalDismissScrim({
     super.key,
-    required this.holeRectGlobal,
+    required this.holeRectLocal,
     this.anchorBorderRadius,
     required this.dismissible,
   });
 
-  final Rect holeRectGlobal;
+  /// Hole rect in the coordinate space of the Overlay hosting the route (the scrim fills the
+  /// route page, which fills the overlay).
+  final Rect holeRectLocal;
   final BorderRadius? anchorBorderRadius;
   final bool dismissible;
 
@@ -32,22 +34,8 @@ class HoleModalDismissScrim extends StatelessWidget {
     return LayoutBuilder(
       builder: (BuildContext layoutContext, BoxConstraints constraints) {
         final Rect viewportLocal = Offset.zero & constraints.biggest;
-        late final Rect holeRect;
-
-        final OverlayState? overlay = Overlay.maybeOf(layoutContext);
-        if (overlay != null &&
-            viewportLocal.width > 0 &&
-            viewportLocal.height > 0 &&
-            overlay.context.findRenderObject() is RenderBox) {
-          final RenderBox overlayBox = overlay.context.findRenderObject()! as RenderBox;
-          holeRect = intersectHoleOverlayLocal(
-            overlayBox: overlayBox,
-            holeRectGlobal: holeRectGlobal,
-            viewportLocal: viewportLocal,
-          );
-        } else {
-          holeRect = holeRectGlobal.intersect(viewportLocal);
-        }
+        // [holeRectLocal] is already overlay-local, matching our own local space.
+        final Rect holeRect = holeRectLocal.intersect(viewportLocal);
 
         final TextDirection td =
             Directionality.maybeOf(layoutContext) ??
@@ -55,7 +43,7 @@ class HoleModalDismissScrim extends StatelessWidget {
             TextDirection.ltr;
 
         final RRect holeShape = anchoredHoleShape(
-          holeLocalIntersectedViewport: holeRect.intersect(viewportLocal),
+          holeLocalIntersectedViewport: holeRect,
           borderRadius: anchorBorderRadius,
           textDirection: td,
         );
