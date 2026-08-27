@@ -313,6 +313,39 @@ void main() {
       );
     });
 
+    testWidgets('cupertinoSheet opacity hits 0 before scale finishes on dismiss', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _animationHarness(style: ChatContextMenuAnimationStyle.cupertinoSheet),
+      );
+
+      await tester.longPress(find.text('Long press me'));
+      await tester.pumpAndSettle();
+      expect(find.text('Copy'), findsOneWidget);
+
+      await tester.tapAt(const Offset(8, 8));
+      await tester.pump();
+      // 60% through the 335ms reverse: controller ~0.4, Interval(0.5, 1.0) => opacity 0.
+      await tester.pump(const Duration(milliseconds: 201));
+
+      final Finder sheetFade = find.descendant(
+        of: find.byType(ChatContextMenuSheetTransition),
+        matching: find.byType(FadeTransition),
+      );
+      expect(sheetFade, findsOneWidget);
+      final FadeTransition fade = tester.widget(sheetFade);
+      expect(fade.opacity.value, 0.0);
+
+      final Finder sheetScale = find.descendant(
+        of: find.byType(ChatContextMenuSheetTransition),
+        matching: find.byType(ScaleTransition),
+      );
+      expect(sheetScale, findsOneWidget);
+      final ScaleTransition scale = tester.widget(sheetScale);
+      expect(scale.scale.value, greaterThanOrEqualTo(0.0));
+    });
+
     testWidgets('cupertinoSheet works for a horizontal menu', (WidgetTester tester) async {
       await tester.pumpWidget(
         _animationHarness(

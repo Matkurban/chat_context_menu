@@ -30,8 +30,19 @@ double _normalizedArrow(double? arrowOffset, double? extent) {
   return ((arrowOffset / extent) * 2 - 1).clamp(-1.0, 1.0);
 }
 
+///Clamps [easeOutBack] overshoot and [easeInBack] undershoot so scale never
+///goes negative (a flipped sliver) or arbitrarily large.
+class _ClampedScale extends Animatable<double> {
+  const _ClampedScale();
+
+  @override
+  double transform(double t) => t.clamp(0.0, 2.0);
+}
+
 ///线性淡入 + easeOutBack / easeInBack 缩放，作用在菜单 widget 上。
+///关闭时透明度在缩放收完前归零，避免极小尺寸下 BoxShadow 剩下一小块矩形。
 ///Linear fade + easeOutBack / easeInBack scale, applied to the menu widget.
+///On dismiss, opacity hits 0 before scale does so the shadow blob never shows.
 class ChatContextMenuSheetTransition extends StatefulWidget {
   const ChatContextMenuSheetTransition({
     super.key,
@@ -50,18 +61,26 @@ class ChatContextMenuSheetTransition extends StatefulWidget {
 
 class _ChatContextMenuSheetTransitionState extends State<ChatContextMenuSheetTransition> {
   late CurvedAnimation _scale;
+  late CurvedAnimation _opacity;
+  late Animation<double> _clampedScale;
 
   @override
   void initState() {
     super.initState();
-    _scale = _createScale();
+    _bindAnimations();
   }
 
-  CurvedAnimation _createScale() {
-    return CurvedAnimation(
+  void _bindAnimations() {
+    _scale = CurvedAnimation(
       parent: widget.animation,
       curve: Curves.easeOutBack,
       reverseCurve: Curves.easeInBack,
+    );
+    _clampedScale = _scale.drive(const _ClampedScale());
+    _opacity = CurvedAnimation(
+      parent: widget.animation,
+      curve: Curves.linear,
+      reverseCurve: const Interval(0.5, 1.0),
     );
   }
 
@@ -70,21 +89,27 @@ class _ChatContextMenuSheetTransitionState extends State<ChatContextMenuSheetTra
     super.didUpdateWidget(oldWidget);
     if (oldWidget.animation != widget.animation) {
       _scale.dispose();
-      _scale = _createScale();
+      _opacity.dispose();
+      _bindAnimations();
     }
   }
 
   @override
   void dispose() {
     _scale.dispose();
+    _opacity.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return FadeTransition(
-      opacity: widget.animation,
-      child: ScaleTransition(scale: _scale, alignment: widget.alignment, child: widget.child),
+      opacity: _opacity,
+      child: ScaleTransition(
+        scale: _clampedScale,
+        alignment: widget.alignment,
+        child: widget.child,
+      ),
     );
   }
 }
