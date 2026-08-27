@@ -12,6 +12,7 @@
 *   **简单集成：** 使用 `ChatContextMenuWrapper` 包裹任意组件即可启用上下文菜单。
 *   **可选文本：** `ChatSelectableText` 提供完全自定义的文本选择，支持拖动手柄、自动滚动和智能定位的上下文菜单，非常适合聊天气泡。
 *   **平台自适应触发：** `ChatContextMenuWrapper` 可配置移动端（单击 / 双击 / 长按）和桌面端（右键 / 左键）的触发方式。
+*   **内置动画样式：** `ChatContextMenuAnimationStyle.scaleFade`（默认，现有整页淡入缩放）或 `cupertinoSheet`（从箭头回弹的 iOS 操作菜单）。可用 `transitionDurations` / `transitionDuration` 覆盖时长，或用 `transitionsBuilder` 完全自定义。
 *   **遮罩锚点开孔（可选）：** 将 `excludeAnchorFromBarrier` 设为 `true` 且 `barrierColor` 非全透明时，遮罩在锚点处镂空，锚点保持明亮可点，点击半透明区域可关闭菜单；可用 `barrierAnchorPadding`、`barrierAnchorBorderRadius` 调整开孔。默认为 `false`，即传统整块半透明遮罩（锚点也会被压暗）。
 
 ## 截图
@@ -203,6 +204,8 @@ class _ChatScreenState extends State<ChatScreen> {
 *   `backgroundColor`：菜单容器的背景颜色。
 *   `borderRadius`：菜单容器的圆角。
 *   `padding`：菜单容器的内边距。
+*   `animationStyle`：内置菜单动画。默认 `ChatContextMenuAnimationStyle.scaleFade`（150ms 整页淡入缩放）。`cupertinoSheet` 为 iOS 操作菜单回弹（335ms，从箭头放大）。非空的 `transitionsBuilder` 会覆盖两种内置样式。
+*   `transitionDurations`：可选时长覆盖。为 `null` 时使用 `animationStyle` 的默认时长。
 *   `barrierDismissible`：为 `true`（默认）时点遮罩暗区会尝试 `Navigator.maybePop` 关闭菜单；为 `false` 时播放系统提示音且不关闭（与 Flutter `ModalBarrier` 语义一致）。
 *   `useRootNavigator`：为 `true` 时把菜单路由推到**根** `Navigator` 而不是最近的 Navigator，默认 `false`。见下文「嵌套 Navigator / 桌面多栏布局」。
 
@@ -359,8 +362,9 @@ ChatSelectableText(
 | `useRootOverlay`       | `bool`                                                              | `false`                    | 手柄/菜单/遮罩插入根 Overlay（嵌套 Navigator 场景，见上文说明）|
 | `onSelectionChanged`   | `ValueChanged<String>?`                                             | `null`                     | 选中文本变化回调           |
 | `onMenuClosed`         | `VoidCallback?`                                                     | `null`                     | 菜单关闭回调             |
-| `transitionsBuilder`   | `Function?`                                                         | `null`                     | 自定义菜单动画            |
-| `transitionDuration`   | `Duration`                                                          | `150ms`                    | 菜单动画时长             |
+| `animationStyle`       | `ChatContextMenuAnimationStyle`                                     | `scaleFade`                | 内置菜单动画（`scaleFade` 或 `cupertinoSheet`） |
+| `transitionsBuilder`   | `Function?`                                                         | `null`                     | 自定义菜单动画（覆盖 `animationStyle`） |
+| `transitionDuration`   | `Duration?`                                                         | 样式默认                      | 菜单动画时长（`scaleFade` 150ms，`cupertinoSheet` 335ms） |
 
 ## 更多信息
 

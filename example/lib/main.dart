@@ -1,3 +1,4 @@
+import 'package:example/animation_style_example.dart';
 import 'package:example/app_theme.dart';
 import 'package:example/context_menu_example.dart';
 import 'package:example/selectable_text_example.dart';
@@ -63,7 +64,11 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: PageView(
         controller: _pageController,
-        children: [ChatContextMenuPage(), ChatSelectableTextPage()],
+        children: [
+          ChatContextMenuPage(),
+          ChatSelectableTextPage(),
+          AnimationStylePage(),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
@@ -73,6 +78,10 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.text_fields),
             label: 'Selectable',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.animation),
+            label: 'Animation',
           ),
         ],
       ),

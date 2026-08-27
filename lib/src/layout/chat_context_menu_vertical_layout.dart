@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:chat_context_menu/src/model/arrow_vertical_direction.dart';
+import 'package:chat_context_menu/src/route/chat_context_menu_transition.dart';
 import 'package:flutter/material.dart';
 
 class ChatContextMenuVerticalLayout extends StatefulWidget {
@@ -17,6 +18,8 @@ class ChatContextMenuVerticalLayout extends StatefulWidget {
     required this.horizontalMargin,
     this.layoutConstraints,
     required this.topPadding,
+    this.animation,
+    this.applyCupertinoSheetTransition = false,
   });
 
   final Rect widgetRect;
@@ -32,6 +35,8 @@ class ChatContextMenuVerticalLayout extends StatefulWidget {
   final double horizontalMargin;
   final BoxConstraints? layoutConstraints;
   final double topPadding;
+  final Animation<double>? animation;
+  final bool applyCupertinoSheetTransition;
 
   @override
   State<ChatContextMenuVerticalLayout> createState() => _ChatContextMenuVerticalLayoutState();
@@ -185,6 +190,22 @@ class _ChatContextMenuVerticalLayoutState extends State<ChatContextMenuVerticalL
     ].reduce(max);
   }
 
+  Widget _decorateMenu(Widget child) {
+    if (!widget.applyCupertinoSheetTransition) {
+      return child;
+    }
+    return ChatContextMenuSheetTransition(
+      animation: widget.animation!,
+      alignment: sheetScaleAlignment(
+        axis: Axis.vertical,
+        vertical: _isArrowUp,
+        arrowOffset: _arrowOffset,
+        menuSize: _childSize,
+      ),
+      child: child,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_childSize == null) {
@@ -202,18 +223,16 @@ class _ChatContextMenuVerticalLayoutState extends State<ChatContextMenuVerticalL
       );
     }
 
+    final Widget menu = _maxHeight == null
+        ? widget.childBuilder(context, _arrowOffset, _isArrowUp)
+        : ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: _maxHeight!),
+            child: widget.childBuilder(context, _arrowOffset, _isArrowUp),
+          );
+
     return Stack(
       children: [
-        Positioned(
-          left: _childPosition!.dx,
-          top: _childPosition!.dy,
-          child: _maxHeight == null
-              ? widget.childBuilder(context, _arrowOffset, _isArrowUp)
-              : ConstrainedBox(
-                  constraints: BoxConstraints(maxHeight: _maxHeight!),
-                  child: widget.childBuilder(context, _arrowOffset, _isArrowUp),
-                ),
-        ),
+        Positioned(left: _childPosition!.dx, top: _childPosition!.dy, child: _decorateMenu(menu)),
       ],
     );
   }

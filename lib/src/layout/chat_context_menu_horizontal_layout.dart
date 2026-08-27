@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:chat_context_menu/src/model/arrow_horizontal_direction.dart';
+import 'package:chat_context_menu/src/route/chat_context_menu_transition.dart';
 import 'package:flutter/material.dart';
 
 /// 横向布局的 Context Menu
@@ -17,6 +18,8 @@ class ChatContextMenuHorizontalLayout extends StatefulWidget {
     required this.borderRadius,
     required this.horizontalMargin,
     required this.topPadding,
+    this.animation,
+    this.applyCupertinoSheetTransition = false,
   });
 
   final Rect widgetRect;
@@ -34,6 +37,8 @@ class ChatContextMenuHorizontalLayout extends StatefulWidget {
   final BorderRadius borderRadius;
   final double horizontalMargin;
   final double topPadding;
+  final Animation<double>? animation;
+  final bool applyCupertinoSheetTransition;
 
   @override
   State<ChatContextMenuHorizontalLayout> createState() => _ChatContextMenuHorizontalLayoutState();
@@ -188,6 +193,22 @@ class _ChatContextMenuHorizontalLayoutState extends State<ChatContextMenuHorizon
     ].reduce(max);
   }
 
+  Widget _decorateMenu(Widget child) {
+    if (!widget.applyCupertinoSheetTransition) {
+      return child;
+    }
+    return ChatContextMenuSheetTransition(
+      animation: widget.animation!,
+      alignment: sheetScaleAlignment(
+        axis: Axis.horizontal,
+        horizontal: _arrowDirection,
+        arrowOffset: _arrowOffset,
+        menuSize: _childSize,
+      ),
+      child: child,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_childSize == null) {
@@ -213,7 +234,7 @@ class _ChatContextMenuHorizontalLayoutState extends State<ChatContextMenuHorizon
         Positioned(
           left: _childPosition!.dx,
           top: _childPosition!.dy,
-          child: widget.childBuilder(context, _arrowOffset, _arrowDirection),
+          child: _decorateMenu(widget.childBuilder(context, _arrowOffset, _arrowDirection)),
         ),
       ],
     );

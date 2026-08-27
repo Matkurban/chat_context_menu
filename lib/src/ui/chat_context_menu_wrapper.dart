@@ -1,6 +1,7 @@
+import 'package:chat_context_menu/src/model/menu_animation_style.dart';
+import 'package:chat_context_menu/src/model/statement.dart';
 import 'package:chat_context_menu/src/route/anchor_viewport_clip.dart';
 import 'package:chat_context_menu/src/route/chat_context_route.dart';
-import 'package:chat_context_menu/src/model/statement.dart';
 import 'package:flutter/material.dart';
 
 class ChatContextMenuWrapper extends StatefulWidget {
@@ -17,8 +18,9 @@ class ChatContextMenuWrapper extends StatefulWidget {
     this.arrowHeight = 8.0,
     this.arrowWidth = 12.0,
     this.spacing = 6.0,
+    this.animationStyle = ChatContextMenuAnimationStyle.scaleFade,
     this.transitionsBuilder,
-    this.transitionDurations = const Duration(milliseconds: 150),
+    this.transitionDurations,
     this.onClose,
     this.horizontalMargin = 10.0,
     this.menuConstraints,
@@ -79,6 +81,15 @@ class ChatContextMenuWrapper extends StatefulWidget {
   ///Spacing between context menu and components
   final double spacing;
 
+  ///内置菜单动画。默认 [ChatContextMenuAnimationStyle.scaleFade] 保持现有手感。
+  ///[ChatContextMenuAnimationStyle.cupertinoSheet] 为 iOS 操作菜单回弹。
+  ///非空的 [transitionsBuilder] 会覆盖两种内置样式。
+  ///
+  ///Built-in menu animation. Defaults to [ChatContextMenuAnimationStyle.scaleFade].
+  ///[ChatContextMenuAnimationStyle.cupertinoSheet] matches the iOS action-sheet bounce.
+  ///A non-null [transitionsBuilder] overrides both built-in styles.
+  final ChatContextMenuAnimationStyle animationStyle;
+
   ///自定义出现的动画
   ///Customize the animation that appears
   final Widget? Function(
@@ -91,9 +102,14 @@ class ChatContextMenuWrapper extends StatefulWidget {
   )?
   transitionsBuilder;
 
-  ///菜单动画时长
-  ///Duration of menu animation
-  final Duration transitionDurations;
+  ///菜单动画时长。为 null 时使用 [animationStyle] 的默认时长
+  ///（[ChatContextMenuAnimationStyle.scaleFade] 150ms，
+  ///[ChatContextMenuAnimationStyle.cupertinoSheet] 335ms）。
+  ///
+  ///Duration of the menu animation. When null, uses [animationStyle]'s default
+  ///(150ms for [ChatContextMenuAnimationStyle.scaleFade], 335ms for
+  ///[ChatContextMenuAnimationStyle.cupertinoSheet]).
+  final Duration? transitionDurations;
 
   ///关闭时触发的回调
   ///Callback triggered when closed
@@ -198,8 +214,9 @@ class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
       arrowHeight: widget.arrowHeight,
       arrowWidth: widget.arrowWidth,
       spacing: widget.spacing,
+      animationStyle: widget.animationStyle,
       transitionsBuilder: widget.transitionsBuilder,
-      transitionDurations: widget.transitionDurations,
+      transitionDurations: widget.animationStyle.resolveDuration(widget.transitionDurations),
       horizontalMargin: widget.horizontalMargin,
       menuConstraints: widget.menuConstraints,
       layoutConstraints: widget.layoutConstraints,

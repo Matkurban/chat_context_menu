@@ -1,6 +1,8 @@
 import 'dart:math';
 
 import 'package:chat_context_menu/src/model/arrow_vertical_direction.dart';
+import 'package:chat_context_menu/src/model/menu_animation_style.dart';
+import 'package:chat_context_menu/src/route/chat_context_menu_transition.dart';
 import 'package:chat_context_menu/src/shape/chat_context_menu_vertical_shape.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -39,7 +41,8 @@ class ChatSelectableText extends StatefulWidget {
     this.onSelectionChanged,
     this.onMenuClosed,
     this.transitionsBuilder,
-    this.transitionDuration = const Duration(milliseconds: 150),
+    this.animationStyle = ChatContextMenuAnimationStyle.scaleFade,
+    this.transitionDuration,
     this.menuBackgroundColor,
     this.menuBorderRadius = const BorderRadius.all(Radius.circular(8)),
     this.menuPadding = const EdgeInsets.all(8),
@@ -136,8 +139,16 @@ class ChatSelectableText extends StatefulWidget {
   )?
   transitionsBuilder;
 
-  ///菜单动画时长
-  final Duration transitionDuration;
+  ///内置菜单动画。默认 [ChatContextMenuAnimationStyle.scaleFade]。
+  ///非空的 [transitionsBuilder] 会覆盖两种内置样式。
+  ///
+  ///Built-in menu animation. Defaults to [ChatContextMenuAnimationStyle.scaleFade].
+  ///A non-null [transitionsBuilder] overrides both built-in styles.
+  final ChatContextMenuAnimationStyle animationStyle;
+
+  ///菜单动画时长。为 null 时使用 [animationStyle] 的默认时长。
+  ///Duration of the menu animation. When null, uses [animationStyle]'s default.
+  final Duration? transitionDuration;
 
   ///菜单容器的背景颜色
   final Color? menuBackgroundColor;
@@ -677,7 +688,7 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
     _menuAnimationController?.dispose();
     _menuAnimationController = AnimationController(
       vsync: this,
-      duration: widget.transitionDuration,
+      duration: widget.animationStyle.resolveDuration(widget.transitionDuration),
     );
 
     _menuSize = null;
@@ -758,6 +769,7 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
       onHideMenu: _hideMenu,
       onSelectAll: _selectAll,
       animation: _menuAnimationController!,
+      animationStyle: widget.animationStyle,
       transitionsBuilder: widget.transitionsBuilder,
       menuBackgroundColor: widget.menuBackgroundColor,
       menuBorderRadius: widget.menuBorderRadius,
@@ -999,6 +1011,7 @@ class _PositionedMenu extends StatelessWidget {
     required this.onHideMenu,
     required this.onSelectAll,
     required this.animation,
+    this.animationStyle = ChatContextMenuAnimationStyle.scaleFade,
     this.transitionsBuilder,
     this.menuBackgroundColor,
     required this.menuBorderRadius,
@@ -1034,6 +1047,7 @@ class _PositionedMenu extends StatelessWidget {
   final VoidCallback onHideMenu;
   final VoidCallback onSelectAll;
   final Animation<double> animation;
+  final ChatContextMenuAnimationStyle animationStyle;
   final Widget? Function(
     BuildContext context,
     Animation<double> animation,
@@ -1175,18 +1189,46 @@ class _PositionedMenu extends StatelessWidget {
     );
     final double alignX = (menuCenter.dx / screenSize.width) * 2 - 1;
     final double alignY = (menuCenter.dy / screenSize.height) * 2 - 1;
-    final Alignment alignment = Alignment(alignX, alignY);
-
-    final Animation<double> curve = animation.drive(CurveTween(curve: Curves.fastOutSlowIn));
+    final Alignment overlayAlignment = Alignment(alignX, alignY);
 
     final Widget animatedMenu =
-        transitionsBuilder?.call(context, animation, menuCenter, alignment, menuWidget) ??
-        FadeTransition(
-          opacity: curve,
-          child: ScaleTransition(scale: curve, alignment: alignment, child: menuWidget),
+        transitionsBuilder?.call(context, animation, menuCenter, overlayAlignment, menuWidget) ??
+        _buildDefaultMenuTransition(
+          menuWidget: menuWidget,
+          overlayAlignment: overlayAlignment,
+          arrowDirection: arrowDirection,
+          arrowOffset: arrowOffset,
+          menuSize: Size(menuWidth, totalMenuHeight),
         );
 
     return Positioned(left: menuXScreen, top: menuYScreen, child: animatedMenu);
+  }
+
+  Widget _buildDefaultMenuTransition({
+    required Widget menuWidget,
+    required Alignment overlayAlignment,
+    required ArrowVerticalDirection arrowDirection,
+    required double arrowOffset,
+    required Size menuSize,
+  }) {
+    if (animationStyle == ChatContextMenuAnimationStyle.cupertinoSheet) {
+      return ChatContextMenuSheetTransition(
+        animation: animation,
+        alignment: sheetScaleAlignment(
+          axis: Axis.vertical,
+          vertical: arrowDirection,
+          arrowOffset: arrowOffset,
+          menuSize: menuSize,
+        ),
+        child: menuWidget,
+      );
+    }
+
+    final Animation<double> curve = animation.drive(CurveTween(curve: Curves.fastOutSlowIn));
+    return FadeTransition(
+      opacity: curve,
+      child: ScaleTransition(scale: curve, alignment: overlayAlignment, child: menuWidget),
+    );
   }
 
   double _maxRadius(BorderRadius radius) {

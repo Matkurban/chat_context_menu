@@ -1,4 +1,5 @@
 import 'package:chat_context_menu/chat_context_menu.dart';
+import 'package:chat_context_menu/src/route/chat_context_menu_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -68,6 +69,30 @@ void main() {
 
     expect(menuRect.left, greaterThanOrEqualTo(horizontalMargin - 1));
     expect(menuRect.right, lessThanOrEqualTo(screenWidth - horizontalMargin + 1));
+  });
+
+  testWidgets('cupertinoSheet wraps the selection menu', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: ChatSelectableText(
+              'Select this text to open the menu.',
+              animationStyle: ChatContextMenuAnimationStyle.cupertinoSheet,
+              menuBuilder: (context, selectedText, hideMenu, selectAll) {
+                return TextButton(onPressed: hideMenu, child: const Text('Copy'));
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.longPress(find.byType(ChatSelectableText));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Copy'), findsOneWidget);
+    expect(find.byType(ChatContextMenuSheetTransition), findsOneWidget);
   });
 }
 

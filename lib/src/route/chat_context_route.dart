@@ -1,8 +1,9 @@
 import 'package:chat_context_menu/src/layout/chat_context_menu_horizontal_layout.dart';
+import 'package:chat_context_menu/src/layout/chat_context_menu_vertical_layout.dart';
+import 'package:chat_context_menu/src/model/menu_animation_style.dart';
 import 'package:chat_context_menu/src/route/hole_modal_barrier.dart';
 import 'package:chat_context_menu/src/route/modal_hole_dismiss_scrim.dart';
 import 'package:chat_context_menu/src/ui/chat_context_menu_horizontal_widget.dart';
-import 'package:chat_context_menu/src/layout/chat_context_menu_vertical_layout.dart';
 import 'package:chat_context_menu/src/ui/chat_context_menu_vertical_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -32,6 +33,7 @@ class ChatContextRoute extends PageRoute {
   )?
   transitionsBuilder;
   final Duration transitionDurations;
+  final ChatContextMenuAnimationStyle animationStyle;
   final BoxConstraints? menuConstraints;
   final BoxConstraints? layoutConstraints;
   final Axis axis;
@@ -71,6 +73,7 @@ class ChatContextRoute extends PageRoute {
     required this.horizontalMargin,
     this.transitionsBuilder,
     required this.transitionDurations,
+    this.animationStyle = ChatContextMenuAnimationStyle.scaleFade,
     this.menuConstraints,
     this.layoutConstraints,
     required this.axis,
@@ -124,6 +127,9 @@ class ChatContextRoute extends PageRoute {
   /// barrier, since [Offstage] already suppresses hit-testing until the route is onstage.
   bool get _useHoleBarrier => excludeAnchorFromBarrier && (_barrierColor?.a ?? 0) != 0;
 
+  bool get _applyCupertinoSheetTransition =>
+      animationStyle == ChatContextMenuAnimationStyle.cupertinoSheet && transitionsBuilder == null;
+
   @override
   Widget buildPage(
     BuildContext context,
@@ -143,6 +149,8 @@ class ChatContextRoute extends PageRoute {
         borderRadius: borderRadius,
         horizontalMargin: horizontalMargin,
         topPadding: topPadding,
+        animation: animation,
+        applyCupertinoSheetTransition: _applyCupertinoSheetTransition,
         childBuilder: (context, arrowOffset, arrowDirection) {
           return ChatContextMenuHorizontalWidget(
             items: menuItems,
@@ -170,6 +178,8 @@ class ChatContextRoute extends PageRoute {
         horizontalMargin: horizontalMargin,
         layoutConstraints: layoutConstraints,
         topPadding: topPadding,
+        animation: animation,
+        applyCupertinoSheetTransition: _applyCupertinoSheetTransition,
         childBuilder: (context, arrowOffset, isArrowUp) {
           return ChatContextMenuVerticalWidget(
             items: menuItems,
@@ -214,6 +224,10 @@ class ChatContextRoute extends PageRoute {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
+    if (_applyCupertinoSheetTransition) {
+      return child;
+    }
+
     // Use the actual overlay constraints instead of MediaQuery.size: [widgetRect]/[pointerRect]
     // are overlay-local, and with nested Navigators the overlay may be smaller than the window.
     return LayoutBuilder(

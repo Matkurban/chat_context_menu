@@ -1,5 +1,8 @@
 import 'package:chat_context_menu/chat_context_menu.dart';
+import 'package:chat_context_menu/src/model/arrow_horizontal_direction.dart';
+import 'package:chat_context_menu/src/model/arrow_vertical_direction.dart';
 import 'package:chat_context_menu/src/route/anchor_viewport_clip.dart';
+import 'package:chat_context_menu/src/route/chat_context_menu_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -232,4 +235,174 @@ void main() {
     expect(clipped.top, greaterThanOrEqualTo(viewportGlobal.top - 0.01));
     expect(raw.height, greaterThan(clipped.height));
   });
+
+  group('ChatContextMenuAnimationStyle', () {
+    test('scaleFade defaults to 150ms and cupertinoSheet to 335ms', () {
+      expect(
+        ChatContextMenuAnimationStyle.scaleFade.defaultDuration,
+        const Duration(milliseconds: 150),
+      );
+      expect(
+        ChatContextMenuAnimationStyle.cupertinoSheet.defaultDuration,
+        const Duration(milliseconds: 335),
+      );
+      expect(
+        ChatContextMenuAnimationStyle.cupertinoSheet.resolveDuration(null),
+        const Duration(milliseconds: 335),
+      );
+      expect(
+        ChatContextMenuAnimationStyle.cupertinoSheet.resolveDuration(
+          const Duration(milliseconds: 400),
+        ),
+        const Duration(milliseconds: 400),
+      );
+    });
+
+    test('sheetScaleAlignment pins the origin to the arrow edge', () {
+      expect(
+        sheetScaleAlignment(
+          axis: Axis.vertical,
+          vertical: ArrowVerticalDirection.up,
+          arrowOffset: 40,
+          menuSize: const Size(80, 40),
+        ),
+        const Alignment(0, -1),
+      );
+      expect(
+        sheetScaleAlignment(axis: Axis.vertical, vertical: ArrowVerticalDirection.down),
+        Alignment.bottomCenter,
+      );
+      expect(
+        sheetScaleAlignment(
+          axis: Axis.horizontal,
+          horizontal: ArrowHorizontalDirection.left,
+          arrowOffset: 10,
+          menuSize: const Size(40, 40),
+        ),
+        const Alignment(-1, -0.5),
+      );
+    });
+
+    testWidgets('scaleFade shows the menu without a sheet transition', (WidgetTester tester) async {
+      await tester.pumpWidget(_animationHarness());
+
+      await tester.longPress(find.text('Long press me'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Copy'), findsOneWidget);
+      expect(find.byType(ChatContextMenuSheetTransition), findsNothing);
+      expect(
+        ModalRoute.of(tester.element(find.text('Copy')))!.transitionDuration,
+        const Duration(milliseconds: 150),
+      );
+    });
+
+    testWidgets('cupertinoSheet wraps the menu and uses 335ms', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _animationHarness(style: ChatContextMenuAnimationStyle.cupertinoSheet),
+      );
+
+      await tester.longPress(find.text('Long press me'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Copy'), findsOneWidget);
+      expect(find.byType(ChatContextMenuSheetTransition), findsOneWidget);
+      expect(
+        ModalRoute.of(tester.element(find.text('Copy')))!.transitionDuration,
+        const Duration(milliseconds: 335),
+      );
+    });
+
+    testWidgets('cupertinoSheet works for a horizontal menu', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _animationHarness(
+          style: ChatContextMenuAnimationStyle.cupertinoSheet,
+          axis: Axis.horizontal,
+        ),
+      );
+
+      await tester.longPress(find.text('Long press me'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Copy'), findsOneWidget);
+      expect(find.byType(ChatContextMenuSheetTransition), findsOneWidget);
+    });
+
+    testWidgets('transitionsBuilder is not wrapped with the cupertino sheet transition', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _animationHarness(
+          style: ChatContextMenuAnimationStyle.cupertinoSheet,
+          transitionsBuilder: (context, animation, secondary, center, alignment, child) {
+            return FadeTransition(
+              key: const Key('custom-transition'),
+              opacity: animation,
+              child: child,
+            );
+          },
+        ),
+      );
+
+      await tester.longPress(find.text('Long press me'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Copy'), findsOneWidget);
+      expect(find.byKey(const Key('custom-transition')), findsOneWidget);
+      expect(find.byType(ChatContextMenuSheetTransition), findsNothing);
+    });
+
+    testWidgets('explicit transitionDurations overrides the style default', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _animationHarness(
+          style: ChatContextMenuAnimationStyle.cupertinoSheet,
+          transitionDurations: const Duration(milliseconds: 400),
+        ),
+      );
+
+      await tester.longPress(find.text('Long press me'));
+      await tester.pumpAndSettle();
+
+      expect(
+        ModalRoute.of(tester.element(find.text('Copy')))!.transitionDuration,
+        const Duration(milliseconds: 400),
+      );
+    });
+  });
+}
+
+Widget _animationHarness({
+  ChatContextMenuAnimationStyle style = ChatContextMenuAnimationStyle.scaleFade,
+  Axis axis = Axis.vertical,
+  Duration? transitionDurations,
+  Widget? Function(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Offset centerOffset,
+    Alignment alignment,
+    Widget child,
+  )?
+  transitionsBuilder,
+}) {
+  return MaterialApp(
+    home: Scaffold(
+      body: Center(
+        child: ChatContextMenuWrapper(
+          animationStyle: style,
+          axis: axis,
+          transitionDurations: transitionDurations,
+          transitionsBuilder: transitionsBuilder,
+          menuBuilder: (context, hideMenu) {
+            return const Text('Copy');
+          },
+          widgetBuilder: (context, showMenu, hideMenu) {
+            return GestureDetector(onLongPress: showMenu, child: const Text('Long press me'));
+          },
+        ),
+      ),
+    ),
+  );
 }

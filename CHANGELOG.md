@@ -1,5 +1,11 @@
 # Chat Context Menu ChangeLog
 
+## 3.2.0
+
+* **`ChatContextMenuAnimationStyle`** — Built-in menu animations, default **`scaleFade`** (existing 150ms overlay fade+scale). New **`cupertinoSheet`** matches Flutter's Cupertino context-menu sheet (335ms, `easeOutBack` / `easeInBack`, linear fade, scale from the arrow). `transitionsBuilder` still overrides both. Optional `transitionDurations` / `transitionDuration` override the style default when non-null.
+* **Example** — Third tab (`Animation`) compares the two styles on bubbles, a horizontal menu, and `ChatSelectableText`.
+* **Tests** — Widget coverage for both styles, horizontal `cupertinoSheet`, custom `transitionsBuilder` not stacking the sheet transition, and duration overrides.
+
 ## 3.1.0
 
 * **Nested Navigator / desktop multi-pane support** — Fixes broken menu positioning and clipping when the anchor lives inside a nested `Navigator` (e.g. desktop "sliding window" layouts where each pane hosts its own Navigator wrapped in `ClipRect`/`Transform.translate`/clipped `Material`).

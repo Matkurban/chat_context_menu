@@ -14,6 +14,7 @@ A Flutter package that provides an iOS-style chat context menu with customizable
 *   **Easy Integration:** Wrap any widget with `ChatContextMenuWrapper` to enable the context menu.
 *   **Selectable Text:** `ChatSelectableText` provides fully custom text selection with draggable handles, auto-scroll, and a context menu with smart positioning — ideal for chat bubbles.
 *   **Platform-Adaptive Triggers:** Configurable trigger modes for mobile (tap / double-tap / long-press) and desktop (right-click / left-click) on `ChatContextMenuWrapper`.
+*   **Built-in animation styles:** `ChatContextMenuAnimationStyle.scaleFade` (default, existing overlay fade+scale) or `cupertinoSheet` (iOS sheet bounce from the arrow). Override duration with `transitionDurations` / `transitionDuration`, or replace both with `transitionsBuilder`.
 *   **Barrier anchor cutout (opt-in):** Set `excludeAnchorFromBarrier: true` with a non-transparent `barrierColor` to punch a hole over the anchor, keep it bright and tappable, and dismiss on shaded taps (in-route dismiss scrim). Use `barrierAnchorPadding` / `barrierAnchorBorderRadius` to size and round the cutout. When `false` (default), the barrier is a classic full sheet over the previous route.
 
 ## Screenshots
@@ -205,6 +206,8 @@ You can customize the `ChatContextMenuWrapper` with the following properties:
 *   `backgroundColor`: Background color of the menu container.
 *   `borderRadius`: Border radius of the menu container.
 *   `padding`: Padding inside the menu container.
+*   `animationStyle`: Built-in menu animation. Default `ChatContextMenuAnimationStyle.scaleFade` (150ms overlay fade+scale). Use `cupertinoSheet` for the iOS action-sheet bounce (335ms, scale from the arrow). A non-null `transitionsBuilder` overrides both.
+*   `transitionDurations`: Optional duration override. When `null`, uses the duration of `animationStyle`.
 *   `barrierDismissible`: When `true` (default), tapping the dimmed area closes the menu; when `false`, taps play the system alert sound and the menu stays open (aligned with Flutter’s `ModalBarrier` behavior).
 *   `useRootNavigator`: When `true`, the menu route is pushed onto the **root** `Navigator` instead of the nearest one. Default is `false`. See “Nested Navigators / desktop multi-pane layouts” below.
 
@@ -361,8 +364,9 @@ ChatSelectableText(
 | `useRootOverlay`      | `bool`                                                              | `false`                    | Insert handles/menu/barrier into the root Overlay (for nested Navigators, see notes above) |
 | `onSelectionChanged`  | `ValueChanged<String>?`                                             | `null`                     | Selection change callback                            |
 | `onMenuClosed`        | `VoidCallback?`                                                     | `null`                     | Menu closed callback                                 |
-| `transitionsBuilder`  | `Function?`                                                         | `null`                     | Custom menu animation                                |
-| `transitionDuration`  | `Duration`                                                          | `150ms`                    | Menu animation duration                              |
+| `animationStyle`      | `ChatContextMenuAnimationStyle`                                     | `scaleFade`                | Built-in menu animation (`scaleFade` or `cupertinoSheet`) |
+| `transitionsBuilder`  | `Function?`                                                         | `null`                     | Custom menu animation (overrides `animationStyle`)   |
+| `transitionDuration`  | `Duration?`                                                         | style default              | Menu animation duration (`scaleFade` 150ms, `cupertinoSheet` 335ms) |
 
 ## Additional information
 
