@@ -1,5 +1,16 @@
 # Chat Context Menu ChangeLog
 
+## 3.3.0
+
+* **`ChatSelectableText` desktop interactions**
+  * **Mouse drag selection** — Press the left mouse button and drag to select text. The pan gesture is mouse-only (`supportedDevices: {PointerDeviceKind.mouse}`), so touch drags still scroll the surrounding list. The selection anchors at the press position (`DragStartBehavior.down`), highlights live while dragging, and shows handles + menu on release (an empty selection just deactivates).
+  * **Right-click** — Activates selection (respecting `selectAllOnActivate`, same as long-press) and shows the menu at the pointer. When already active, right-click re-selects the word under the pointer.
+  * **Double-click / triple-click** — Double-click selects the word under the pointer; triple-click selects the whole newline-delimited paragraph. Implemented with a single `SerialTapGestureRecognizer` (no double-tap delay).
+  * **Text cursor** — The text now shows `SystemMouseCursors.text` on hover.
+* **`axis` on `ChatSelectableText`** — Same as `ChatContextMenuWrapper`: `Axis.vertical` (default, menu above/below the selection — unchanged behavior) or `Axis.horizontal` (menu beside the selection with a horizontal arrow, preferring the right side and falling back to the press position when neither side fits).
+* **Internal** — The gesture handling was consolidated into a single `RawGestureDetector` (serial tap + long press + mouse-only pan) replacing the previous `GestureDetector`.
+* **Tests** — Widget coverage for right-click activation, horizontal axis placement, mouse drag selection, double-click word and triple-click paragraph selection.
+
 ## 3.2.0
 
 * **`ChatContextMenuAnimationStyle`** — Built-in menu animations, default **`scaleFade`** (existing 150ms overlay fade+scale). New **`cupertinoSheet`** matches Flutter's Cupertino context-menu sheet (335ms, `easeOutBack` / `easeInBack`, linear fade, scale from the arrow). `transitionsBuilder` still overrides both. Optional `transitionDurations` / `transitionDuration` override the style default when non-null.

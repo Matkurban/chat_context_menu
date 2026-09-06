@@ -1,9 +1,12 @@
 import 'dart:math';
 
+import 'package:chat_context_menu/src/model/arrow_horizontal_direction.dart';
 import 'package:chat_context_menu/src/model/arrow_vertical_direction.dart';
 import 'package:chat_context_menu/src/model/menu_animation_style.dart';
 import 'package:chat_context_menu/src/route/chat_context_menu_transition.dart';
+import 'package:chat_context_menu/src/shape/chat_context_menu_horizontal_shape.dart';
 import 'package:chat_context_menu/src/shape/chat_context_menu_vertical_shape.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -51,6 +54,7 @@ class ChatSelectableText extends StatefulWidget {
     this.arrowWidth = 12.0,
     this.spacing = 0.0,
     this.horizontalMargin = 10.0,
+    this.axis = Axis.vertical,
     this.useRootOverlay = false,
   });
 
@@ -174,6 +178,14 @@ class ChatSelectableText extends StatefulWidget {
   ///距屏幕左右的最小留白
   final double horizontalMargin;
 
+  ///菜单排列方向。默认 [Axis.vertical]（菜单显示在选区上方/下方）。
+  ///[Axis.horizontal] 时菜单显示在选区左侧/右侧。
+  ///
+  ///Arrangement direction of the menu. Defaults to [Axis.vertical]
+  ///(menu appears above/below the selection).
+  ///With [Axis.horizontal] the menu appears to the left/right of the selection.
+  final Axis axis;
+
   ///是否把手柄、菜单与遮罩插入根 Overlay。
   ///默认为 false(使用最近的 Overlay,保持既有行为)。当文本位于嵌套 Navigator 内
   ///(如桌面端多栏布局,每栏各自有 Navigator 且被 ClipRect 等包裹)时,设为 true 可让
@@ -232,6 +244,10 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
   Offset? _lastDragGlobalPosition;
 
   bool _lastDragIsBase = false;
+
+  ///鼠标左键拖动选择的起始文本偏移；null 表示当前没有进行中的鼠标拖选
+  ///Base text offset of an in-progress mouse drag selection; null when idle.
+  int? _mouseDragBaseOffset;
 
   @override
   void didChangeDependencies() {
@@ -363,10 +379,17 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
       newSelection = wordSelection;
     }
 
-    _selection = newSelection;
+    _setActiveSelection(newSelection);
+  }
+
+  ///以给定选区进入激活状态并显示 barrier、手柄和菜单
+  ///Activate with the given selection and show barrier, handles and menu.
+  void _setActiveSelection(TextSelection selection, {bool haptic = true}) {
+    final bool wasActive = _isActive;
+    _selection = selection;
     _isActive = true;
 
-    if (widget.enableHapticFeedback) {
+    if (!wasActive && haptic && widget.enableHapticFeedback) {
       HapticFeedback.mediumImpact();
     }
 
@@ -380,6 +403,83 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
     if (text.isNotEmpty) {
       widget.onSelectionChanged?.call(text);
     }
+  }
+
+  // ─── 双击选词 / 三击选段 ───
+
+  void _selectWordAt(Offset localPosition) {
+    _layoutTextPainter();
+    _activationGlobalPosition = _getTextGlobalOffset() + localPosition;
+    final position = _getPositionForOffset(localPosition);
+    final wordSelection = _selectWordAtPosition(position);
+    if (wordSelection.isCollapsed) return;
+    _setActiveSelection(wordSelection);
+  }
+
+  void _selectParagraphAt(Offset localPosition) {
+    _layoutTextPainter();
+    _activationGlobalPosition = _getTextGlobalOffset() + localPosition;
+    final position = _getPositionForOffset(localPosition);
+    final paragraphSelection = _selectParagraphAtPosition(position);
+    if (paragraphSelection.isCollapsed) return;
+    _setActiveSelection(paragraphSelection);
+  }
+
+  ///以换行符为边界选中 [position] 所在的整个段落
+  ///Select the whole paragraph (newline-delimited) containing [position].
+  TextSelection _selectParagraphAtPosition(TextPosition position) {
+    final String text = widget.data;
+    if (text.isEmpty) return const TextSelection.collapsed(offset: 0);
+    final int offset = position.offset.clamp(0, text.length);
+    final int start = offset > 0 ? text.lastIndexOf('\n', offset - 1) + 1 : 0;
+    int end = text.indexOf('\n', offset);
+    if (end == -1) end = text.length;
+    if (start >= end) return TextSelection.collapsed(offset: offset);
+    return TextSelection(baseOffset: start, extentOffset: end);
+  }
+
+  // ─── 鼠标左键拖动选择 ───
+
+  void _onMouseDragStart(DragStartDetails details) {
+    _layoutTextPainter();
+    _activationGlobalPosition = details.globalPosition;
+
+    // 拖动期间隐藏菜单和手柄
+    _removeMenuEntry();
+    _removeHandleEntries();
+
+    final position = _getPositionForOffset(details.localPosition);
+    _mouseDragBaseOffset = position.offset;
+    setState(() {
+      _selection = TextSelection.collapsed(offset: position.offset);
+      _isActive = true;
+    });
+  }
+
+  void _onMouseDragUpdate(DragUpdateDetails details) {
+    final int? base = _mouseDragBaseOffset;
+    if (base == null) return;
+    final Offset local = details.globalPosition - _getTextGlobalOffset();
+    final int extent = _getPositionForOffset(local).offset;
+    _updateSelection(TextSelection(baseOffset: min(base, extent), extentOffset: max(base, extent)));
+  }
+
+  void _onMouseDragEnd(DragEndDetails details) {
+    _finishMouseDrag();
+  }
+
+  void _onMouseDragCancel() {
+    _finishMouseDrag();
+  }
+
+  void _finishMouseDrag() {
+    if (_mouseDragBaseOffset == null) return;
+    _mouseDragBaseOffset = null;
+    if (_selection.isCollapsed || _selection.start < 0) {
+      _deactivateSelection();
+      return;
+    }
+    _setActiveSelection(_selection, haptic: false);
   }
 
   // ─── 选区内点击选词 ───
@@ -779,6 +879,7 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
       arrowWidth: widget.arrowWidth,
       spacing: widget.spacing,
       horizontalMargin: widget.horizontalMargin,
+      axis: widget.axis,
     );
   }
 
@@ -839,33 +940,86 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
 
     return CompositedTransformTarget(
       link: _layerLink,
-      child: GestureDetector(
+      child: RawGestureDetector(
         behavior: HitTestBehavior.opaque,
-        onLongPressStart: _isActive ? null : (details) => _activateSelection(details.localPosition),
-        onDoubleTapDown: _isActive ? null : (details) => _activateSelection(details.localPosition),
-        onTapDown: _isActive ? (details) => _onTapDownInSelection(details.localPosition) : null,
-        child: CustomPaint(
-          foregroundPainter: _isActive && _textPainter != null && !_selection.isCollapsed
-              ? _SelectionHighlightPainter(
-                  textPainter: _textPainter!,
-                  selection: _selection,
-                  selectionColor:
-                      widget.selectionColor ??
-                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
-                )
-              : null,
-          child: RichText(
-            text: TextSpan(text: widget.data, style: effectiveStyle),
-            textAlign: widget.textAlign,
-            textDirection: widget.textDirection ?? Directionality.of(context),
-            maxLines: widget.maxLines,
-            overflow: widget.overflow,
-            textScaler: widget.textScaler,
-            textWidthBasis: widget.textWidthBasis,
-            textHeightBehavior: widget.textHeightBehavior,
-            strutStyle: widget.strutStyle,
-            locale: widget.locale,
-            softWrap: widget.softWrap,
+        gestures: <Type, GestureRecognizerFactory>{
+          // 右键触发 / 单击（激活时选词）/ 双击选词 / 三击选段
+          // Right-click trigger / tap-in-selection / double-click word / triple-click paragraph.
+          SerialTapGestureRecognizer:
+              GestureRecognizerFactoryWithHandlers<SerialTapGestureRecognizer>(
+                () => SerialTapGestureRecognizer(debugOwner: this),
+                (SerialTapGestureRecognizer instance) {
+                  instance.onSerialTapDown = (SerialTapDownDetails details) {
+                    if (details.buttons == kSecondaryButton) {
+                      if (_isActive) {
+                        _onTapDownInSelection(details.localPosition);
+                      } else {
+                        _activateSelection(details.localPosition);
+                      }
+                    } else if (details.count == 2) {
+                      _selectWordAt(details.localPosition);
+                    } else if (details.count == 3) {
+                      _selectParagraphAt(details.localPosition);
+                    } else if (details.count == 1 && _isActive) {
+                      _onTapDownInSelection(details.localPosition);
+                    }
+                  };
+                },
+              ),
+          // 长按激活
+          LongPressGestureRecognizer:
+              GestureRecognizerFactoryWithHandlers<LongPressGestureRecognizer>(
+                () => LongPressGestureRecognizer(debugOwner: this),
+                (LongPressGestureRecognizer instance) {
+                  instance.onLongPressStart = (LongPressStartDetails details) {
+                    if (!_isActive) _activateSelection(details.localPosition);
+                  };
+                },
+              ),
+          // 鼠标左键拖动选择。仅限鼠标设备，避免抢走触摸设备上 Scrollable 的滚动手势
+          // Mouse-only drag selection so touch drags still scroll the surrounding Scrollable.
+          PanGestureRecognizer: GestureRecognizerFactoryWithHandlers<PanGestureRecognizer>(
+            () => PanGestureRecognizer(
+              debugOwner: this,
+              supportedDevices: <PointerDeviceKind>{PointerDeviceKind.mouse},
+            ),
+            (PanGestureRecognizer instance) {
+              instance
+                // 以按下位置（而非越过 slop 后的位置）作为选区起点
+                // Anchor the selection at the press position, not the post-slop position.
+                ..dragStartBehavior = DragStartBehavior.down
+                ..onStart = _onMouseDragStart
+                ..onUpdate = _onMouseDragUpdate
+                ..onEnd = _onMouseDragEnd
+                ..onCancel = _onMouseDragCancel;
+            },
+          ),
+        },
+        child: MouseRegion(
+          cursor: SystemMouseCursors.text,
+          child: CustomPaint(
+            foregroundPainter: _isActive && _textPainter != null && !_selection.isCollapsed
+                ? _SelectionHighlightPainter(
+                    textPainter: _textPainter!,
+                    selection: _selection,
+                    selectionColor:
+                        widget.selectionColor ??
+                        Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                  )
+                : null,
+            child: RichText(
+              text: TextSpan(text: widget.data, style: effectiveStyle),
+              textAlign: widget.textAlign,
+              textDirection: widget.textDirection ?? Directionality.of(context),
+              maxLines: widget.maxLines,
+              overflow: widget.overflow,
+              textScaler: widget.textScaler,
+              textWidthBasis: widget.textWidthBasis,
+              textHeightBehavior: widget.textHeightBehavior,
+              strutStyle: widget.strutStyle,
+              locale: widget.locale,
+              softWrap: widget.softWrap,
+            ),
           ),
         ),
       ),
@@ -972,25 +1126,35 @@ Widget _buildMenuShell({
   List<BoxShadow>? shadows,
   double? arrowOffset,
   ArrowVerticalDirection? arrowDirection,
+  ArrowHorizontalDirection? arrowHorizontalDirection,
   required double arrowHeight,
   required double arrowWidth,
 }) {
+  final ShapeBorder shape;
+  if (arrowOffset != null && arrowHorizontalDirection != null) {
+    shape = ChatContextMenuHorizontalShape(
+      arrowOffset: arrowOffset,
+      arrowDirection: arrowHorizontalDirection,
+      borderRadius: borderRadius,
+      arrowHeight: arrowHeight,
+      arrowWidth: arrowWidth,
+    );
+  } else if (arrowOffset != null && arrowDirection != null) {
+    shape = ChatContextMenuVerticalShape(
+      arrowOffset: arrowOffset,
+      isArrowUp: arrowDirection,
+      borderRadius: borderRadius,
+      arrowHeight: arrowHeight,
+      arrowWidth: arrowWidth,
+    );
+  } else {
+    shape = RoundedRectangleBorder(borderRadius: borderRadius);
+  }
+
   return Container(
     key: key,
     padding: padding,
-    decoration: ShapeDecoration(
-      color: backgroundColor,
-      shadows: shadows,
-      shape: arrowOffset != null && arrowDirection != null
-          ? ChatContextMenuVerticalShape(
-              arrowOffset: arrowOffset,
-              isArrowUp: arrowDirection,
-              borderRadius: borderRadius,
-              arrowHeight: arrowHeight,
-              arrowWidth: arrowWidth,
-            )
-          : RoundedRectangleBorder(borderRadius: borderRadius),
-    ),
+    decoration: ShapeDecoration(color: backgroundColor, shadows: shadows, shape: shape),
     child: child,
   );
 }
@@ -1021,6 +1185,7 @@ class _PositionedMenu extends StatelessWidget {
     required this.arrowWidth,
     required this.spacing,
     required this.horizontalMargin,
+    this.axis = Axis.vertical,
   });
 
   final TextPainter textPainter;
@@ -1065,8 +1230,16 @@ class _PositionedMenu extends StatelessWidget {
   final double spacing;
   final double horizontalMargin;
 
+  ///菜单排列方向
+  ///Arrangement direction of the menu
+  final Axis axis;
+
   @override
   Widget build(BuildContext context) {
+    if (axis == Axis.horizontal) {
+      return _buildHorizontalMenu(context);
+    }
+
     // All positions below are in the hosting Overlay's coordinate space; the Positioned result is
     // interpreted in the same space, so nested-Navigator overlays position correctly.
     final Size screenSize = overlaySize ?? MediaQuery.of(context).size;
@@ -1196,9 +1369,148 @@ class _PositionedMenu extends StatelessWidget {
         _buildDefaultMenuTransition(
           menuWidget: menuWidget,
           overlayAlignment: overlayAlignment,
-          arrowDirection: arrowDirection,
+          verticalArrowDirection: arrowDirection,
           arrowOffset: arrowOffset,
           menuSize: Size(menuWidth, totalMenuHeight),
+        );
+
+    return Positioned(left: menuXScreen, top: menuYScreen, child: animatedMenu);
+  }
+
+  ///横向布局：菜单显示在选区左侧/右侧,箭头水平指向锚点。
+  ///Horizontal layout: the menu appears to the left/right of the selection
+  ///with the arrow pointing horizontally at the anchor.
+  Widget _buildHorizontalMenu(BuildContext context) {
+    final Size screenSize = overlaySize ?? MediaQuery.of(context).size;
+    final double screenWidth = screenSize.width;
+    final double screenHeight = screenSize.height;
+    final double topPadding = MediaQuery.of(context).padding.top;
+    final double bottomPadding = MediaQuery.of(context).padding.bottom;
+
+    final Offset textGlobal = getTextOverlayOffset();
+
+    // 选区包围盒（本地坐标）
+    final List<TextBox> boxes = textPainter.getBoxesForSelection(selection);
+    final double selectionLeftLocal;
+    final double selectionRightLocal;
+    final double selectionTopLocal;
+    final double selectionBottomLocal;
+    if (boxes.isNotEmpty) {
+      selectionLeftLocal = boxes.map((b) => b.left).reduce(min);
+      selectionRightLocal = boxes.map((b) => b.right).reduce(max);
+      selectionTopLocal = boxes.map((b) => b.top).reduce(min);
+      selectionBottomLocal = boxes.map((b) => b.bottom).reduce(max);
+    } else {
+      final baseCaretOffset = textPainter.getOffsetForCaret(
+        TextPosition(offset: selection.baseOffset),
+        Rect.zero,
+      );
+      final extentCaretOffset = textPainter.getOffsetForCaret(
+        TextPosition(offset: selection.extentOffset),
+        Rect.zero,
+      );
+      selectionLeftLocal = min(baseCaretOffset.dx, extentCaretOffset.dx);
+      selectionRightLocal = max(baseCaretOffset.dx, extentCaretOffset.dx);
+      selectionTopLocal = min(baseCaretOffset.dy, extentCaretOffset.dy);
+      selectionBottomLocal =
+          max(baseCaretOffset.dy, extentCaretOffset.dy) + textPainter.preferredLineHeight;
+    }
+
+    Rect anchorRect = Rect.fromLTRB(
+      textGlobal.dx + selectionLeftLocal,
+      textGlobal.dy + selectionTopLocal,
+      textGlobal.dx + selectionRightLocal,
+      textGlobal.dy + selectionBottomLocal,
+    );
+
+    final double menuWidth = menuSize?.width ?? 200;
+    final double menuHeight = menuSize?.height ?? 48;
+    // 箭头占据水平空间
+    final double menuTotalWidth = menuWidth + arrowHeight;
+    final double totalSpacing = handleSize + spacing;
+
+    double leftSpace = anchorRect.left - horizontalMargin - totalSpacing;
+    double rightSpace = screenWidth - horizontalMargin - anchorRect.right - totalSpacing;
+
+    // 左右都放不下且有按压位置时，回退到按压位置作为锚点
+    if (leftSpace < menuTotalWidth &&
+        rightSpace < menuTotalWidth &&
+        pointerOverlayPosition != null) {
+      anchorRect = Rect.fromCenter(center: pointerOverlayPosition!, width: 1, height: 1);
+      leftSpace = anchorRect.left - horizontalMargin - totalSpacing;
+      rightSpace = screenWidth - horizontalMargin - anchorRect.right - totalSpacing;
+    }
+
+    ArrowHorizontalDirection arrowDirection;
+    double menuXScreen;
+
+    if (rightSpace >= menuTotalWidth) {
+      // 右侧空间足够，箭头朝左
+      arrowDirection = ArrowHorizontalDirection.left;
+      menuXScreen = anchorRect.right + totalSpacing;
+    } else if (leftSpace >= menuTotalWidth) {
+      // 左侧空间足够，箭头朝右
+      arrowDirection = ArrowHorizontalDirection.right;
+      menuXScreen = anchorRect.left - totalSpacing - menuTotalWidth;
+    } else if (leftSpace > rightSpace) {
+      arrowDirection = ArrowHorizontalDirection.right;
+      menuXScreen = anchorRect.left - totalSpacing - menuTotalWidth;
+      if (menuXScreen < horizontalMargin) menuXScreen = horizontalMargin;
+    } else {
+      arrowDirection = ArrowHorizontalDirection.left;
+      menuXScreen = anchorRect.right + totalSpacing;
+      if (menuXScreen + menuTotalWidth > screenWidth - horizontalMargin) {
+        menuXScreen = screenWidth - horizontalMargin - menuTotalWidth;
+      }
+    }
+
+    // 垂直方向：菜单中心对齐锚点中心
+    double menuYScreen = anchorRect.center.dy - menuHeight / 2;
+    if (menuYScreen < topPadding) menuYScreen = topPadding;
+    if (menuYScreen + menuHeight > screenHeight - bottomPadding) {
+      menuYScreen = screenHeight - bottomPadding - menuHeight;
+    }
+
+    // 箭头相对菜单顶边的偏移，指向锚点中心
+    double arrowOffset = anchorRect.center.dy - menuYScreen;
+    final double safeMargin = _maxRadius(menuBorderRadius) + arrowWidth / 2;
+    if (arrowOffset < safeMargin) arrowOffset = safeMargin;
+    if (arrowOffset > menuHeight - safeMargin) {
+      arrowOffset = menuHeight - safeMargin;
+    }
+
+    final Widget menuWidget = Material(
+      type: MaterialType.transparency,
+      color: Colors.transparent,
+      child: _buildMenuShell(
+        padding: menuPadding,
+        borderRadius: menuBorderRadius,
+        backgroundColor: menuBackgroundColor,
+        shadows: menuShadows,
+        arrowOffset: arrowOffset,
+        arrowHorizontalDirection: arrowDirection,
+        arrowHeight: arrowHeight,
+        arrowWidth: arrowWidth,
+        child: menuBuilder(context, selectedText, onHideMenu, onSelectAll),
+      ),
+    );
+
+    final Offset menuCenter = Offset(
+      menuXScreen + menuTotalWidth / 2,
+      menuYScreen + menuHeight / 2,
+    );
+    final double alignX = (menuCenter.dx / screenSize.width) * 2 - 1;
+    final double alignY = (menuCenter.dy / screenSize.height) * 2 - 1;
+    final Alignment overlayAlignment = Alignment(alignX, alignY);
+
+    final Widget animatedMenu =
+        transitionsBuilder?.call(context, animation, menuCenter, overlayAlignment, menuWidget) ??
+        _buildDefaultMenuTransition(
+          menuWidget: menuWidget,
+          overlayAlignment: overlayAlignment,
+          horizontalArrowDirection: arrowDirection,
+          arrowOffset: arrowOffset,
+          menuSize: Size(menuTotalWidth, menuHeight),
         );
 
     return Positioned(left: menuXScreen, top: menuYScreen, child: animatedMenu);
@@ -1207,7 +1519,8 @@ class _PositionedMenu extends StatelessWidget {
   Widget _buildDefaultMenuTransition({
     required Widget menuWidget,
     required Alignment overlayAlignment,
-    required ArrowVerticalDirection arrowDirection,
+    ArrowVerticalDirection? verticalArrowDirection,
+    ArrowHorizontalDirection? horizontalArrowDirection,
     required double arrowOffset,
     required Size menuSize,
   }) {
@@ -1215,8 +1528,9 @@ class _PositionedMenu extends StatelessWidget {
       return ChatContextMenuSheetTransition(
         animation: animation,
         alignment: sheetScaleAlignment(
-          axis: Axis.vertical,
-          vertical: arrowDirection,
+          axis: axis,
+          vertical: verticalArrowDirection,
+          horizontal: horizontalArrowDirection,
           arrowOffset: arrowOffset,
           menuSize: menuSize,
         ),

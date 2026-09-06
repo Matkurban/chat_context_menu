@@ -12,7 +12,7 @@ A Flutter package that provides an iOS-style chat context menu with customizable
 *   **Customizable Appearance:** Configure background color, border radius, and barrier color.
 *   **Flexible Content:** You provide the widget for the menu content, giving you full control over the items and layout.
 *   **Easy Integration:** Wrap any widget with `ChatContextMenuWrapper` to enable the context menu.
-*   **Selectable Text:** `ChatSelectableText` provides fully custom text selection with draggable handles, auto-scroll, and a context menu with smart positioning — ideal for chat bubbles.
+*   **Selectable Text:** `ChatSelectableText` provides fully custom text selection with draggable handles, auto-scroll, and a context menu with smart positioning — ideal for chat bubbles. Activates via long-press, double-click (word), triple-click (paragraph), right-click, or mouse drag on desktop, with vertical or horizontal menu placement (`axis`).
 *   **Platform-Adaptive Triggers:** Configurable trigger modes for mobile (tap / double-tap / long-press) and desktop (right-click / left-click) on `ChatContextMenuWrapper`.
 *   **Built-in animation styles:** `ChatContextMenuAnimationStyle.scaleFade` (default, existing overlay fade+scale) or `cupertinoSheet` (iOS sheet bounce from the arrow). Override duration with `transitionDurations` / `transitionDuration`, or replace both with `transitionsBuilder`.
 *   **Barrier anchor cutout (opt-in):** Set `excludeAnchorFromBarrier: true` with a non-transparent `barrierColor` to punch a hole over the anchor, keep it bright and tappable, and dismiss on shaded taps (in-route dismiss scrim). Use `barrierAnchorPadding` / `barrierAnchorBorderRadius` to size and round the cutout. When `false` (default), the barrier is a classic full sheet over the previous route.
@@ -240,7 +240,7 @@ You can customize the `ChatContextMenuWrapper` with the following properties:
 
 ## ChatSelectableText
 
-A fully custom selectable text widget built from the ground up. Users can long-press to activate selection, adjust the range with draggable handles, and perform operations on the selected text via a context menu.
+A fully custom selectable text widget built from the ground up. Users can long-press to activate selection, adjust the range with draggable handles, and perform operations on the selected text via a context menu. On desktop, selection also works with the mouse: drag with the left button to select, right-click to open the menu, double-click to select a word, and triple-click to select a paragraph.
 
 ### Basic Usage
 
@@ -339,6 +339,32 @@ ChatSelectableText(
 )
 ```
 
+### Desktop Interactions & Menu Axis
+
+On desktop platforms `ChatSelectableText` supports mouse-first workflows out of the box:
+
+*   **Mouse drag** — press the left button and drag to select; the menu appears on release. Touch drags are unaffected and still scroll the surrounding list.
+*   **Right-click** — activates selection (respects `selectAllOnActivate`) and opens the menu at the pointer.
+*   **Double-click / triple-click** — selects the word / the whole paragraph under the pointer.
+
+Use `axis` to place the menu beside the selection instead of above/below it:
+
+```dart
+ChatSelectableText(
+  'Drag, right-click, double-click or triple-click me.',
+  axis: Axis.horizontal, // menu appears to the left/right of the selection
+  menuBuilder: (context, selectedText, hideMenu, selectAll) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        TextButton(onPressed: () { hideMenu(); }, child: Text('Copy')),
+        TextButton(onPressed: selectAll, child: Text('Select All')),
+      ],
+    );
+  },
+)
+```
+
 ### ChatSelectableText Properties
 
 | Property              | Type                                                                | Default                    | Description                                          |
@@ -361,6 +387,7 @@ ChatSelectableText(
 | `arrowWidth`          | `double`                                                            | `12.0`                     | Arrow indicator width                                |
 | `spacing`             | `double`                                                            | `6.0`                      | Space between menu and selection                     |
 | `horizontalMargin`    | `double`                                                            | `10.0`                     | Min margin from screen edges                         |
+| `axis`                | `Axis`                                                              | `Axis.vertical`            | Menu placement: above/below (`vertical`) or beside (`horizontal`) the selection |
 | `useRootOverlay`      | `bool`                                                              | `false`                    | Insert handles/menu/barrier into the root Overlay (for nested Navigators, see notes above) |
 | `onSelectionChanged`  | `ValueChanged<String>?`                                             | `null`                     | Selection change callback                            |
 | `onMenuClosed`        | `VoidCallback?`                                                     | `null`                     | Menu closed callback                                 |
