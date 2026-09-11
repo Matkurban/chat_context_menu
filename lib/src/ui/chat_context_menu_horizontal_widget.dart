@@ -1,6 +1,6 @@
 import 'package:chat_context_menu/src/model/arrow_horizontal_direction.dart';
 import 'package:chat_context_menu/src/shape/chat_context_menu_horizontal_shape.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// 横向显示的 Context Menu Widget
 /// Horizontal Context Menu Widget

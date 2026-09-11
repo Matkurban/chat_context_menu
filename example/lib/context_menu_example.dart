@@ -1,5 +1,5 @@
 import 'package:chat_context_menu/chat_context_menu.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:example/context_menu_pane.dart';
 
 class ChatContextMenuPage extends StatefulWidget {

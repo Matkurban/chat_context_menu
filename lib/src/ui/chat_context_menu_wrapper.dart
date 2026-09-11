@@ -2,7 +2,7 @@ import 'package:chat_context_menu/src/model/menu_animation_style.dart';
 import 'package:chat_context_menu/src/model/statement.dart';
 import 'package:chat_context_menu/src/route/anchor_viewport_clip.dart';
 import 'package:chat_context_menu/src/route/chat_context_route.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class ChatContextMenuWrapper extends StatefulWidget {
   const ChatContextMenuWrapper({

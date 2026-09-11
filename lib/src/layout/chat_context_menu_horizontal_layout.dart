@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:chat_context_menu/src/model/arrow_horizontal_direction.dart';
 import 'package:chat_context_menu/src/route/chat_context_menu_transition.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// 横向布局的 Context Menu
 /// Horizontal layout for Context Menu

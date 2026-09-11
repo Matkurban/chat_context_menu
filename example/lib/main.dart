@@ -2,7 +2,7 @@ import 'package:example/animation_style_example.dart';
 import 'package:example/app_theme.dart';
 import 'package:example/context_menu_example.dart';
 import 'package:example/selectable_text_example.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,8 +15,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Chat Context Menu',
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
+      theme: ThemeData(
+        brightness: Brightness.light,
+        colorScheme: lightColorScheme,
+      ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        colorScheme: darkColorScheme,
+      ),
       themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
       home: const HomePage(),

@@ -1,7 +1,7 @@
 import 'package:chat_context_menu/chat_context_menu.dart';
 import 'package:chat_context_menu/src/route/anchor_viewport_clip.dart';
 import 'package:chat_context_menu/src/ui/chat_context_menu_vertical_widget.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Minimal reproduction of a desktop "sliding window" strip:

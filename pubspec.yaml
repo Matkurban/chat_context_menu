@@ -1,6 +1,6 @@
 name: chat_context_menu
 description: "A Flutter package that provides chat context menu with customizable appearance and animations, perfect for chat applications."
-version: 3.3.0
+version: 4.0.0
 homepage: https://github.com/Matkurban/chat_context_menu.git
 repository: https://github.com/Matkurban/chat_context_menu.git
 topics:
@@ -19,12 +19,15 @@ screenshots:
     path: doc/screenshot/screenshot_3.jpg
 
 environment:
-  sdk: ^3.10.0
-  flutter: ">=3.38.1"
+  sdk: ^3.13.0
+  flutter: ">=3.47.0"
 
 dependencies:
   flutter:
     sdk: flutter
+
+  material_ui: any
+  cupertino_ui: any
 
 dev_dependencies:
   flutter_test:

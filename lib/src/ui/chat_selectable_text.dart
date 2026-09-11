@@ -7,7 +7,7 @@ import 'package:chat_context_menu/src/route/chat_context_menu_transition.dart';
 import 'package:chat_context_menu/src/shape/chat_context_menu_horizontal_shape.dart';
 import 'package:chat_context_menu/src/shape/chat_context_menu_vertical_shape.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
