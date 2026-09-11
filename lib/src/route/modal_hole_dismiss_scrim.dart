@@ -92,12 +92,10 @@ class _MaskedHoleDismissHitTarget extends LeafRenderObjectWidget {
 
 class RenderMaskedHoleDismissHitTarget extends RenderBox {
   RenderMaskedHoleDismissHitTarget({
-    required Rect viewport,
-    required RRect holeShape,
-    required VoidCallback onMaskedPointerDown,
-  }) : _viewport = viewport,
-       _holeShape = holeShape,
-       _onMaskedPointerDown = onMaskedPointerDown;
+    required this._viewport,
+    required this._holeShape,
+    required this._onMaskedPointerDown,
+  });
 
   Rect _viewport;
   RRect _holeShape;

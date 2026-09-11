@@ -59,10 +59,10 @@ class ChatContextRoute extends PageRoute {
     super.directionalTraversalEdgeBehavior,
     super.fullscreenDialog,
     super.allowSnapshotting,
-    bool barrierDismissible = true,
+    this._barrierDismissible = true,
     required this.widgetRect,
     required this.menuItems,
-    Color? barrierColor,
+    this._barrierColor,
     this.backgroundColor,
     required this.borderRadius,
     required this.padding,
@@ -82,8 +82,7 @@ class ChatContextRoute extends PageRoute {
     this.excludeAnchorFromBarrier = false,
     this.barrierAnchorPadding = EdgeInsets.zero,
     this.barrierAnchorBorderRadius,
-  }) : _barrierColor = barrierColor,
-       _barrierDismissible = barrierDismissible;
+  });
 
   @override
   bool get barrierDismissible => _barrierDismissible;

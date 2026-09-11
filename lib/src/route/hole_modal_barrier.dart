@@ -94,10 +94,11 @@ class HoleBarrierPainterLayer extends LeafRenderObjectWidget {
 }
 
 class RenderHoleBarrierPainter extends RenderBox {
-  RenderHoleBarrierPainter({required Rect viewport, required RRect holeShape, required Color color})
-    : _viewport = viewport,
-      _holeShape = holeShape,
-      _color = color;
+  RenderHoleBarrierPainter({
+    required this._viewport,
+    required this._holeShape,
+    required this._color,
+  });
 
   Rect _viewport;
   RRect _holeShape;

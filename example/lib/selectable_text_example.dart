@@ -109,8 +109,7 @@ class _ChatSelectableTextPageState extends State<ChatSelectableTextPage> {
           Text('Chat Bubble Example', style: textTheme.titleMedium),
           const SizedBox(height: 8),
           _buildChatBubble(
-            text:
-                'Native SelectableText makes text selection easy with built-in handles and gestures.',
+            text: 'Native SelectableText makes text selection easy with built-in handles and gestures.',
             isMe: false,
             colorScheme: colorScheme,
           ),
