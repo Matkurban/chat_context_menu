@@ -19,7 +19,7 @@ A Flutter package that provides an iOS-style chat context menu with customizable
 
 ## Screenshots
 
-|                    ScreenShot                    |                    ScreenShot                    |         ScreenShot                    ｜          |
+|                    ScreenShot                    |                    ScreenShot                    |         ScreenShot                    ｜         |
 |:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|
 | ![Screenshot 1](doc/screenshot/screenshot_1.jpg) | ![Screenshot 2](doc/screenshot/screenshot_2.jpg) | ![Screenshot 2](doc/screenshot/screenshot_3.jpg) |
 
