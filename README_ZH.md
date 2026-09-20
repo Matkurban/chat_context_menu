@@ -30,6 +30,16 @@ dependencies:
   chat_context_menu: ^last_version
 ```
 
+## Agent skills
+
+本包随附面向 AI 编程助手的 Agent Skills，覆盖 `ChatContextMenuWrapper` 与 `ChatSelectableText`。在依赖了 `chat_context_menu` 的项目中安装：
+
+```bash
+dart run skills@ get
+```
+
+使用 `--all` 可跳过交互、安装全部 skill。说明见 [Ship skills with packages](https://dart.dev/tools/pub/package-skills)。
+
 ## 用法
 
 使用 `ChatContextMenuWrapper` 包裹你想触发菜单的组件（通常是聊天气泡）。

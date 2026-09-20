@@ -32,6 +32,16 @@ dependencies:
   chat_context_menu: ^last_version
 ```
 
+## Agent skills
+
+This package ships Agent Skills that teach coding agents how to use `ChatContextMenuWrapper` and `ChatSelectableText`. In a project that depends on `chat_context_menu`, install them with:
+
+```bash
+dart run skills@ get
+```
+
+Pass `--all` to install every skill without the interactive prompt. See [Ship skills with packages](https://dart.dev/tools/pub/package-skills).
+
 ## Usage
 
 Wrap the widget you want to trigger the menu (usually a chat bubble) with `ChatContextMenuWrapper`.

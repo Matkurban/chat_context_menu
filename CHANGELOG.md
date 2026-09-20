@@ -1,3 +1,7 @@
+## 4.0.2
+
+* **Agent skills** — Ships `skills/chat-context-menu-wrapper` and `skills/chat-context-menu-selectable-text` for AI coding agents. In an app that depends on this package, run `dart run skills@ get` (or `--all`) to install them.
+
 ## 4.0.1
 
 * update `material_ui` version to ^1.3.0
