@@ -1,3 +1,7 @@
+## 4.0.3
+
+* Update cupertino_ui dependency to version ^1.1.0 and increment package version in pubspec.yaml to 4.0.3.
+
 ## 4.0.2
 
 * **Agent skills** — Ships `skills/chat-context-menu-wrapper` and `skills/chat-context-menu-selectable-text` for AI coding agents. In an app that depends on this package, run `dart run skills@ get` (or `--all`) to install them.
