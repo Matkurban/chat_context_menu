@@ -2,7 +2,7 @@
 
 * update `material_ui` version to ^1.4.0
 * update `cupertino_ui` version to ^1.1.1
-* **SDK Constraints**: Bumped minimum Flutter SDK requirement to `>=3.44.0` and Bumped minimum Dart SDK requirement to `>=3.13.0`
+* **SDK Constraints**: Bumped minimum Flutter SDK requirement to `>=3.47.0` and Bumped minimum Dart SDK requirement to `>=3.13.0`
 
 ## 4.0.3
 
