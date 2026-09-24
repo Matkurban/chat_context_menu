@@ -167,6 +167,7 @@ class ChatContextMenuWrapper extends StatefulWidget {
 
 class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
   ChatContextRoute? _route;
+  
   Offset? _lastPointerDown;
 
   void _showMenu() {

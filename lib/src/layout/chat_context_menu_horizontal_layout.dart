@@ -46,16 +46,25 @@ class ChatContextMenuHorizontalLayout extends StatefulWidget {
 
 class _ChatContextMenuHorizontalLayoutState extends State<ChatContextMenuHorizontalLayout> {
   final GlobalKey _childKey = GlobalKey();
+
   Size? _childSize;
+
   Offset? _childPosition;
+
   double? _arrowOffset;
+
   ArrowHorizontalDirection _arrowDirection = ArrowHorizontalDirection.left;
 
   EdgeInsets get padding => widget.padding;
+
   double get arrowHeight => widget.arrowHeight;
+
   double get spacing => widget.spacing;
+
   double get arrowWidth => widget.arrowWidth;
+
   BorderRadius get borderRadius => widget.borderRadius;
+  
   double get horizontalMargin => widget.horizontalMargin;
 
   @override

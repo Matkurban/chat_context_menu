@@ -44,17 +44,27 @@ class ChatContextMenuVerticalLayout extends StatefulWidget {
 
 class _ChatContextMenuVerticalLayoutState extends State<ChatContextMenuVerticalLayout> {
   final GlobalKey _childKey = GlobalKey();
+
   Size? _childSize;
+
   Offset? _childPosition;
+
   double? _arrowOffset;
+
   ArrowVerticalDirection _isArrowUp = .down;
+
   double? _maxHeight;
 
   EdgeInsets get padding => widget.padding;
+
   double get arrowHeight => widget.arrowHeight;
+
   double get spacing => widget.spacing;
+
   double get arrowWidth => widget.arrowWidth;
+
   BorderRadius get borderRadius => widget.borderRadius;
+  
   double get horizontalMargin => widget.horizontalMargin;
 
   @override
