@@ -4,6 +4,8 @@
 
 A Flutter package that provides an iOS-style chat context menu with customizable appearance and animations. This package handles the positioning, arrow indicator, and background blur/dimming, allowing you to provide any widget as the menu content.
 
+**Live demo:** https://matkurban.github.io/chat_context_menu/
+
 ## Features
 
 *   **iOS-style Context Menu:** Smooth animations and layout similar to native iOS context menus.

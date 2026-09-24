@@ -34,7 +34,7 @@ jobs:
           flutter analyze
       - name: Build web
         working-directory: example
-        run: flutter build web --release --base-href /xue_hua_adaptive_sliding_layout/
+        run: flutter build web --release --base-href /chat_context_menu/
       - uses: actions/upload-pages-artifact@v4
         with:
           path: example/build/web

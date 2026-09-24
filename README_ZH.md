@@ -2,6 +2,8 @@
 
 一个提供 iOS 风格聊天上下文菜单的 Flutter 组件包，支持自定义外观和动画。该组件包处理菜单定位、箭头指示器和背景遮罩，你只需提供任意 Widget 作为菜单内容。
 
+**在线演示：** https://matkurban.github.io/chat_context_menu/
+
 ## 功能特性
 
 *   **iOS 风格上下文菜单：** 流畅的动画和布局，类似原生 iOS 上下文菜单。
