@@ -1,3 +1,9 @@
+## 4.1.0
+
+* update `material_ui` version to ^1.4.0
+* update `cupertino_ui` version to ^1.1.1
+* **SDK Constraints**: Bumped minimum Flutter SDK requirement to `>=3.44.0` and Bumped minimum Dart SDK requirement to `>=3.13.0`
+
 ## 4.0.3
 
 * Update cupertino_ui dependency to version ^1.1.0 and increment package version in pubspec.yaml to 4.0.3.
@@ -14,7 +20,7 @@
 
 ### Breaking Changes ⚠️
 
-* **Dependency Migration**: Replaced legacy Flutter package imports with `material_ui` and `cupertino_ui` following the Flutter 3.47 package decoupling.
+* **Dependency Migration**: Replaced legacy Flutter package imports with `material_ui` and `cupertino_ui` following the Flutter 3.44 package decoupling.
 * **SDK Constraints**: Bumped minimum Flutter SDK requirement to `>=3.44.0`.
 
 ### Features & Improvements

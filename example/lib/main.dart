@@ -15,14 +15,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Chat Context Menu',
-      theme: ThemeData(
-        brightness: Brightness.light,
-        colorScheme: lightColorScheme,
-      ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        colorScheme: darkColorScheme,
-      ),
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
       themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
       home: const HomePage(),
@@ -70,25 +64,15 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: PageView(
         controller: _pageController,
-        children: [
-          ChatContextMenuPage(),
-          ChatSelectableTextPage(),
-          AnimationStylePage(),
-        ],
+        children: [ChatContextMenuPage(), ChatSelectableTextPage(), AnimationStylePage()],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
         onTap: onTabTapped,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'ContextMenu'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.text_fields),
-            label: 'Selectable',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.animation),
-            label: 'Animation',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.text_fields), label: 'Selectable'),
+          BottomNavigationBarItem(icon: Icon(Icons.animation), label: 'Animation'),
         ],
       ),
     );
