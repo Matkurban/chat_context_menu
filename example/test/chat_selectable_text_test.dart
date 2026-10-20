@@ -250,6 +250,99 @@ void main() {
     expect(lastSelection, 'First paragraph line');
     expect(find.text('Copy'), findsOneWidget);
   });
+
+  testWidgets('ChatSelectableText vertical pointer mode anchors menu at click position', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 320,
+              child: ChatSelectableText(
+                'Line one of a multi-line selectable text block\n'
+                'Line two of a multi-line selectable text block\n'
+                'Line three of a multi-line selectable text block\n'
+                'Line four of a multi-line selectable text block',
+                positionMode: ChatContextMenuPositionMode.pointer,
+                axis: Axis.vertical,
+                spacing: 4.0,
+                menuBuilder: (context, selectedText, hideMenu, selectAll) {
+                  return const SizedBox(width: 80, height: 32, child: Text('Copy'));
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final Rect textRect = tester.getRect(find.byType(ChatSelectableText));
+    final Offset tapPoint = textRect.topLeft + const Offset(40, 36);
+
+    await tester.tapAt(tapPoint, buttons: kSecondaryButton);
+    await tester.pumpAndSettle();
+
+    final Finder menuShellFinder = find.ancestor(
+      of: find.text('Copy'),
+      matching: find.byWidgetPredicate(
+        (Widget widget) => widget is Container && widget.decoration is ShapeDecoration,
+      ),
+    );
+    expect(menuShellFinder, findsOneWidget);
+
+    final Rect menuRect = tester.getRect(menuShellFinder);
+    // Horizontally centered around tapPoint.dx (not textRect.center.dx)
+    expect(menuRect.center.dx, closeTo(tapPoint.dx, 2.0));
+    // Vertically anchored above tapPoint.dy with spacing 4.0
+    expect(menuRect.bottom, closeTo(tapPoint.dy - 4.0, 2.0));
+  });
+
+  testWidgets('ChatSelectableText horizontal pointer mode anchors menu at click position', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 320,
+              child: ChatSelectableText(
+                'A wide selectable text block that spans across the container width',
+                positionMode: ChatContextMenuPositionMode.pointer,
+                axis: Axis.horizontal,
+                spacing: 4.0,
+                menuBuilder: (context, selectedText, hideMenu, selectAll) {
+                  return const SizedBox(width: 80, height: 32, child: Text('Copy'));
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final Rect textRect = tester.getRect(find.byType(ChatSelectableText));
+    final Offset tapPoint = textRect.topLeft + const Offset(30, 12);
+
+    await tester.tapAt(tapPoint, buttons: kSecondaryButton);
+    await tester.pumpAndSettle();
+
+    final Finder menuShellFinder = find.ancestor(
+      of: find.text('Copy'),
+      matching: find.byWidgetPredicate(
+        (Widget widget) => widget is Container && widget.decoration is ShapeDecoration,
+      ),
+    );
+    expect(menuShellFinder, findsOneWidget);
+
+    final Rect menuRect = tester.getRect(menuShellFinder);
+    // Placed right beside tapPoint.dx (+0.5 + spacing), well to the left of textRect.right
+    expect(menuRect.left, closeTo(tapPoint.dx + 0.5 + 4.0, 2.0));
+    expect(menuRect.left, lessThan(textRect.right));
+    expect(menuRect.center.dy, closeTo(tapPoint.dy, 2.0));
+  });
 }
 
 Widget _menuAction(String label, VoidCallback onTap) {

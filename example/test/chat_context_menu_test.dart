@@ -3,6 +3,8 @@ import 'package:chat_context_menu/src/model/arrow_horizontal_direction.dart';
 import 'package:chat_context_menu/src/model/arrow_vertical_direction.dart';
 import 'package:chat_context_menu/src/route/anchor_viewport_clip.dart';
 import 'package:chat_context_menu/src/route/chat_context_menu_transition.dart';
+import 'package:chat_context_menu/src/ui/chat_context_menu_horizontal_widget.dart';
+import 'package:chat_context_menu/src/ui/chat_context_menu_vertical_widget.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -402,6 +404,108 @@ void main() {
         ModalRoute.of(tester.element(find.text('Copy')))!.transitionDuration,
         const Duration(milliseconds: 400),
       );
+    });
+  });
+
+  group('ChatContextMenuPositionMode.pointer', () {
+    testWidgets('vertical menu anchors at pointer click position with arrow', (
+      WidgetTester tester,
+    ) async {
+      const Key anchorKey = Key('pointer-vertical-anchor');
+      const double spacing = 6.0;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: ChatContextMenuWrapper(
+                positionMode: ChatContextMenuPositionMode.pointer,
+                axis: Axis.vertical,
+                spacing: spacing,
+                menuBuilder: (context, hideMenu) {
+                  return const SizedBox(width: 80, height: 32, child: Text('Copy'));
+                },
+                widgetBuilder: (context, showMenu, hideMenu) {
+                  return GestureDetector(
+                    key: anchorKey,
+                    onTap: showMenu,
+                    behavior: HitTestBehavior.opaque,
+                    child: const SizedBox(width: 300, height: 160),
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final Rect anchorRect = tester.getRect(find.byKey(anchorKey));
+      final Offset tapPoint = anchorRect.topLeft + const Offset(40, 30);
+
+      await tester.tapAt(tapPoint);
+      await tester.pumpAndSettle();
+
+      final Finder menuFinder = find.byType(ChatContextMenuVerticalWidget);
+      expect(menuFinder, findsOneWidget);
+
+      final Rect menuRect = tester.getRect(menuFinder);
+      final ChatContextMenuVerticalWidget menuWidget = tester.widget(menuFinder);
+
+      // Menu should appear right below tapPoint (inside the 160px tall anchor), not below anchorRect.bottom
+      expect(menuRect.top, closeTo(tapPoint.dy + 0.5 + spacing, 1.5));
+      expect(menuRect.top, lessThan(anchorRect.bottom));
+      expect(menuWidget.arrowOffset, isNotNull);
+      expect(menuRect.left + menuWidget.arrowOffset!, closeTo(tapPoint.dx, 1.5));
+    });
+
+    testWidgets('horizontal menu anchors at pointer click position with arrow', (
+      WidgetTester tester,
+    ) async {
+      const Key anchorKey = Key('pointer-horizontal-anchor');
+      const double spacing = 6.0;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: ChatContextMenuWrapper(
+                positionMode: ChatContextMenuPositionMode.pointer,
+                axis: Axis.horizontal,
+                spacing: spacing,
+                menuBuilder: (context, hideMenu) {
+                  return const SizedBox(width: 80, height: 40, child: Text('Copy'));
+                },
+                widgetBuilder: (context, showMenu, hideMenu) {
+                  return GestureDetector(
+                    key: anchorKey,
+                    onTap: showMenu,
+                    behavior: HitTestBehavior.opaque,
+                    child: const SizedBox(width: 300, height: 160),
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final Rect anchorRect = tester.getRect(find.byKey(anchorKey));
+      final Offset tapPoint = anchorRect.topLeft + const Offset(50, 40);
+
+      await tester.tapAt(tapPoint);
+      await tester.pumpAndSettle();
+
+      final Finder menuFinder = find.byType(ChatContextMenuHorizontalWidget);
+      expect(menuFinder, findsOneWidget);
+
+      final Rect menuRect = tester.getRect(menuFinder);
+      final ChatContextMenuHorizontalWidget menuWidget = tester.widget(menuFinder);
+
+      // Menu should appear right next to tapPoint.dx, not outside anchorRect.right
+      expect(menuRect.left, closeTo(tapPoint.dx + 0.5 + spacing, 1.5));
+      expect(menuRect.left, lessThan(anchorRect.right));
+      expect(menuWidget.arrowOffset, isNotNull);
+      expect(menuRect.top + menuWidget.arrowOffset!, closeTo(tapPoint.dy, 1.5));
     });
   });
 }
