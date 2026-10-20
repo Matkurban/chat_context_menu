@@ -1,6 +1,6 @@
 import 'package:chat_context_menu/src/model/arrow_vertical_direction.dart';
 import 'package:chat_context_menu/src/shape/chat_context_menu_vertical_shape.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 
 class ChatContextMenuVerticalWidget extends StatelessWidget {
   final Widget items;

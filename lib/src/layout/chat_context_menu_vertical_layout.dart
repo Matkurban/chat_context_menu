@@ -1,14 +1,16 @@
 import 'dart:math';
 
 import 'package:chat_context_menu/src/model/arrow_vertical_direction.dart';
+import 'package:chat_context_menu/src/model/menu_position_mode.dart';
 import 'package:chat_context_menu/src/route/chat_context_menu_transition.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 
 class ChatContextMenuVerticalLayout extends StatefulWidget {
   const ChatContextMenuVerticalLayout({
     super.key,
     required this.widgetRect,
     this.pointerRect,
+    this.positionMode = ChatContextMenuPositionMode.outside,
     required this.childBuilder,
     required this.padding,
     required this.arrowHeight,
@@ -24,6 +26,7 @@ class ChatContextMenuVerticalLayout extends StatefulWidget {
 
   final Rect widgetRect;
   final Rect? pointerRect;
+  final ChatContextMenuPositionMode positionMode;
   final Widget Function(BuildContext context, double? arrowOffset, ArrowVerticalDirection isArrowUp)
   childBuilder;
 
@@ -51,7 +54,7 @@ class _ChatContextMenuVerticalLayoutState extends State<ChatContextMenuVerticalL
 
   double? _arrowOffset;
 
-  ArrowVerticalDirection _isArrowUp = .down;
+  ArrowVerticalDirection _isArrowUp = ArrowVerticalDirection.down;
 
   double? _maxHeight;
 
@@ -64,7 +67,7 @@ class _ChatContextMenuVerticalLayoutState extends State<ChatContextMenuVerticalL
   double get arrowWidth => widget.arrowWidth;
 
   BorderRadius get borderRadius => widget.borderRadius;
-  
+
   double get horizontalMargin => widget.horizontalMargin;
 
   @override
@@ -115,14 +118,16 @@ class _ChatContextMenuVerticalLayoutState extends State<ChatContextMenuVerticalL
     final double widgetTopSpace = widgetRect.top - topLimit;
     final bool fitsWithWidgetAnchor =
         widgetTopSpace >= totalHeight || widgetBottomSpace >= totalHeight;
-    final bool usePointerAnchor = widget.pointerRect != null && !fitsWithWidgetAnchor;
+    final bool usePointerAnchor =
+        widget.pointerRect != null &&
+        (widget.positionMode == ChatContextMenuPositionMode.pointer || !fitsWithWidgetAnchor);
 
     // Calculate available space
     final Rect anchorRect = usePointerAnchor ? widget.pointerRect! : widgetRect;
     final double bottomSpace = bottomLimit - anchorRect.bottom;
     final double topSpace = anchorRect.top - topLimit;
 
-    ArrowVerticalDirection isArrowUp = .up;
+    ArrowVerticalDirection isArrowUp = ArrowVerticalDirection.up;
     double y = anchorRect.bottom + effectiveSpacing;
 
     // Prefer bottom, but check if it fits
@@ -130,12 +135,12 @@ class _ChatContextMenuVerticalLayoutState extends State<ChatContextMenuVerticalL
       // If it doesn't fit bottom, try top
       if (topSpace > totalHeight) {
         y = anchorRect.top - constrainedChildHeight - arrowHeight - effectiveSpacing;
-        isArrowUp = .down;
+        isArrowUp = ArrowVerticalDirection.down;
       } else {
         // If it fits neither, pick the one with more space
         if (topSpace > bottomSpace) {
           y = anchorRect.top - constrainedChildHeight - arrowHeight - effectiveSpacing;
-          isArrowUp = .down;
+          isArrowUp = ArrowVerticalDirection.down;
         } else {
           // else keep bottom (default), but clamp to bottomLimit
           if (y + totalHeight > bottomLimit) {
@@ -143,7 +148,7 @@ class _ChatContextMenuVerticalLayoutState extends State<ChatContextMenuVerticalL
             if (maxY <= anchorRect.bottom) {
               // Not enough room below without covering the anchor; flip to top.
               y = anchorRect.top - constrainedChildHeight - arrowHeight - effectiveSpacing;
-              isArrowUp = .down;
+              isArrowUp = ArrowVerticalDirection.down;
             } else {
               // Clamp within bottom limit while keeping spacing from the anchor.
               y = max(maxY, anchorRect.bottom + effectiveSpacing);
@@ -226,7 +231,10 @@ class _ChatContextMenuVerticalLayoutState extends State<ChatContextMenuVerticalL
             left: 0,
             child: Opacity(
               opacity: 0,
-              child: Container(key: _childKey, child: widget.childBuilder(context, null, .down)),
+              child: Container(
+                key: _childKey,
+                child: widget.childBuilder(context, null, ArrowVerticalDirection.down),
+              ),
             ),
           ),
         ],

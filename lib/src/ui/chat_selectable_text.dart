@@ -3,11 +3,12 @@ import 'dart:math';
 import 'package:chat_context_menu/src/model/arrow_horizontal_direction.dart';
 import 'package:chat_context_menu/src/model/arrow_vertical_direction.dart';
 import 'package:chat_context_menu/src/model/menu_animation_style.dart';
+import 'package:chat_context_menu/src/model/menu_position_mode.dart';
 import 'package:chat_context_menu/src/route/chat_context_menu_transition.dart';
 import 'package:chat_context_menu/src/shape/chat_context_menu_horizontal_shape.dart';
 import 'package:chat_context_menu/src/shape/chat_context_menu_vertical_shape.dart';
 import 'package:flutter/gestures.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
@@ -34,8 +35,8 @@ class ChatSelectableText extends StatefulWidget {
     this.locale,
     this.softWrap = true,
     this.selectAllOnActivate = true,
-    this.selectionColor,
-    this.handleColor,
+    this.selectionColor = const Color(0x3333A9FF),
+    this.handleColor = const Color(0xFF33A9FF),
     this.handleSize = 16.0,
     this.autoScrollEdgeExtent = 0.0,
     this.autoScrollSpeed = 10.0,
@@ -55,6 +56,7 @@ class ChatSelectableText extends StatefulWidget {
     this.spacing = 0.0,
     this.horizontalMargin = 10.0,
     this.axis = Axis.vertical,
+    this.positionMode = ChatContextMenuPositionMode.outside,
     this.useRootOverlay = false,
   });
 
@@ -99,10 +101,10 @@ class ChatSelectableText extends StatefulWidget {
   final bool selectAllOnActivate;
 
   ///选中区域的颜色
-  final Color? selectionColor;
+  final Color selectionColor;
 
   ///选中手柄的颜色
-  final Color? handleColor;
+  final Color handleColor;
 
   ///手柄大小
   final double handleSize;
@@ -185,6 +187,13 @@ class ChatSelectableText extends StatefulWidget {
   ///(menu appears above/below the selection).
   ///With [Axis.horizontal] the menu appears to the left/right of the selection.
   final Axis axis;
+
+  ///菜单定位模式。默认 [ChatContextMenuPositionMode.outside] 在选区外部计算显示位置；
+  ///设为 [ChatContextMenuPositionMode.pointer] 时直接从鼠标/手指点击位置计算显示。
+  ///
+  ///Menu positioning mode. Defaults to [ChatContextMenuPositionMode.outside] (outside the selection);
+  ///set to [ChatContextMenuPositionMode.pointer] to position the menu directly at the click/tap point.
+  final ChatContextMenuPositionMode positionMode;
 
   ///是否把手柄、菜单与遮罩插入根 Overlay。
   ///默认为 false(使用最近的 Overlay,保持既有行为)。当文本位于嵌套 Navigator 内
@@ -459,6 +468,7 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
   void _onMouseDragUpdate(DragUpdateDetails details) {
     final int? base = _mouseDragBaseOffset;
     if (base == null) return;
+    _activationGlobalPosition = details.globalPosition;
     final Offset local = details.globalPosition - _getTextGlobalOffset();
     final int extent = _getPositionForOffset(local).offset;
     _updateSelection(TextSelection(baseOffset: min(base, extent), extentOffset: max(base, extent)));
@@ -724,9 +734,6 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
     final double handleX = caretOffset.dx - widget.handleSize / 2;
     final double handleY = isBase ? caretOffset.dy : caretOffset.dy;
 
-    final ThemeData theme = Theme.of(context);
-    final Color handleColor = widget.handleColor ?? theme.colorScheme.primary;
-
     final double handleTouchPadding = 8.0;
 
     return CompositedTransformFollower(
@@ -752,6 +759,7 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
             if (!isBase && !_isDraggingExtent) return;
 
             final Offset globalPos = details.globalPosition;
+            _activationGlobalPosition = globalPos;
             _lastDragGlobalPosition = globalPos;
             _lastDragIsBase = isBase;
 
@@ -768,7 +776,7 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
           child: Padding(
             padding: EdgeInsets.all(handleTouchPadding),
             child: _SelectionHandle(
-              color: handleColor,
+              color: widget.handleColor,
               size: widget.handleSize,
               lineHeight: lineHeight,
               isBase: isBase,
@@ -836,18 +844,15 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
         top: -9999,
         child: Opacity(
           opacity: 0,
-          child: Material(
-            type: MaterialType.transparency,
-            child: _buildMenuShell(
-              key: _menuMeasureKey,
-              padding: widget.menuPadding,
-              borderRadius: widget.menuBorderRadius,
-              backgroundColor: widget.menuBackgroundColor,
-              shadows: widget.menuShadows,
-              arrowHeight: widget.arrowHeight,
-              arrowWidth: widget.arrowWidth,
-              child: widget.menuBuilder(context, _selectedText, _hideMenu, _selectAll),
-            ),
+          child: _buildMenuShell(
+            key: _menuMeasureKey,
+            padding: widget.menuPadding,
+            borderRadius: widget.menuBorderRadius,
+            backgroundColor: widget.menuBackgroundColor,
+            shadows: widget.menuShadows,
+            arrowHeight: widget.arrowHeight,
+            arrowWidth: widget.arrowWidth,
+            child: widget.menuBuilder(context, _selectedText, _hideMenu, _selectAll),
           ),
         ),
       );
@@ -880,6 +885,7 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
       spacing: widget.spacing,
       horizontalMargin: widget.horizontalMargin,
       axis: widget.axis,
+      positionMode: widget.positionMode,
     );
   }
 
@@ -1002,9 +1008,7 @@ class _ChatSelectableTextState extends State<ChatSelectableText> with TickerProv
                 ? _SelectionHighlightPainter(
                     textPainter: _textPainter!,
                     selection: _selection,
-                    selectionColor:
-                        widget.selectionColor ??
-                        Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                    selectionColor: widget.selectionColor,
                   )
                 : null,
             child: RichText(
@@ -1186,6 +1190,7 @@ class _PositionedMenu extends StatelessWidget {
     required this.spacing,
     required this.horizontalMargin,
     this.axis = Axis.vertical,
+    this.positionMode = ChatContextMenuPositionMode.outside,
   });
 
   final TextPainter textPainter;
@@ -1234,6 +1239,10 @@ class _PositionedMenu extends StatelessWidget {
   ///Arrangement direction of the menu
   final Axis axis;
 
+  ///菜单定位模式
+  ///Menu positioning mode
+  final ChatContextMenuPositionMode positionMode;
+
   @override
   Widget build(BuildContext context) {
     if (axis == Axis.horizontal) {
@@ -1268,10 +1277,12 @@ class _PositionedMenu extends StatelessWidget {
     final double selectionBottomScreen = textGlobal.dy + selectionBottomLocal;
     final double selectionCenterXScreen = textGlobal.dx + selectionCenterXLocal;
 
+    final bool isPointerMode =
+        positionMode == ChatContextMenuPositionMode.pointer && pointerOverlayPosition != null;
     final double menuWidth = menuSize?.width ?? 200;
     final double menuHeight = menuSize?.height ?? 48;
     final double totalMenuHeight = menuHeight + arrowHeight;
-    final double totalSpacing = handleSize + spacing;
+    final double totalSpacing = isPointerMode ? spacing : handleSize + spacing;
 
     // 先尝试用完整选区做锚点
     final double selectionSpaceAbove = selectionTopScreen - topPadding;
@@ -1288,7 +1299,11 @@ class _PositionedMenu extends StatelessWidget {
     final double anchorBottomScreen;
     final double anchorCenterXScreen;
 
-    if (usePointerAnchor) {
+    if (isPointerMode) {
+      anchorTopScreen = pointerOverlayPosition!.dy;
+      anchorBottomScreen = pointerOverlayPosition!.dy;
+      anchorCenterXScreen = pointerOverlayPosition!.dx;
+    } else if (usePointerAnchor) {
       final double pointerLocalY = pointerOverlayPosition!.dy - textGlobal.dy;
       final double lineTop = (pointerLocalY / lineHeight).floorToDouble() * lineHeight;
       anchorTopScreen = textGlobal.dy + lineTop;
@@ -1340,20 +1355,16 @@ class _PositionedMenu extends StatelessWidget {
       arrowOffset = menuWidth - safeMargin;
     }
 
-    final Widget menuWidget = Material(
-      type: MaterialType.transparency,
-      color: Colors.transparent,
-      child: _buildMenuShell(
-        padding: menuPadding,
-        borderRadius: menuBorderRadius,
-        backgroundColor: menuBackgroundColor,
-        shadows: menuShadows,
-        arrowOffset: arrowOffset,
-        arrowDirection: arrowDirection,
-        arrowHeight: arrowHeight,
-        arrowWidth: arrowWidth,
-        child: menuBuilder(context, selectedText, onHideMenu, onSelectAll),
-      ),
+    final Widget menuWidget = _buildMenuShell(
+      padding: menuPadding,
+      borderRadius: menuBorderRadius,
+      backgroundColor: menuBackgroundColor,
+      shadows: menuShadows,
+      arrowOffset: arrowOffset,
+      arrowDirection: arrowDirection,
+      arrowHeight: arrowHeight,
+      arrowWidth: arrowWidth,
+      child: menuBuilder(context, selectedText, onHideMenu, onSelectAll),
     );
 
     final Offset menuCenter = Offset(
@@ -1423,17 +1434,24 @@ class _PositionedMenu extends StatelessWidget {
       textGlobal.dy + selectionBottomLocal,
     );
 
+    final bool isPointerMode =
+        positionMode == ChatContextMenuPositionMode.pointer && pointerOverlayPosition != null;
     final double menuWidth = menuSize?.width ?? 200;
     final double menuHeight = menuSize?.height ?? 48;
     // 箭头占据水平空间
     final double menuTotalWidth = menuWidth + arrowHeight;
-    final double totalSpacing = handleSize + spacing;
+    final double totalSpacing = isPointerMode ? spacing : handleSize + spacing;
+
+    if (isPointerMode) {
+      anchorRect = Rect.fromCenter(center: pointerOverlayPosition!, width: 1, height: 1);
+    }
 
     double leftSpace = anchorRect.left - horizontalMargin - totalSpacing;
     double rightSpace = screenWidth - horizontalMargin - anchorRect.right - totalSpacing;
 
     // 左右都放不下且有按压位置时，回退到按压位置作为锚点
-    if (leftSpace < menuTotalWidth &&
+    if (!isPointerMode &&
+        leftSpace < menuTotalWidth &&
         rightSpace < menuTotalWidth &&
         pointerOverlayPosition != null) {
       anchorRect = Rect.fromCenter(center: pointerOverlayPosition!, width: 1, height: 1);
@@ -1479,20 +1497,16 @@ class _PositionedMenu extends StatelessWidget {
       arrowOffset = menuHeight - safeMargin;
     }
 
-    final Widget menuWidget = Material(
-      type: MaterialType.transparency,
-      color: Colors.transparent,
-      child: _buildMenuShell(
-        padding: menuPadding,
-        borderRadius: menuBorderRadius,
-        backgroundColor: menuBackgroundColor,
-        shadows: menuShadows,
-        arrowOffset: arrowOffset,
-        arrowHorizontalDirection: arrowDirection,
-        arrowHeight: arrowHeight,
-        arrowWidth: arrowWidth,
-        child: menuBuilder(context, selectedText, onHideMenu, onSelectAll),
-      ),
+    final Widget menuWidget = _buildMenuShell(
+      padding: menuPadding,
+      borderRadius: menuBorderRadius,
+      backgroundColor: menuBackgroundColor,
+      shadows: menuShadows,
+      arrowOffset: arrowOffset,
+      arrowHorizontalDirection: arrowDirection,
+      arrowHeight: arrowHeight,
+      arrowWidth: arrowWidth,
+      child: menuBuilder(context, selectedText, onHideMenu, onSelectAll),
     );
 
     final Offset menuCenter = Offset(

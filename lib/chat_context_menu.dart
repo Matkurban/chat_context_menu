@@ -7,3 +7,4 @@ export 'src/ui/chat_selectable_text.dart';
 export 'src/model/statement.dart';
 export 'src/model/menu_trigger_mode.dart';
 export 'src/model/menu_animation_style.dart';
+export 'src/model/menu_position_mode.dart';

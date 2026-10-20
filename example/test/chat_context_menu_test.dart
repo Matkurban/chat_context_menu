@@ -5,12 +5,14 @@ import 'package:chat_context_menu/src/route/anchor_viewport_clip.dart';
 import 'package:chat_context_menu/src/route/chat_context_menu_transition.dart';
 import 'package:chat_context_menu/src/ui/chat_context_menu_horizontal_widget.dart';
 import 'package:chat_context_menu/src/ui/chat_context_menu_vertical_widget.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
-  testWidgets('ChatContextMenuWrapper builds and shows menu', (WidgetTester tester) async {
+  testWidgets('ChatContextMenuWrapper builds and shows menu', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -23,12 +25,18 @@ void main() {
                     const Text('Delete'),
                     const Icon(Icons.copy),
                     const Icon(Icons.delete),
-                    ElevatedButton(onPressed: hideMenu, child: const Text('Close')),
+                    ElevatedButton(
+                      onPressed: hideMenu,
+                      child: const Text('Close'),
+                    ),
                   ],
                 );
               },
               widgetBuilder: (context, showMenu, hideMenu) {
-                return GestureDetector(onLongPress: showMenu, child: const Text('Long press me'));
+                return GestureDetector(
+                  onLongPress: showMenu,
+                  child: const Text('Long press me'),
+                );
               },
             ),
           ),
@@ -47,64 +55,70 @@ void main() {
     expect(find.byIcon(Icons.delete), findsOneWidget);
   });
 
-  testWidgets('Anchor stays tappable when barrier uses cutout (excludeAnchorFromBarrier)', (
-    WidgetTester tester,
-  ) async {
-    const Key anchorKey = Key('anchor');
+  testWidgets(
+    'Anchor stays tappable when barrier uses cutout (excludeAnchorFromBarrier)',
+    (WidgetTester tester) async {
+      const Key anchorKey = Key('anchor');
 
-    var anchorTaps = 0;
+      var anchorTaps = 0;
 
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 80),
-              child: ChatContextMenuWrapper(
-                barrierColor: Colors.black54,
-                excludeAnchorFromBarrier: true,
-                menuBuilder: (context, hideMenu) {
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text('Action'),
-                      ElevatedButton(onPressed: hideMenu, child: const Text('Close')),
-                    ],
-                  );
-                },
-                widgetBuilder: (context, showMenu, hideMenu) {
-                  return GestureDetector(
-                    key: anchorKey,
-                    onTap: () => anchorTaps++,
-                    onLongPress: showMenu,
-                    behavior: HitTestBehavior.opaque,
-                    child: const SizedBox(
-                      width: 160,
-                      height: 56,
-                      child: Center(child: Text('anchor')),
-                    ),
-                  );
-                },
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 80),
+                child: ChatContextMenuWrapper(
+                  barrierColor: Colors.black54,
+                  excludeAnchorFromBarrier: true,
+                  menuBuilder: (context, hideMenu) {
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('Action'),
+                        ElevatedButton(
+                          onPressed: hideMenu,
+                          child: const Text('Close'),
+                        ),
+                      ],
+                    );
+                  },
+                  widgetBuilder: (context, showMenu, hideMenu) {
+                    return GestureDetector(
+                      key: anchorKey,
+                      onTap: () => anchorTaps++,
+                      onLongPress: showMenu,
+                      behavior: HitTestBehavior.opaque,
+                      child: const SizedBox(
+                        width: 160,
+                        height: 56,
+                        child: Center(child: Text('anchor')),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           ),
         ),
-      ),
-    );
+      );
 
-    await tester.longPress(find.byKey(anchorKey));
-    await tester.pumpAndSettle();
+      await tester.longPress(find.byKey(anchorKey));
+      await tester.pumpAndSettle();
 
-    expect(find.text('Action'), findsOneWidget);
+      expect(find.text('Action'), findsOneWidget);
 
-    await tester.tap(find.byKey(anchorKey));
-    await tester.pump();
+      await tester.tap(find.byKey(anchorKey));
+      await tester.pump();
 
-    expect(anchorTaps, 1);
-  });
+      expect(anchorTaps, 1);
+    },
+  );
 
-  testWidgets('hideMenu from widgetBuilder closes menu when open', (WidgetTester tester) async {
+  testWidgets('hideMenu from widgetBuilder closes menu when open', (
+    WidgetTester tester,
+  ) async {
     VoidCallback? hideMenuFromAnchor;
 
     await tester.pumpWidget(
@@ -117,7 +131,10 @@ void main() {
               },
               widgetBuilder: (context, showMenu, hideMenu) {
                 hideMenuFromAnchor = hideMenu;
-                return GestureDetector(onLongPress: showMenu, child: const Text('Open menu'));
+                return GestureDetector(
+                  onLongPress: showMenu,
+                  child: const Text('Open menu'),
+                );
               },
             ),
           ),
@@ -156,7 +173,10 @@ void main() {
               },
               barrierAnchorBorderRadius: BorderRadius.circular(12),
               widgetBuilder: (context, showMenu, hideMenu) {
-                return GestureDetector(onLongPress: showMenu, child: const Text('Hold me'));
+                return GestureDetector(
+                  onLongPress: showMenu,
+                  child: const Text('Hold me'),
+                );
               },
             ),
           ),
@@ -194,7 +214,11 @@ void main() {
                         return const Text('Action');
                       },
                       widgetBuilder:
-                          (BuildContext c, void Function() showMenu, void Function() hideMenu) {
+                          (
+                            BuildContext c,
+                            void Function() showMenu,
+                            void Function() hideMenu,
+                          ) {
                             return GestureDetector(
                               onLongPress: showMenu,
                               child: Container(
@@ -228,10 +252,12 @@ void main() {
       anchorRenderBox: anchorBox,
     );
 
-    final RenderAbstractViewport? abstractViewport = RenderAbstractViewport.maybeOf(anchorBox);
+    final RenderAbstractViewport? abstractViewport =
+        RenderAbstractViewport.maybeOf(anchorBox);
     expect(abstractViewport, isNotNull);
     final RenderBox viewportBox = abstractViewport! as RenderBox;
-    final Rect viewportGlobal = viewportBox.localToGlobal(Offset.zero) & viewportBox.size;
+    final Rect viewportGlobal =
+        viewportBox.localToGlobal(Offset.zero) & viewportBox.size;
 
     expect(clipped.bottom, lessThanOrEqualTo(viewportGlobal.bottom + 0.01));
     expect(clipped.top, greaterThanOrEqualTo(viewportGlobal.top - 0.01));
@@ -271,7 +297,10 @@ void main() {
         const Alignment(0, -1),
       );
       expect(
-        sheetScaleAlignment(axis: Axis.vertical, vertical: ArrowVerticalDirection.down),
+        sheetScaleAlignment(
+          axis: Axis.vertical,
+          vertical: ArrowVerticalDirection.down,
+        ),
         Alignment.bottomCenter,
       );
       expect(
@@ -285,7 +314,9 @@ void main() {
       );
     });
 
-    testWidgets('scaleFade shows the menu without a sheet transition', (WidgetTester tester) async {
+    testWidgets('scaleFade shows the menu without a sheet transition', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_animationHarness());
 
       await tester.longPress(find.text('Long press me'));
@@ -299,7 +330,9 @@ void main() {
       );
     });
 
-    testWidgets('cupertinoSheet wraps the menu and uses 335ms', (WidgetTester tester) async {
+    testWidgets('cupertinoSheet wraps the menu and uses 335ms', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _animationHarness(style: ChatContextMenuAnimationStyle.cupertinoSheet),
       );
@@ -315,40 +348,45 @@ void main() {
       );
     });
 
-    testWidgets('cupertinoSheet opacity hits 0 before scale finishes on dismiss', (
+    testWidgets(
+      'cupertinoSheet opacity hits 0 before scale finishes on dismiss',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          _animationHarness(
+            style: ChatContextMenuAnimationStyle.cupertinoSheet,
+          ),
+        );
+
+        await tester.longPress(find.text('Long press me'));
+        await tester.pumpAndSettle();
+        expect(find.text('Copy'), findsOneWidget);
+
+        await tester.tapAt(const Offset(8, 8));
+        await tester.pump();
+        // 60% through the 335ms reverse: controller ~0.4, Interval(0.5, 1.0) => opacity 0.
+        await tester.pump(const Duration(milliseconds: 201));
+
+        final Finder sheetFade = find.descendant(
+          of: find.byType(ChatContextMenuSheetTransition),
+          matching: find.byType(FadeTransition),
+        );
+        expect(sheetFade, findsOneWidget);
+        final FadeTransition fade = tester.widget(sheetFade);
+        expect(fade.opacity.value, 0.0);
+
+        final Finder sheetScale = find.descendant(
+          of: find.byType(ChatContextMenuSheetTransition),
+          matching: find.byType(ScaleTransition),
+        );
+        expect(sheetScale, findsOneWidget);
+        final ScaleTransition scale = tester.widget(sheetScale);
+        expect(scale.scale.value, greaterThanOrEqualTo(0.0));
+      },
+    );
+
+    testWidgets('cupertinoSheet works for a horizontal menu', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(
-        _animationHarness(style: ChatContextMenuAnimationStyle.cupertinoSheet),
-      );
-
-      await tester.longPress(find.text('Long press me'));
-      await tester.pumpAndSettle();
-      expect(find.text('Copy'), findsOneWidget);
-
-      await tester.tapAt(const Offset(8, 8));
-      await tester.pump();
-      // 60% through the 335ms reverse: controller ~0.4, Interval(0.5, 1.0) => opacity 0.
-      await tester.pump(const Duration(milliseconds: 201));
-
-      final Finder sheetFade = find.descendant(
-        of: find.byType(ChatContextMenuSheetTransition),
-        matching: find.byType(FadeTransition),
-      );
-      expect(sheetFade, findsOneWidget);
-      final FadeTransition fade = tester.widget(sheetFade);
-      expect(fade.opacity.value, 0.0);
-
-      final Finder sheetScale = find.descendant(
-        of: find.byType(ChatContextMenuSheetTransition),
-        matching: find.byType(ScaleTransition),
-      );
-      expect(sheetScale, findsOneWidget);
-      final ScaleTransition scale = tester.widget(sheetScale);
-      expect(scale.scale.value, greaterThanOrEqualTo(0.0));
-    });
-
-    testWidgets('cupertinoSheet works for a horizontal menu', (WidgetTester tester) async {
       await tester.pumpWidget(
         _animationHarness(
           style: ChatContextMenuAnimationStyle.cupertinoSheet,
@@ -363,29 +401,31 @@ void main() {
       expect(find.byType(ChatContextMenuSheetTransition), findsOneWidget);
     });
 
-    testWidgets('transitionsBuilder is not wrapped with the cupertino sheet transition', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(
-        _animationHarness(
-          style: ChatContextMenuAnimationStyle.cupertinoSheet,
-          transitionsBuilder: (context, animation, secondary, center, alignment, child) {
-            return FadeTransition(
-              key: const Key('custom-transition'),
-              opacity: animation,
-              child: child,
-            );
-          },
-        ),
-      );
+    testWidgets(
+      'transitionsBuilder is not wrapped with the cupertino sheet transition',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          _animationHarness(
+            style: ChatContextMenuAnimationStyle.cupertinoSheet,
+            transitionsBuilder:
+                (context, animation, secondary, center, alignment, child) {
+                  return FadeTransition(
+                    key: const Key('custom-transition'),
+                    opacity: animation,
+                    child: child,
+                  );
+                },
+          ),
+        );
 
-      await tester.longPress(find.text('Long press me'));
-      await tester.pumpAndSettle();
+        await tester.longPress(find.text('Long press me'));
+        await tester.pumpAndSettle();
 
-      expect(find.text('Copy'), findsOneWidget);
-      expect(find.byKey(const Key('custom-transition')), findsOneWidget);
-      expect(find.byType(ChatContextMenuSheetTransition), findsNothing);
-    });
+        expect(find.text('Copy'), findsOneWidget);
+        expect(find.byKey(const Key('custom-transition')), findsOneWidget);
+        expect(find.byType(ChatContextMenuSheetTransition), findsNothing);
+      },
+    );
 
     testWidgets('explicit transitionDurations overrides the style default', (
       WidgetTester tester,
@@ -423,7 +463,11 @@ void main() {
                 axis: Axis.vertical,
                 spacing: spacing,
                 menuBuilder: (context, hideMenu) {
-                  return const SizedBox(width: 80, height: 32, child: Text('Copy'));
+                  return const SizedBox(
+                    width: 80,
+                    height: 32,
+                    child: Text('Copy'),
+                  );
                 },
                 widgetBuilder: (context, showMenu, hideMenu) {
                   return GestureDetector(
@@ -449,64 +493,79 @@ void main() {
       expect(menuFinder, findsOneWidget);
 
       final Rect menuRect = tester.getRect(menuFinder);
-      final ChatContextMenuVerticalWidget menuWidget = tester.widget(menuFinder);
+      final ChatContextMenuVerticalWidget menuWidget = tester.widget(
+        menuFinder,
+      );
 
       // Menu should appear right below tapPoint (inside the 160px tall anchor), not below anchorRect.bottom
       expect(menuRect.top, closeTo(tapPoint.dy + 0.5 + spacing, 1.5));
       expect(menuRect.top, lessThan(anchorRect.bottom));
       expect(menuWidget.arrowOffset, isNotNull);
-      expect(menuRect.left + menuWidget.arrowOffset!, closeTo(tapPoint.dx, 1.5));
+      expect(
+        menuRect.left + menuWidget.arrowOffset!,
+        closeTo(tapPoint.dx, 1.5),
+      );
     });
 
-    testWidgets('horizontal menu anchors at pointer click position with arrow', (
-      WidgetTester tester,
-    ) async {
-      const Key anchorKey = Key('pointer-horizontal-anchor');
-      const double spacing = 6.0;
+    testWidgets(
+      'horizontal menu anchors at pointer click position with arrow',
+      (WidgetTester tester) async {
+        const Key anchorKey = Key('pointer-horizontal-anchor');
+        const double spacing = 6.0;
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: ChatContextMenuWrapper(
-                positionMode: ChatContextMenuPositionMode.pointer,
-                axis: Axis.horizontal,
-                spacing: spacing,
-                menuBuilder: (context, hideMenu) {
-                  return const SizedBox(width: 80, height: 40, child: Text('Copy'));
-                },
-                widgetBuilder: (context, showMenu, hideMenu) {
-                  return GestureDetector(
-                    key: anchorKey,
-                    onTap: showMenu,
-                    behavior: HitTestBehavior.opaque,
-                    child: const SizedBox(width: 300, height: 160),
-                  );
-                },
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: Center(
+                child: ChatContextMenuWrapper(
+                  positionMode: ChatContextMenuPositionMode.pointer,
+                  axis: Axis.horizontal,
+                  spacing: spacing,
+                  menuBuilder: (context, hideMenu) {
+                    return const SizedBox(
+                      width: 80,
+                      height: 40,
+                      child: Text('Copy'),
+                    );
+                  },
+                  widgetBuilder: (context, showMenu, hideMenu) {
+                    return GestureDetector(
+                      key: anchorKey,
+                      onTap: showMenu,
+                      behavior: HitTestBehavior.opaque,
+                      child: const SizedBox(width: 300, height: 160),
+                    );
+                  },
+                ),
               ),
             ),
           ),
-        ),
-      );
+        );
 
-      final Rect anchorRect = tester.getRect(find.byKey(anchorKey));
-      final Offset tapPoint = anchorRect.topLeft + const Offset(50, 40);
+        final Rect anchorRect = tester.getRect(find.byKey(anchorKey));
+        final Offset tapPoint = anchorRect.topLeft + const Offset(50, 40);
 
-      await tester.tapAt(tapPoint);
-      await tester.pumpAndSettle();
+        await tester.tapAt(tapPoint);
+        await tester.pumpAndSettle();
 
-      final Finder menuFinder = find.byType(ChatContextMenuHorizontalWidget);
-      expect(menuFinder, findsOneWidget);
+        final Finder menuFinder = find.byType(ChatContextMenuHorizontalWidget);
+        expect(menuFinder, findsOneWidget);
 
-      final Rect menuRect = tester.getRect(menuFinder);
-      final ChatContextMenuHorizontalWidget menuWidget = tester.widget(menuFinder);
+        final Rect menuRect = tester.getRect(menuFinder);
+        final ChatContextMenuHorizontalWidget menuWidget = tester.widget(
+          menuFinder,
+        );
 
-      // Menu should appear right next to tapPoint.dx, not outside anchorRect.right
-      expect(menuRect.left, closeTo(tapPoint.dx + 0.5 + spacing, 1.5));
-      expect(menuRect.left, lessThan(anchorRect.right));
-      expect(menuWidget.arrowOffset, isNotNull);
-      expect(menuRect.top + menuWidget.arrowOffset!, closeTo(tapPoint.dy, 1.5));
-    });
+        // Menu should appear right next to tapPoint.dx, not outside anchorRect.right
+        expect(menuRect.left, closeTo(tapPoint.dx + 0.5 + spacing, 1.5));
+        expect(menuRect.left, lessThan(anchorRect.right));
+        expect(menuWidget.arrowOffset, isNotNull);
+        expect(
+          menuRect.top + menuWidget.arrowOffset!,
+          closeTo(tapPoint.dy, 1.5),
+        );
+      },
+    );
   });
 }
 
@@ -536,7 +595,10 @@ Widget _animationHarness({
             return const Text('Copy');
           },
           widgetBuilder: (context, showMenu, hideMenu) {
-            return GestureDetector(onLongPress: showMenu, child: const Text('Long press me'));
+            return GestureDetector(
+              onLongPress: showMenu,
+              child: const Text('Long press me'),
+            );
           },
         ),
       ),

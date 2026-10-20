@@ -1,11 +1,12 @@
 import 'package:chat_context_menu/src/layout/chat_context_menu_horizontal_layout.dart';
 import 'package:chat_context_menu/src/layout/chat_context_menu_vertical_layout.dart';
 import 'package:chat_context_menu/src/model/menu_animation_style.dart';
+import 'package:chat_context_menu/src/model/menu_position_mode.dart';
 import 'package:chat_context_menu/src/route/hole_modal_barrier.dart';
 import 'package:chat_context_menu/src/route/modal_hole_dismiss_scrim.dart';
 import 'package:chat_context_menu/src/ui/chat_context_menu_horizontal_widget.dart';
 import 'package:chat_context_menu/src/ui/chat_context_menu_vertical_widget.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 
 class ChatContextRoute extends PageRoute {
   /// Anchor rect in the coordinate space of the Overlay of the Navigator this route is pushed
@@ -37,6 +38,7 @@ class ChatContextRoute extends PageRoute {
   final BoxConstraints? menuConstraints;
   final BoxConstraints? layoutConstraints;
   final Axis axis;
+  final ChatContextMenuPositionMode positionMode;
 
   /// Pointer-down rect in the same overlay coordinate space as [widgetRect].
   final Rect? pointerRect;
@@ -77,6 +79,7 @@ class ChatContextRoute extends PageRoute {
     this.menuConstraints,
     this.layoutConstraints,
     required this.axis,
+    this.positionMode = ChatContextMenuPositionMode.outside,
     this.pointerRect,
     required this.topPadding,
     this.excludeAnchorFromBarrier = false,
@@ -141,6 +144,8 @@ class ChatContextRoute extends PageRoute {
     if (axis == Axis.horizontal) {
       menuLayer = ChatContextMenuHorizontalLayout(
         widgetRect: widgetRect,
+        pointerRect: pointerRect,
+        positionMode: positionMode,
         padding: padding,
         arrowHeight: arrowHeight,
         spacing: spacing,
@@ -169,6 +174,7 @@ class ChatContextRoute extends PageRoute {
       menuLayer = ChatContextMenuVerticalLayout(
         widgetRect: widgetRect,
         pointerRect: pointerRect,
+        positionMode: positionMode,
         padding: padding,
         arrowHeight: arrowHeight,
         spacing: spacing,

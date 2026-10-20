@@ -1,15 +1,16 @@
 import 'package:chat_context_menu/src/model/menu_animation_style.dart';
+import 'package:chat_context_menu/src/model/menu_position_mode.dart';
 import 'package:chat_context_menu/src/model/statement.dart';
 import 'package:chat_context_menu/src/route/anchor_viewport_clip.dart';
 import 'package:chat_context_menu/src/route/chat_context_route.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 
 class ChatContextMenuWrapper extends StatefulWidget {
   const ChatContextMenuWrapper({
     super.key,
     required this.widgetBuilder,
     required this.menuBuilder,
-    this.barrierColor = Colors.transparent,
+    this.barrierColor = const Color(0x00000000),
     this.backgroundColor,
     this.borderRadius = const BorderRadius.all(Radius.circular(8)),
     this.padding = const EdgeInsets.all(8),
@@ -26,7 +27,8 @@ class ChatContextMenuWrapper extends StatefulWidget {
     this.menuConstraints,
     this.layoutConstraints,
     this.axis = Axis.vertical,
-    this.topPadding = kToolbarHeight,
+    this.positionMode = ChatContextMenuPositionMode.outside,
+    this.topPadding = 48,
     this.excludeAnchorFromBarrier = false,
     this.barrierAnchorPadding = EdgeInsets.zero,
     this.barrierAnchorBorderRadius,
@@ -131,6 +133,13 @@ class ChatContextMenuWrapper extends StatefulWidget {
   ///Arrangement direction
   final Axis axis;
 
+  ///菜单定位模式。默认 [ChatContextMenuPositionMode.outside] 在组件外部计算显示位置；
+  ///设为 [ChatContextMenuPositionMode.pointer] 时直接从鼠标/手指点击位置计算显示。
+  ///
+  ///Menu positioning mode. Defaults to [ChatContextMenuPositionMode.outside] (outside the widget);
+  ///set to [ChatContextMenuPositionMode.pointer] to position the menu directly at the click/tap point.
+  final ChatContextMenuPositionMode positionMode;
+
   ///顶部安全区域的额外边距
   ///默认为 kToolbarHeight，当在 AppBar 中使用时可设为 0
   ///Extra padding for top safe area
@@ -167,7 +176,7 @@ class ChatContextMenuWrapper extends StatefulWidget {
 
 class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
   ChatContextRoute? _route;
-  
+
   Offset? _lastPointerDown;
 
   void _showMenu() {
@@ -201,11 +210,7 @@ class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
 
     _route = ChatContextRoute(
       widgetRect: widgetRect,
-      menuItems: Material(
-        type: MaterialType.transparency,
-        color: Colors.transparent,
-        child: widget.menuBuilder(context, _hideMenu),
-      ),
+      menuItems: widget.menuBuilder(context, _hideMenu),
       barrierColor: widget.barrierColor,
       backgroundColor: widget.backgroundColor,
       borderRadius: widget.borderRadius,
@@ -222,6 +227,7 @@ class _ChatContextMenuWrapperState extends State<ChatContextMenuWrapper> {
       menuConstraints: widget.menuConstraints,
       layoutConstraints: widget.layoutConstraints,
       axis: widget.axis,
+      positionMode: widget.positionMode,
       pointerRect: pointerRect,
       topPadding: widget.topPadding,
       excludeAnchorFromBarrier: widget.excludeAnchorFromBarrier,

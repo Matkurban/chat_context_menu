@@ -1,8 +1,9 @@
 import 'dart:math';
 
 import 'package:chat_context_menu/src/model/arrow_horizontal_direction.dart';
+import 'package:chat_context_menu/src/model/menu_position_mode.dart';
 import 'package:chat_context_menu/src/route/chat_context_menu_transition.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 
 /// 横向布局的 Context Menu
 /// Horizontal layout for Context Menu
@@ -10,6 +11,8 @@ class ChatContextMenuHorizontalLayout extends StatefulWidget {
   const ChatContextMenuHorizontalLayout({
     super.key,
     required this.widgetRect,
+    this.pointerRect,
+    this.positionMode = ChatContextMenuPositionMode.outside,
     required this.childBuilder,
     required this.padding,
     required this.arrowHeight,
@@ -23,6 +26,8 @@ class ChatContextMenuHorizontalLayout extends StatefulWidget {
   });
 
   final Rect widgetRect;
+  final Rect? pointerRect;
+  final ChatContextMenuPositionMode positionMode;
   final Widget Function(
     BuildContext context,
     double? arrowOffset,
@@ -64,7 +69,7 @@ class _ChatContextMenuHorizontalLayoutState extends State<ChatContextMenuHorizon
   double get arrowWidth => widget.arrowWidth;
 
   BorderRadius get borderRadius => widget.borderRadius;
-  
+
   double get horizontalMargin => widget.horizontalMargin;
 
   @override
@@ -87,6 +92,9 @@ class _ChatContextMenuHorizontalLayoutState extends State<ChatContextMenuHorizon
         ? layoutBox.size
         : media.size;
     final Rect widgetRect = widget.widgetRect;
+    final bool usePointerAnchor =
+        widget.positionMode == ChatContextMenuPositionMode.pointer && widget.pointerRect != null;
+    final Rect anchorRect = usePointerAnchor ? widget.pointerRect! : widgetRect;
 
     final double leftLimit = media.padding.left + horizontalMargin;
     final double rightLimit = screenSize.width - media.padding.right - horizontalMargin;
@@ -97,8 +105,8 @@ class _ChatContextMenuHorizontalLayoutState extends State<ChatContextMenuHorizon
     // Calculate available space on left and right
     // Menu width includes arrow height since arrow is part of the shape
     final double menuTotalWidth = childSize.width + arrowHeight;
-    final double rightSpace = rightLimit - widgetRect.right - spacing;
-    final double leftSpace = widgetRect.left - leftLimit - spacing;
+    final double rightSpace = rightLimit - anchorRect.right - spacing;
+    final double leftSpace = anchorRect.left - leftLimit - spacing;
 
     ArrowHorizontalDirection arrowDirection;
     double x;
@@ -109,23 +117,23 @@ class _ChatContextMenuHorizontalLayoutState extends State<ChatContextMenuHorizon
 
     if (fitsRight) {
       // Show on right side, arrow points left
-      x = widgetRect.right + spacing;
+      x = anchorRect.right + spacing;
       arrowDirection = ArrowHorizontalDirection.left;
     } else if (fitsLeft) {
       // Show on left side, arrow points right
-      x = widgetRect.left - spacing - childSize.width - arrowHeight;
+      x = anchorRect.left - spacing - childSize.width - arrowHeight;
       arrowDirection = ArrowHorizontalDirection.right;
     } else {
       // Neither side fits perfectly, pick the one with more space
       if (leftSpace > rightSpace) {
-        x = widgetRect.left - spacing - childSize.width - arrowHeight;
+        x = anchorRect.left - spacing - childSize.width - arrowHeight;
         arrowDirection = ArrowHorizontalDirection.right;
         // Clamp to left limit
         if (x < leftLimit) {
           x = leftLimit;
         }
       } else {
-        x = widgetRect.right + spacing;
+        x = anchorRect.right + spacing;
         arrowDirection = ArrowHorizontalDirection.left;
         // Clamp to right limit
         if (x + menuTotalWidth > rightLimit) {
@@ -137,38 +145,50 @@ class _ChatContextMenuHorizontalLayoutState extends State<ChatContextMenuHorizon
     // Calculate Y position with alignment logic
     double y;
 
-    // 计算子组件中心位置的 Y 坐标
-    final double widgetCenterY = widgetRect.center.dy;
+    // 计算锚点中心位置的 Y 坐标
+    final double anchorCenterY = anchorRect.center.dy;
 
     // 安全边距：箭头需要在圆角之外，同时考虑箭头宽度
     final double safeMargin = _maxRadius(borderRadius) + arrowWidth / 2;
 
-    // 默认：context_menu 顶部与子组件顶部对齐
-    final double topAlignedY = widgetRect.top;
-
-    // 检查顶部对齐时，底部是否有足够空间
-    final bool fitsWithTopAlign = topAlignedY + childSize.height <= bottomLimit - horizontalMargin;
-
-    if (fitsWithTopAlign) {
-      // 顶部对齐，底部空间足够
-      y = topAlignedY;
-      // 确保不超出顶部边界
+    if (usePointerAnchor) {
+      // 点击位置模式：菜单在垂直方向居中对齐点击坐标，并在上下边界内收敛
+      y = anchorCenterY - childSize.height / 2;
+      if (y + childSize.height > bottomLimit - horizontalMargin) {
+        y = bottomLimit - horizontalMargin - childSize.height;
+      }
       if (y < topLimit + horizontalMargin) {
         y = topLimit + horizontalMargin;
       }
     } else {
-      // 底部空间不足，改为底部对齐
-      // context_menu 底部与子组件底部对齐
-      y = widgetRect.bottom - childSize.height;
-      // 确保不超出顶部边界
-      if (y < topLimit + horizontalMargin) {
-        y = topLimit + horizontalMargin;
+      // 默认：context_menu 顶部与子组件顶部对齐
+      final double topAlignedY = anchorRect.top;
+
+      // 检查顶部对齐时，底部是否有足够空间
+      final bool fitsWithTopAlign =
+          topAlignedY + childSize.height <= bottomLimit - horizontalMargin;
+
+      if (fitsWithTopAlign) {
+        // 顶部对齐，底部空间足够
+        y = topAlignedY;
+        // 确保不超出顶部边界
+        if (y < topLimit + horizontalMargin) {
+          y = topLimit + horizontalMargin;
+        }
+      } else {
+        // 底部空间不足，改为底部对齐
+        // context_menu 底部与子组件底部对齐
+        y = anchorRect.bottom - childSize.height;
+        // 确保不超出顶部边界
+        if (y < topLimit + horizontalMargin) {
+          y = topLimit + horizontalMargin;
+        }
       }
     }
 
-    // Calculate arrow offset - arrow should point to the center of widget
+    // Calculate arrow offset - arrow should point to the center of anchor
     // Arrow offset is relative to menu's top edge (不包含 padding)
-    double arrowOffset = widgetCenterY - y;
+    double arrowOffset = anchorCenterY - y;
 
     // Clamp arrow offset to be within the menu's valid area
     // to keep the arrow away from rounded corners

@@ -1,3 +1,11 @@
+## 4.2.0
+
+* **`ChatContextMenuPositionMode`** — Added menu positioning mode enum with `outside` (default, positions the menu outside the anchor widget or text selection) and `pointer` (positions the menu directly at the mouse click / touch press coordinate with the arrow pointing to the click position).
+* **`positionMode` on `ChatContextMenuWrapper` and `ChatSelectableText`** — Both widgets now accept `positionMode` (default `ChatContextMenuPositionMode.outside`) and support `ChatContextMenuPositionMode.pointer` across both `Axis.vertical` and `Axis.horizontal` layouts.
+* **Example** — Added interactive `ChatContextMenuPositionMode` toggles (`outside` vs `pointer`) and desktop right-click triggers in the example app pages.
+* **Docs** — Updated `README.md` and `README_ZH.md` with `positionMode` usage and corrected property defaults and customization tables to match the actual API.
+* **Tests** — Added widget tests covering `ChatContextMenuPositionMode.pointer` in both vertical and horizontal layouts for `ChatContextMenuWrapper` and `ChatSelectableText`.
+
 ## 4.1.1
 
 - update `material_ui` version to ^1.6.0
@@ -60,12 +68,12 @@
   * **Overlay-space coordinates everywhere** — The anchor rect and pointer position are now measured in the **target Navigator's Overlay coordinate space** (`localToGlobal(..., ancestor: overlayBox)`) instead of raw window coordinates, so menus position correctly regardless of which Navigator the route is pushed onto. Layouts and `buildTransitions` use the actual overlay size instead of `MediaQuery.of(context).size`.
   * **Clip-aware barrier cutout** — `clipAnchorRectForHole` (renamed from `clipAnchorGlobalRectForHole`) now walks the render tree from the anchor to the overlay and intersects with every clipping ancestor (`RenderAbstractViewport`, `ClipRect`/`ClipRRect`/`ClipOval`/`ClipPath`, `Material`/`PhysicalModel` with a non-none `clipBehavior`), so with `excludeAnchorFromBarrier: true` the hole never extends past the visible pane bounds.
   * Backward compatible: with a single full-window Navigator (typical mobile apps) the overlay origin equals the window origin, so behavior is unchanged. Internal `HoleModalDismissScrim.holeRectGlobal` was renamed to `holeRectLocal` and the `intersectHoleOverlayLocal` helper was removed (holes are already overlay-local).
-* **Tests** — Added `test/nested_navigator_overlay_test.dart` covering a minimal sliding-pane reproduction (`ClipRect > OverflowBox > Transform.translate > panes with nested Navigators`): menu alignment with/without `useRootNavigator`, hole-barrier hit-testing across panes, clip-chain clamping, and `ChatSelectableText` with `useRootOverlay`.
+* **Tests** — Added `example/test/nested_navigator_overlay_test.dart` covering a minimal sliding-pane reproduction (`ClipRect > OverflowBox > Transform.translate > panes with nested Navigators`): menu alignment with/without `useRootNavigator`, hole-barrier hit-testing across panes, clip-chain clamping, and `ChatSelectableText` with `useRootOverlay`.
 
 ## 3.0.1
 
 * **Fix `ChatSelectableText` menu overflow** — Menu positioning now measures the full menu shell (`menuPadding` + content), matching `ChatContextMenuWrapper` / `ChatContextMenuVerticalLayout`. Previously only `menuBuilder` content was measured, so horizontal edge clamping underestimated the rendered width and the menu could extend past the screen edge (e.g. right-aligned chat bubbles).
-* **Tests** — Added `test/chat_selectable_text_test.dart` to assert the menu stays within `horizontalMargin` at the screen edge.
+* **Tests** — Added `example/test/chat_selectable_text_test.dart` to assert the menu stays within `horizontalMargin` at the screen edge.
 
 ## 3.0.0
 

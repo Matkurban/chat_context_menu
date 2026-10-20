@@ -1,27 +1,30 @@
 # Chat Context Menu
 
-一个提供 iOS 风格聊天上下文菜单的 Flutter 组件包，支持自定义外观和动画。该组件包处理菜单定位、箭头指示器和背景遮罩，你只需提供任意 Widget 作为菜单内容。
+[![English](https://img.shields.io/badge/Docs-English-blue)](README.md)
+
+一个提供 iOS 风格聊天上下文菜单的 Flutter 组件包，支持自定义外观和动画。该组件包处理菜单定位、箭头指示器和背景遮罩/镂空，你只需提供任意 Widget 作为菜单内容。
 
 **在线演示：** https://matkurban.github.io/chat_context_menu/
 
 ## 功能特性
 
 *   **iOS 风格上下文菜单：** 流畅的动画和布局，类似原生 iOS 上下文菜单。
-*   **自动定位：** 菜单自动定位在目标组件附近，智能处理溢出情况。
-*   **箭头指示器：** 可选的箭头指向目标组件。
-*   **自定义外观：** 可配置背景颜色、圆角和遮罩颜色。
-*   **灵活的内容：** 你提供菜单内容的 Widget，完全控制菜单项和布局。
-*   **简单集成：** 使用 `ChatContextMenuWrapper` 包裹任意组件即可启用上下文菜单。
-*   **可选文本：** `ChatSelectableText` 提供完全自定义的文本选择，支持拖动手柄、自动滚动和智能定位的上下文菜单，非常适合聊天气泡。支持长按、双击（选词）、三击（选段）、鼠标右键和桌面端鼠标拖动选择，菜单可垂直或水平排列（`axis`）。
-*   **平台自适应触发：** `ChatContextMenuWrapper` 可配置移动端（单击 / 双击 / 长按）和桌面端（右键 / 左键）的触发方式。
-*   **内置动画样式：** `ChatContextMenuAnimationStyle.scaleFade`（默认，现有整页淡入缩放）或 `cupertinoSheet`（从箭头回弹的 iOS 操作菜单）。可用 `transitionDurations` / `transitionDuration` 覆盖时长，或用 `transitionsBuilder` 完全自定义。
-*   **遮罩锚点开孔（可选）：** 将 `excludeAnchorFromBarrier` 设为 `true` 且 `barrierColor` 非全透明时，遮罩在锚点处镂空，锚点保持明亮可点，点击半透明区域可关闭菜单；可用 `barrierAnchorPadding`、`barrierAnchorBorderRadius` 调整开孔。默认为 `false`，即传统整块半透明遮罩（锚点也会被压暗）。
+*   **两种定位模式（`ChatContextMenuPositionMode`）：**
+    *   `ChatContextMenuPositionMode.outside`（默认）：在目标组件或文本选区边界外部计算显示位置；当组件/选区超出屏幕可用空间时自动回退到点击位置。
+    *   `ChatContextMenuPositionMode.pointer`：直接以鼠标点击或手指按压坐标作为锚点从点击位置显示菜单，角标直接指向点击位置（`ChatContextMenuWrapper` 与 `ChatSelectableText` 均支持，且同时兼容 `Axis.vertical` 与 `Axis.horizontal`）。
+*   **箭头指示器：** 箭头指向目标组件、文本选区或点击坐标，并自动避开圆角区域。
+*   **纵向与横向布局：** 支持在锚点上下方（`Axis.vertical`）或左右侧（`Axis.horizontal`）弹出菜单。
+*   **自定义外观：** 可配置背景颜色、圆角、内边距、阴影、箭头尺寸和背景遮罩颜色。
+*   **灵活的内容与触发方式：** 自由提供菜单内容 Widget，并通过 `widgetBuilder` 提供的 `showMenu` / `hideMenu` 回调绑定任意触发手势（如 `onLongPress`、`onSecondaryTap`、`onTap`、`IconButton` 等）。
+*   **可选择文本（`ChatSelectableText`）：** 从底层完全自定义实现的可选择文本组件（`RichText` + `TextPainter` + `OverlayEntry`），支持拖动手柄、边缘自动滚动和浮动上下文菜单。支持长按、双击（选词）、三击（选段）、鼠标右键和桌面端鼠标左键拖动选择。
+*   **内置动画样式：** `ChatContextMenuAnimationStyle.scaleFade`（默认，150ms 整页淡入缩放）或 `cupertinoSheet`（335ms 从箭头回弹的 iOS 操作菜单）。可用 `transitionDurations` / `transitionDuration` 覆盖时长，或用 `transitionsBuilder` 完全自定义。
+*   **遮罩锚点开孔（可选）：** 将 `excludeAnchorFromBarrier` 设为 `true` 且 `barrierColor` 非全透明时，遮罩在锚点处镂空，锚点保持明亮可点，点击半透明暗区可关闭菜单；可用 `barrierAnchorPadding`、`barrierAnchorBorderRadius` 调整开孔大小与圆角。
 
 ## 截图
 
-|                    ScreenShot                    |                    ScreenShot                    |         ScreenShot                    ｜         |
+|                    ScreenShot                    |                    ScreenShot                    |                    ScreenShot                    |
 |:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|
-| ![Screenshot 1](doc/screenshot/screenshot_1.jpg) | ![Screenshot 2](doc/screenshot/screenshot_2.jpg) | ![Screenshot 2](doc/screenshot/screenshot_3.jpg) |
+| ![Screenshot 1](doc/screenshot/screenshot_1.jpg) | ![Screenshot 2](doc/screenshot/screenshot_2.jpg) | ![Screenshot 3](doc/screenshot/screenshot_3.jpg) |
 
 ## 开始使用
 
@@ -29,7 +32,7 @@
 
 ```yaml
 dependencies:
-  chat_context_menu: ^last_version
+  chat_context_menu: ^4.2.0
 ```
 
 ## Agent skills
@@ -50,7 +53,7 @@ dart run skills@ get
 import 'package:chat_context_menu/chat_context_menu.dart';
 import 'package:example/app_theme.dart';
 import 'package:example/context_menu_pane.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   runApp(const MyApp());
@@ -65,7 +68,7 @@ class MyApp extends StatelessWidget {
       title: 'Chat Context Menu',
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: .system,
+      themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
       home: const ChatScreen(),
     );
@@ -82,22 +85,10 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final List<String> _messages = [
     "Hello!",
-    "Hello!",
     "How are you?",
-    "Im Fine",
-    "and you?",
-    "Im good too, thanks for asking.",
-    "This is a long press context menu demo.",
-    "Try long pressing on any message.",
-    "Try long pressing on any message.",
-    "You can see different options.",
-    "You can see different options.",
+    "Try long-pressing or right-clicking on any message.",
     "Like Reply, Copy, Forward, Delete.",
     "It mimics the iOS style context menu.",
-    "Hope",
-    "It mimics the iOS style context menu.",
-    "Hope",
-    "Like Reply, Copy, Forward, Delete.",
   ];
 
   @override
@@ -108,118 +99,124 @@ class _ChatScreenState extends State<ChatScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Chat Context Menu')),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                final isMe = index % 2 == 0;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Align(
-                    alignment: isMe
-                        ? Alignment.centerRight
-                        : Alignment.centerLeft,
-                    child: ChatContextMenuWrapper(
-                      barrierColor: Colors.transparent,
-                      backgroundColor: colorScheme.surface,
-                      borderRadius: BorderRadius.circular(10),
-                      shadows: [
-                        BoxShadow(
-                          color: colorScheme.onSurface.withValues(alpha: 0.15),
-                          blurRadius: 32,
-                        ),
-                      ],
-                      menuBuilder: (context, hideMenu) {
-                        return ContextMenuPane(
-                          textTheme: textTheme,
-                          colorScheme: colorScheme,
-                          onReplayTap: hideMenu,
-                          onForwardTap: hideMenu,
-                          onCopyTap: hideMenu,
-                          onDeleteTap: hideMenu,
-                          onMoreTap: hideMenu,
-                          onQuoteTap: hideMenu,
-                          onSelectTap: hideMenu,
-                        );
-                      },
-                      widgetBuilder: (context, showMenu, hideMenu) {
-                        return GestureDetector(
-                          onLongPress: showMenu,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            margin: .symmetric(vertical: 4),
-                            decoration: BoxDecoration(
-                              color: isMe
-                                  ? colorScheme.primary
-                                  : colorScheme.surfaceContainerHighest,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              _messages[index],
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: isMe ? colorScheme.onPrimary : null,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+      body: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: _messages.length,
+        itemBuilder: (context, index) {
+          final isMe = index % 2 == 0;
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Align(
+              alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+              child: ChatContextMenuWrapper(
+                barrierColor: Colors.black26,
+                excludeAnchorFromBarrier: true,
+                barrierAnchorBorderRadius: BorderRadius.circular(8),
+                backgroundColor: colorScheme.surface,
+                borderRadius: BorderRadius.circular(10),
+                positionMode: ChatContextMenuPositionMode.outside,
+                shadows: [
+                  BoxShadow(
+                    color: colorScheme.onSurface.withValues(alpha: 0.15),
+                    blurRadius: 32,
                   ),
-                );
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              decoration: const InputDecoration(
-                hintText: 'Type a message...',
-                border: OutlineInputBorder(),
+                ],
+                menuBuilder: (context, hideMenu) {
+                  return ContextMenuPane(
+                    textTheme: textTheme,
+                    colorScheme: colorScheme,
+                    onReplayTap: hideMenu,
+                    onForwardTap: hideMenu,
+                    onCopyTap: hideMenu,
+                    onDeleteTap: hideMenu,
+                    onMoreTap: hideMenu,
+                    onQuoteTap: hideMenu,
+                    onSelectTap: hideMenu,
+                  );
+                },
+                widgetBuilder: (context, showMenu, hideMenu) {
+                  return GestureDetector(
+                    onLongPress: showMenu,
+                    onSecondaryTap: showMenu,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isMe
+                            ? colorScheme.primary
+                            : colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        _messages[index],
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: isMe ? colorScheme.onPrimary : null,
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
+          );
+        },
       ),
     );
   }
 }
-
-
 ```
 
-## 自定义
+### 定位模式（`outside` 与 `pointer`）
 
-你可以通过以下属性自定义 `ChatContextMenuWrapper`：
+默认情况下，`positionMode` 为 `ChatContextMenuPositionMode.outside`（在组件外部计算显示位置）。如果希望鼠标点击或手指按压哪里，就从点击位置直接弹出带角标的菜单，可设置 `positionMode: ChatContextMenuPositionMode.pointer`：
 
-*   `widgetBuilder`：锚点组件的构建函数，提供 `showMenu` 与 `hideMenu` 回调（菜单未打开时调用 `hideMenu` 无效果）。
-*   `menuBuilder`：返回菜单内容 Widget 的构建函数，提供 `hideMenu` 回调。
-*   `barrierColor`：背景遮罩颜色。
-*   `excludeAnchorFromBarrier`：为 `true` 时遮罩在锚点上镂空（见下文「使用与注意事项」）；默认 `false`，锚点与整屏一同被遮罩压暗（与常规 `ModalRoute` 一致）。
-*   `barrierAnchorPadding`：在测得的锚点矩形四周增加/缩减开孔用的 `EdgeInsets`。
-*   `barrierAnchorBorderRadius`：可选；与气泡 `BoxDecoration` 一致的圆角，用于开孔形状与半透明区外点击-dismiss 的区域判定。
-*   `backgroundColor`：菜单容器的背景颜色。
-*   `borderRadius`：菜单容器的圆角。
-*   `padding`：菜单容器的内边距。
-*   `animationStyle`：内置菜单动画。默认 `ChatContextMenuAnimationStyle.scaleFade`（150ms 整页淡入缩放）。`cupertinoSheet` 为 iOS 操作菜单回弹（335ms，从箭头放大）。非空的 `transitionsBuilder` 会覆盖两种内置样式。
-*   `transitionDurations`：可选时长覆盖。为 `null` 时使用 `animationStyle` 的默认时长。
-*   `barrierDismissible`：为 `true`（默认）时点遮罩暗区会尝试 `Navigator.maybePop` 关闭菜单；为 `false` 时播放系统提示音且不关闭（与 Flutter `ModalBarrier` 语义一致）。
-*   `useRootNavigator`：为 `true` 时把菜单路由推到**根** `Navigator` 而不是最近的 Navigator，默认 `false`。见下文「嵌套 Navigator / 桌面多栏布局」。
+```dart
+ChatContextMenuWrapper(
+  positionMode: ChatContextMenuPositionMode.pointer,
+  axis: Axis.vertical, // 或 Axis.horizontal
+  menuBuilder: (context, hideMenu) => MyMenuContent(onClose: hideMenu),
+  widgetBuilder: (context, showMenu, hideMenu) {
+    return GestureDetector(
+      onSecondaryTap: showMenu,
+      onLongPress: showMenu,
+      child: child,
+    );
+  },
+)
+```
+
+## ChatContextMenuWrapper 属性
+
+| 属性                        | 类型                                                                                                   | 默认值                                       | 说明                                                                                     |
+|-----------------------------|--------------------------------------------------------------------------------------------------------|----------------------------------------------|------------------------------------------------------------------------------------------|
+| `widgetBuilder`             | `ContextMenuWidgetBuilder` (`Widget Function(BuildContext, VoidCallback showMenu, VoidCallback hideMenu)`) | 必填                                         | 锚点组件构建函数（菜单未打开时调用 `hideMenu` 无效果）                                   |
+| `menuBuilder`               | `ContextMenuContentBuilder` (`Widget Function(BuildContext, VoidCallback hideMenu)`)                   | 必填                                         | 菜单内容构建函数                                                                         |
+| `positionMode`              | `ChatContextMenuPositionMode`                                                                          | `ChatContextMenuPositionMode.outside`        | `outside`：在组件外部计算显示；`pointer`：直接从点击/按压位置显示，角标指向点击坐标       |
+| `axis`                      | `Axis`                                                                                                 | `Axis.vertical`                              | 排列方向：`Axis.vertical`（上下方）或 `Axis.horizontal`（左右侧）                        |
+| `barrierColor`              | `Color`                                                                                                | `Colors.transparent`                         | 背景遮罩颜色                                                                             |
+| `excludeAnchorFromBarrier`  | `bool`                                                                                                 | `false`                                      | 为 `true` 且 `barrierColor` 非全透明时，在锚点区域镂空遮罩                               |
+| `barrierAnchorPadding`      | `EdgeInsets`                                                                                           | `EdgeInsets.zero`                            | 在测得的锚点矩形四周扩大或缩小镂空区域                                                   |
+| `barrierAnchorBorderRadius` | `BorderRadius?`                                                                                        | `null`                                       | 锚点镂空区域的圆角（建议与气泡 `BorderRadius` 保持一致）                                 |
+| `backgroundColor`           | `Color?`                                                                                               | `null`                                       | 菜单容器与角标的背景颜色                                                                 |
+| `borderRadius`              | `BorderRadius`                                                                                         | `BorderRadius.all(Radius.circular(8))`       | 菜单容器圆角                                                                             |
+| `padding`                   | `EdgeInsets`                                                                                           | `EdgeInsets.all(8)`                          | 菜单容器内边距                                                                           |
+| `shadows`                   | `List<BoxShadow>?`                                                                                     | `null`                                       | 菜单容器阴影                                                                             |
+| `arrowHeight`               | `double`                                                                                               | `8.0`                                        | 角标高度                                                                                 |
+| `arrowWidth`                | `double`                                                                                               | `12.0`                                       | 角标底边宽度                                                                             |
+| `spacing`                   | `double`                                                                                               | `6.0`                                        | 菜单（含角标）与组件/点击点之间的间距                                                    |
+| `horizontalMargin`          | `double`                                                                                               | `10.0`                                       | 距屏幕（Overlay）左右边缘的最小留白                                                      |
+| `topPadding`                | `double`                                                                                               | `kToolbarHeight`                             | 顶部安全区域额外边距（在 `AppBar` 内使用时可设为 `0`）                                   |
+| `menuConstraints`           | `BoxConstraints?`                                                                                      | `null`                                       | 菜单容器尺寸约束                                                                         |
+| `layoutConstraints`         | `BoxConstraints?`                                                                                      | `null`                                       | 可用屏幕区域约束（用于布局判定）                                                         |
+| `requestFocus`              | `bool`                                                                                                 | `false`                                      | 菜单显示时是否获取焦点                                                                   |
+| `animationStyle`            | `ChatContextMenuAnimationStyle`                                                                        | `ChatContextMenuAnimationStyle.scaleFade`    | 内置菜单动画（`scaleFade` 150ms 或 `cupertinoSheet` 335ms）                              |
+| `transitionsBuilder`        | `Widget? Function(BuildContext, Animation<double>, Animation<double>, Offset, Alignment, Widget)?`     | `null`                                       | 自定义路由动画（非空时覆盖 `animationStyle`）                                            |
+| `transitionDurations`       | `Duration?`                                                                                            | `null`（使用 `animationStyle.defaultDuration`） | 菜单动画时长覆盖                                                                         |
+| `onClose`                   | `void Function(dynamic result)?`                                                                       | `null`                                       | 菜单关闭时触发的回调                                                                     |
+| `useRootNavigator`          | `bool`                                                                                                 | `false`                                      | 是否将菜单路由推到根 `Navigator`（用于嵌套 Navigator / 桌面端多栏布局）                  |
 
 ## 使用与注意事项
 
@@ -349,20 +346,21 @@ ChatSelectableText(
 )
 ```
 
-### 桌面端交互与菜单排列方向
+### 桌面端交互、菜单排列方向与点击位置模式
 
 在桌面平台上，`ChatSelectableText` 开箱即支持鼠标操作：
 
 *   **鼠标拖动** —— 按住左键拖动选择文本，松开后显示菜单；触摸拖动不受影响，仍可正常滚动列表。
-*   **鼠标右键** —— 激活选择（遵循 `selectAllOnActivate`）并在指针位置打开菜单。
+*   **鼠标右键** —— 激活选择（遵循 `selectAllOnActivate`）并打开菜单。
 *   **双击 / 三击** —— 选中指针下的单词 / 整个段落（以换行符为边界）。
 
-使用 `axis` 可以让菜单显示在选区左右两侧，而非上下方：
+使用 `axis` 可以让菜单显示在选区左右两侧（`Axis.horizontal`）或上下方（`Axis.vertical`）；使用 `positionMode: ChatContextMenuPositionMode.pointer` 可以让菜单及角标直接从点击位置弹出：
 
 ```dart
 ChatSelectableText(
   '拖动、右键、双击或三击试试。',
-  axis: Axis.horizontal, // 菜单显示在选区左侧/右侧
+  axis: Axis.horizontal, // 菜单显示在左侧/右侧
+  positionMode: ChatContextMenuPositionMode.pointer, // 直接从鼠标点击位置显示
   menuBuilder: (context, selectedText, hideMenu, selectAll) {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -377,33 +375,44 @@ ChatSelectableText(
 
 ### ChatSelectableText 属性
 
-| 属性                   | 类型                                                                | 默认值                     | 说明                                                            |
-|------------------------|---------------------------------------------------------------------|----------------------------|-----------------------------------------------------------------|
-| `data`                 | `String`                                                            | 必填                       | 文本内容                                                        |
-| `style`                | `TextStyle?`                                                        | `null`                     | 文本样式                                                        |
-| `selectionColor`       | `Color?`                                                            | 主题色 (30% 透明度)        | 选中高亮颜色                                                    |
-| `handleColor`          | `Color?`                                                            | 主题色                     | 拖动手柄颜色                                                    |
-| `handleSize`           | `double`                                                            | `16.0`                     | 手柄大小                                                        |
-| `selectAllOnActivate`  | `bool`                                                              | `true`                     | 激活时全选文本，或只选按压的单词                                |
-| `autoScrollEdgeExtent` | `double`                                                            | `48.0`                     | 触发自动滚动的边缘距离                                          |
-| `autoScrollSpeed`      | `double`                                                            | `10.0`                     | 自动滚动速度（每帧像素数）                                      |
-| `enableHapticFeedback` | `bool`                                                              | `true`                     | 激活选择时是否触发触感反馈                                      |
-| `menuBuilder`          | `Widget Function(BuildContext, String, VoidCallback, VoidCallback)` | 必填                       | 菜单构建函数（上下文、文本、隐藏、全选）                        |
-| `menuBackgroundColor`  | `Color?`                                                            | `null`                     | 菜单背景颜色                                                    |
-| `menuBorderRadius`     | `BorderRadius`                                                      | `BorderRadius.circular(8)` | 菜单圆角                                                        |
-| `menuPadding`          | `EdgeInsets`                                                        | `EdgeInsets.all(8)`        | 菜单内边距                                                      |
-| `menuShadows`          | `List<BoxShadow>?`                                                  | `null`                     | 菜单阴影                                                        |
-| `arrowHeight`          | `double`                                                            | `8.0`                      | 箭头指示器高度                                                  |
-| `arrowWidth`           | `double`                                                            | `12.0`                     | 箭头指示器宽度                                                  |
-| `spacing`              | `double`                                                            | `6.0`                      | 菜单与选区的间距                                                |
-| `horizontalMargin`     | `double`                                                            | `10.0`                     | 距屏幕边缘最小留白                                              |
-| `axis`                 | `Axis`                                                              | `Axis.vertical`            | 菜单排列方向：选区上下方（`vertical`）或左右侧（`horizontal`）  |
-| `useRootOverlay`       | `bool`                                                              | `false`                    | 手柄/菜单/遮罩插入根 Overlay（嵌套 Navigator 场景，见上文说明） |
-| `onSelectionChanged`   | `ValueChanged<String>?`                                             | `null`                     | 选中文本变化回调                                                |
-| `onMenuClosed`         | `VoidCallback?`                                                     | `null`                     | 菜单关闭回调                                                    |
-| `animationStyle`       | `ChatContextMenuAnimationStyle`                                     | `scaleFade`                | 内置菜单动画（`scaleFade` 或 `cupertinoSheet`）                 |
-| `transitionsBuilder`   | `Function?`                                                         | `null`                     | 自定义菜单动画（覆盖 `animationStyle`）                         |
-| `transitionDuration`   | `Duration?`                                                         | 样式默认                   | 菜单动画时长（`scaleFade` 150ms，`cupertinoSheet` 335ms）       |
+| 属性                   | 类型                                                                                         | 默认值                                    | 说明                                                                                     |
+|------------------------|----------------------------------------------------------------------------------------------|-------------------------------------------|------------------------------------------------------------------------------------------|
+| `data`                 | `String`                                                                                     | 必填                                      | 文本内容                                                                                 |
+| `style`                | `TextStyle?`                                                                                 | `null`                                    | 文本样式（为 `null` 或 `inherit: true` 时与 `DefaultTextStyle` 合并）                    |
+| `textAlign`            | `TextAlign`                                                                                  | `TextAlign.start`                         | 文本对齐方式                                                                             |
+| `textDirection`        | `TextDirection?`                                                                             | `null`                                    | 文本方向                                                                                 |
+| `maxLines`             | `int?`                                                                                       | `null`                                    | 最大行数                                                                                 |
+| `overflow`             | `TextOverflow`                                                                               | `TextOverflow.clip`                       | 文本溢出处理方式                                                                         |
+| `textScaler`           | `TextScaler`                                                                                 | `TextScaler.noScaling`                    | 文本缩放比例                                                                             |
+| `textWidthBasis`       | `TextWidthBasis`                                                                             | `TextWidthBasis.parent`                   | 文本宽度计算基准                                                                         |
+| `textHeightBehavior`   | `TextHeightBehavior?`                                                                        | `null`                                    | 首行与末行高度行为                                                                       |
+| `strutStyle`           | `StrutStyle?`                                                                                | `null`                                    | 支柱样式                                                                                 |
+| `locale`               | `Locale?`                                                                                    | `null`                                    | 区域设置                                                                                 |
+| `softWrap`             | `bool`                                                                                       | `true`                                    | 是否自动换行                                                                             |
+| `selectAllOnActivate`  | `bool`                                                                                       | `true`                                    | 激活时全选文本（`true`），或只选按压的单词（`false`）                                    |
+| `selectionColor`       | `Color?`                                                                                     | 主题色（`30%` 透明度）                    | 选中高亮颜色                                                                             |
+| `handleColor`          | `Color?`                                                                                     | 主题色                                    | 拖动手柄颜色                                                                             |
+| `handleSize`           | `double`                                                                                     | `16.0`                                    | 手柄尺寸                                                                                 |
+| `autoScrollEdgeExtent` | `double`                                                                                     | `0.0`                                     | 拖拽手柄时距视口边缘触发自动滚动的距离                                                   |
+| `autoScrollSpeed`      | `double`                                                                                     | `10.0`                                    | 自动滚动速度（每帧像素数）                                                               |
+| `enableHapticFeedback` | `bool`                                                                                       | `true`                                    | 首次激活选择时是否触发触感反馈                                                           |
+| `menuBuilder`          | `Widget Function(BuildContext, String, VoidCallback, VoidCallback)`                          | 必填                                      | 菜单构建函数（`(context, selectedText, hideMenu, selectAll)`）                           |
+| `onSelectionChanged`   | `ValueChanged<String>?`                                                                      | `null`                                    | 选中文本变化回调                                                                         |
+| `onMenuClosed`         | `VoidCallback?`                                                                              | `null`                                    | 菜单关闭及取消选择时的回调                                                               |
+| `positionMode`         | `ChatContextMenuPositionMode`                                                                | `ChatContextMenuPositionMode.outside`     | `outside`：在选区外部计算显示；`pointer`：直接从点击/按压位置显示，角标指向点击坐标       |
+| `axis`                 | `Axis`                                                                                       | `Axis.vertical`                           | 菜单排列方向：上下方（`Axis.vertical`）或左右侧（`Axis.horizontal`）                     |
+| `menuBackgroundColor`  | `Color?`                                                                                     | `null`                                    | 菜单背景及角标颜色                                                                       |
+| `menuBorderRadius`     | `BorderRadius`                                                                               | `BorderRadius.all(Radius.circular(8))`    | 菜单圆角                                                                                 |
+| `menuPadding`          | `EdgeInsets`                                                                                 | `EdgeInsets.all(8)`                       | 菜单内边距                                                                               |
+| `menuShadows`          | `List<BoxShadow>?`                                                                           | `null`                                    | 菜单阴影                                                                                 |
+| `arrowHeight`          | `double`                                                                                     | `8.0`                                     | 箭头指示器高度                                                                           |
+| `arrowWidth`           | `double`                                                                                     | `12.0`                                    | 箭头指示器宽度                                                                           |
+| `spacing`              | `double`                                                                                     | `0.0`                                     | 菜单与选区/点击点的额外间距（`outside` 模式下会叠加 `handleSize`）                       |
+| `horizontalMargin`     | `double`                                                                                     | `10.0`                                    | 距屏幕（Overlay）左右边缘的最小留白                                                      |
+| `useRootOverlay`       | `bool`                                                                                       | `false`                                   | 手柄/菜单/遮罩插入根 `Overlay`（用于嵌套 Navigator 场景）                                |
+| `animationStyle`       | `ChatContextMenuAnimationStyle`                                                              | `ChatContextMenuAnimationStyle.scaleFade` | 内置菜单动画（`scaleFade` 或 `cupertinoSheet`）                                          |
+| `transitionsBuilder`   | `Widget? Function(BuildContext, Animation<double>, Offset, Alignment, Widget)?`              | `null`                                    | 自定义菜单动画（非空时覆盖 `animationStyle`）                                            |
+| `transitionDuration`   | `Duration?`                                                                                  | `null`（使用样式默认时长）                | 菜单动画时长（`scaleFade` 150ms，`cupertinoSheet` 335ms）                                |
 
 ## 更多信息
 

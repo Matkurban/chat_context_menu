@@ -13,6 +13,8 @@ class ChatSelectableTextPage extends StatefulWidget {
 
 class _ChatSelectableTextPageState extends State<ChatSelectableTextPage> {
   String _lastSelectedText = '';
+  ChatContextMenuPositionMode _positionMode = ChatContextMenuPositionMode.outside;
+  Axis _axis = Axis.vertical;
 
   @override
   Widget build(BuildContext context) {
@@ -25,8 +27,53 @@ class _ChatSelectableTextPageState extends State<ChatSelectableTextPage> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          Wrap(
+            spacing: 12,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              SegmentedButton<ChatContextMenuPositionMode>(
+                segments: const <ButtonSegment<ChatContextMenuPositionMode>>[
+                  ButtonSegment<ChatContextMenuPositionMode>(
+                    value: ChatContextMenuPositionMode.outside,
+                    label: Text('outside'),
+                    icon: Icon(Icons.crop_free),
+                  ),
+                  ButtonSegment<ChatContextMenuPositionMode>(
+                    value: ChatContextMenuPositionMode.pointer,
+                    label: Text('pointer'),
+                    icon: Icon(Icons.mouse),
+                  ),
+                ],
+                selected: <ChatContextMenuPositionMode>{_positionMode},
+                onSelectionChanged: (Set<ChatContextMenuPositionMode> selection) {
+                  setState(() => _positionMode = selection.first);
+                },
+              ),
+              SegmentedButton<Axis>(
+                segments: const <ButtonSegment<Axis>>[
+                  ButtonSegment<Axis>(
+                    value: Axis.vertical,
+                    label: Text('vertical'),
+                    icon: Icon(Icons.swap_vert),
+                  ),
+                  ButtonSegment<Axis>(
+                    value: Axis.horizontal,
+                    label: Text('horizontal'),
+                    icon: Icon(Icons.swap_horiz),
+                  ),
+                ],
+                selected: <Axis>{_axis},
+                onSelectionChanged: (Set<Axis> selection) {
+                  setState(() => _axis = selection.first);
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
           ///基础用法
-          Text('Basic Usage (Native Selection)', style: textTheme.titleMedium),
+          Text('Basic Usage (Custom Selection)', style: textTheme.titleMedium),
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.all(12),
@@ -35,17 +82,16 @@ class _ChatSelectableTextPageState extends State<ChatSelectableTextPage> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: ChatSelectableText(
-              'This uses Flutter\'s native SelectableText with a custom context menu. '
-              'Long press or double tap to select text, then you\'ll see a custom menu '
-              'instead of the default system toolbar. The selection handles are native Flutter handles.',
-              style: TextStyle(fontSize: 30, color: colorScheme.onSurface),
+              'Long-press, right-click, double-click, or drag with the mouse to select text. '
+              'Toggle between outside and pointer mode above to see the menu anchor either '
+              'outside the selection bounds or directly at your click position.',
+              style: TextStyle(fontSize: 24, color: colorScheme.onSurface),
               menuBackgroundColor: colorScheme.surface,
               handleSize: 24,
+              axis: _axis,
+              positionMode: _positionMode,
               menuShadows: [
-                BoxShadow(
-                  color: colorScheme.onSurface.withValues(alpha: 0.15),
-                  blurRadius: 32,
-                ),
+                BoxShadow(color: colorScheme.onSurface.withValues(alpha: 0.15), blurRadius: 32),
               ],
               menuBuilder: (context, selectedText, hideMenu, selectAll) {
                 return _buildMenuPane(
@@ -85,11 +131,10 @@ class _ChatSelectableTextPageState extends State<ChatSelectableTextPage> {
               'Cupertino (iOS-style) design patterns. These widgets look and feel native on each platform.',
               style: TextStyle(fontSize: 22, color: colorScheme.onSurface),
               menuBackgroundColor: colorScheme.surface,
+              axis: _axis,
+              positionMode: _positionMode,
               menuShadows: [
-                BoxShadow(
-                  color: colorScheme.onSurface.withValues(alpha: 0.15),
-                  blurRadius: 32,
-                ),
+                BoxShadow(color: colorScheme.onSurface.withValues(alpha: 0.15), blurRadius: 32),
               ],
               menuBuilder: (context, selectedText, hideMenu, selectAll) {
                 debugPrint('Selected text: $selectedText');
@@ -109,13 +154,13 @@ class _ChatSelectableTextPageState extends State<ChatSelectableTextPage> {
           Text('Chat Bubble Example', style: textTheme.titleMedium),
           const SizedBox(height: 8),
           _buildChatBubble(
-            text: 'Native SelectableText makes text selection easy with built-in handles and gestures.',
+            text: 'ChatSelectableText makes text selection easy with built-in handles and mouse/touch gestures.',
             isMe: false,
             colorScheme: colorScheme,
           ),
           const SizedBox(height: 8),
           _buildChatBubble(
-            text: 'And the custom menu looks great too!',
+            text: 'And the custom menu looks great in both outside and pointer modes!',
             isMe: true,
             colorScheme: colorScheme,
           ),
@@ -135,10 +180,7 @@ class _ChatSelectableTextPageState extends State<ChatSelectableTextPage> {
               ),
               child: Text(
                 _lastSelectedText,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: colorScheme.onPrimaryContainer,
-                ),
+                style: TextStyle(fontSize: 14, color: colorScheme.onPrimaryContainer),
               ),
             ),
           ],
@@ -158,13 +200,9 @@ class _ChatSelectableTextPageState extends State<ChatSelectableTextPage> {
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.sizeOf(context).width * 0.7,
-        ),
+        constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.7),
         decoration: BoxDecoration(
-          color: isMe
-              ? colorScheme.primary
-              : colorScheme.surfaceContainerHighest,
+          color: isMe ? colorScheme.primary : colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12),
         ),
         child: ChatSelectableText(
@@ -173,12 +211,11 @@ class _ChatSelectableTextPageState extends State<ChatSelectableTextPage> {
             fontSize: 16,
             color: isMe ? colorScheme.onPrimary : colorScheme.onSurface,
           ),
+          axis: _axis,
+          positionMode: _positionMode,
           menuBackgroundColor: colorScheme.surface,
           menuShadows: [
-            BoxShadow(
-              color: colorScheme.onSurface.withValues(alpha: 0.15),
-              blurRadius: 32,
-            ),
+            BoxShadow(color: colorScheme.onSurface.withValues(alpha: 0.15), blurRadius: 32),
           ],
           menuBuilder: (context, selectedText, hideMenu, selectAll) {
             return _buildMenuPane(
@@ -199,47 +236,50 @@ class _ChatSelectableTextPageState extends State<ChatSelectableTextPage> {
     required VoidCallback hideMenu,
     required VoidCallback selectAll,
   }) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _MenuButton(
-          icon: Icons.copy_outlined,
-          label: 'Copy',
-          colorScheme: colorScheme,
-          onTap: () {
-            Clipboard.setData(ClipboardData(text: selectedText));
-            hideMenu();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Copied to clipboard'),
-                duration: Duration(seconds: 1),
-              ),
-            );
-          },
-        ),
-        _MenuButton(
-          icon: Icons.select_all_outlined,
-          label: 'Select All',
-          colorScheme: colorScheme,
-          onTap: selectAll,
-        ),
-        _MenuButton(
-          icon: Icons.search_outlined,
-          label: 'Search',
-          colorScheme: colorScheme,
-          onTap: () {
-            hideMenu();
-          },
-        ),
-        _MenuButton(
-          icon: Icons.share_outlined,
-          label: 'Share',
-          colorScheme: colorScheme,
-          onTap: () {
-            hideMenu();
-          },
-        ),
-      ],
+    return Material(
+      type: .transparency,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _MenuButton(
+            icon: Icons.copy_outlined,
+            label: 'Copy',
+            colorScheme: colorScheme,
+            onTap: () {
+              Clipboard.setData(ClipboardData(text: selectedText));
+              hideMenu();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Copied to clipboard'),
+                  duration: Duration(seconds: 1),
+                ),
+              );
+            },
+          ),
+          _MenuButton(
+            icon: Icons.select_all_outlined,
+            label: 'Select All',
+            colorScheme: colorScheme,
+            onTap: selectAll,
+          ),
+          _MenuButton(
+            icon: Icons.search_outlined,
+            label: 'Search',
+            colorScheme: colorScheme,
+            onTap: () {
+              hideMenu();
+            },
+          ),
+          _MenuButton(
+            icon: Icons.share_outlined,
+            label: 'Share',
+            colorScheme: colorScheme,
+            onTap: () {
+              hideMenu();
+            },
+          ),
+        ],
+      ),
     );
   }
 }
@@ -268,10 +308,7 @@ class _MenuButton extends StatelessWidget {
           children: [
             Icon(icon, size: 20, color: colorScheme.onSurface),
             const SizedBox(height: 2),
-            Text(
-              label,
-              style: TextStyle(color: colorScheme.onSurface, fontSize: 11),
-            ),
+            Text(label, style: TextStyle(color: colorScheme.onSurface, fontSize: 11)),
           ],
         ),
       ),

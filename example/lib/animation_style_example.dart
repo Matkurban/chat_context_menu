@@ -4,7 +4,8 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 
 ///对照 [ChatContextMenuAnimationStyle.scaleFade] 与
-///[ChatContextMenuAnimationStyle.cupertinoSheet] 的测试页。
+///[ChatContextMenuAnimationStyle.cupertinoSheet] 以及
+///[ChatContextMenuPositionMode.outside] 与 [ChatContextMenuPositionMode.pointer] 的测试页。
 class AnimationStylePage extends StatefulWidget {
   const AnimationStylePage({super.key});
 
@@ -15,11 +16,13 @@ class AnimationStylePage extends StatefulWidget {
 class _AnimationStylePageState extends State<AnimationStylePage> {
   ChatContextMenuAnimationStyle _style =
       ChatContextMenuAnimationStyle.scaleFade;
+  ChatContextMenuPositionMode _positionMode =
+      ChatContextMenuPositionMode.outside;
 
   static const List<String> _messages = <String>[
-    'Long-press this bubble (left, vertical menu).',
-    'Long-press this bubble (right, vertical menu).',
-    'Switch the style above, then open the menu again.',
+    'Long-press or right-click this bubble (left, vertical menu).',
+    'Long-press or right-click this bubble (right, vertical menu).',
+    'Switch the style or positionMode above, then open the menu again.',
   ];
 
   @override
@@ -31,39 +34,63 @@ class _AnimationStylePageState extends State<AnimationStylePage> {
     final Duration duration = _style.resolveDuration(null);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Animation styles')),
+      appBar: AppBar(title: const Text('Animation & Position Modes')),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
         children: [
-          SegmentedButton<ChatContextMenuAnimationStyle>(
-            segments: const <ButtonSegment<ChatContextMenuAnimationStyle>>[
-              ButtonSegment<ChatContextMenuAnimationStyle>(
-                value: ChatContextMenuAnimationStyle.scaleFade,
-                label: Text('scaleFade'),
-                icon: Icon(Icons.tune),
+          Wrap(
+            spacing: 12,
+            runSpacing: 8,
+            children: [
+              SegmentedButton<ChatContextMenuAnimationStyle>(
+                segments: const <ButtonSegment<ChatContextMenuAnimationStyle>>[
+                  ButtonSegment<ChatContextMenuAnimationStyle>(
+                    value: ChatContextMenuAnimationStyle.scaleFade,
+                    label: Text('scaleFade'),
+                    icon: Icon(Icons.tune),
+                  ),
+                  ButtonSegment<ChatContextMenuAnimationStyle>(
+                    value: ChatContextMenuAnimationStyle.cupertinoSheet,
+                    label: Text('cupertinoSheet'),
+                    icon: Icon(Icons.animation),
+                  ),
+                ],
+                selected: <ChatContextMenuAnimationStyle>{_style},
+                onSelectionChanged: (Set<ChatContextMenuAnimationStyle> next) {
+                  setState(() => _style = next.first);
+                },
               ),
-              ButtonSegment<ChatContextMenuAnimationStyle>(
-                value: ChatContextMenuAnimationStyle.cupertinoSheet,
-                label: Text('cupertinoSheet'),
-                icon: Icon(Icons.animation),
+              SegmentedButton<ChatContextMenuPositionMode>(
+                segments: const <ButtonSegment<ChatContextMenuPositionMode>>[
+                  ButtonSegment<ChatContextMenuPositionMode>(
+                    value: ChatContextMenuPositionMode.outside,
+                    label: Text('outside'),
+                    icon: Icon(Icons.crop_free),
+                  ),
+                  ButtonSegment<ChatContextMenuPositionMode>(
+                    value: ChatContextMenuPositionMode.pointer,
+                    label: Text('pointer'),
+                    icon: Icon(Icons.mouse),
+                  ),
+                ],
+                selected: <ChatContextMenuPositionMode>{_positionMode},
+                onSelectionChanged: (Set<ChatContextMenuPositionMode> next) {
+                  setState(() => _positionMode = next.first);
+                },
               ),
             ],
-            selected: <ChatContextMenuAnimationStyle>{_style},
-            onSelectionChanged: (Set<ChatContextMenuAnimationStyle> next) {
-              setState(() => _style = next.first);
-            },
           ),
           const SizedBox(height: 12),
           Text(
-            'style: ${_style.name}  ·  duration: ${duration.inMilliseconds}ms',
+            'style: ${_style.name} (${duration.inMilliseconds}ms)  ·  positionMode: ${_positionMode.name}',
             style: textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'scaleFade keeps the current overlay fade+scale. '
-            'cupertinoSheet bounces the menu in from the arrow like iOS.',
+            'outside places the menu outside the widget/selection bounds. '
+            'pointer places the menu directly at the clicked position with the arrow pointing to the cursor.',
             style: textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -97,7 +124,7 @@ class _AnimationStylePageState extends State<AnimationStylePage> {
               colorScheme: colorScheme,
               textTheme: textTheme,
               size: size,
-              text: 'Long-press — menu opens to the side',
+              text: 'Long-press or right-click — menu opens to the side',
               isMe: false,
               axis: Axis.horizontal,
             ),
@@ -112,10 +139,11 @@ class _AnimationStylePageState extends State<AnimationStylePage> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: ChatSelectableText(
-              'Long-press to select this text. The selection menu uses the same '
-              'animationStyle as the bubbles above.',
+              'Long-press or right-click to select this text. The selection menu uses '
+              'both the selected animationStyle and positionMode above.',
               style: TextStyle(fontSize: 16, color: colorScheme.onSurface),
               animationStyle: _style,
+              positionMode: _positionMode,
               menuBackgroundColor: colorScheme.surface,
               menuShadows: [
                 BoxShadow(
@@ -158,6 +186,7 @@ class _AnimationStylePageState extends State<AnimationStylePage> {
   }) {
     return ChatContextMenuWrapper(
       animationStyle: _style,
+      positionMode: _positionMode,
       barrierColor: Colors.black26,
       excludeAnchorFromBarrier: true,
       backgroundColor: colorScheme.surface,
@@ -192,6 +221,7 @@ class _AnimationStylePageState extends State<AnimationStylePage> {
           ) {
             return GestureDetector(
               onLongPress: showMenu,
+              onSecondaryTap: showMenu,
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
